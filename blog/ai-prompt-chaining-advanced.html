@@ -93,7 +93,7 @@ Step 4: Synthesize final output from aggregated data</code></pre>
 
     <p>The fallback prompt should be simpler than the primary prompt. If the primary prompt asks for detailed analysis with specific formatting, the fallback asks for a basic summary with minimal formatting constraints. You trade quality for reliability.</p>
 
-    <p>This pattern is directly inspired by error handling in software engineering: try the ideal path, catch failures, fall back to a simpler approach, and always return something useful rather than nothing. Tools like <a href="https://epochpilot.com">EpochPilot</a> use this pattern extensively for monitoring AI systems in production.</p>
+    <p>This pattern is directly inspired by error handling in software engineering: try the ideal path, catch failures, fall back to a simpler approach, and always return something useful rather than nothing. Tools like <a href="https://epochpilot.com" rel="nofollow">EpochPilot</a> use this pattern extensively for monitoring AI systems in production.</p>
 
     <h2>Putting It All Together</h2>
 
@@ -125,11 +125,11 @@ Step 4: Synthesize final output from aggregated data</code></pre>
 
     <p>Document each block's expected input and output format. When a chain breaks, the most common cause is a format mismatch between steps: one step produces a bullet list but the next step expects numbered items, or one step includes a preamble that the next step cannot parse. Explicit format contracts between steps prevent most chain failures.</p>
 
-    <p>Finally, version your workflows. When you export a workflow JSON from ClaudFlow, save it with a meaningful name and date. Workflows evolve over time as you optimize prompts and adjust routing logic, and being able to roll back to a previous version is invaluable when an optimization makes things worse. The <a href="https://zovo.one">zovo.one</a> network of tools is designed to support this iterative approach to workflow development.</p>
+    <p>Finally, version your workflows. When you export a workflow JSON from ClaudFlow, save it with a meaningful name and date. Workflows evolve over time as you optimize prompts and adjust routing logic, and being able to roll back to a previous version is invaluable when an optimization makes things worse. The <a href="https://zovo.one">more AI tools</a> network of tools is designed to support this iterative approach to workflow development.</p>
   </div>
 
   <footer>
-    Built by <a href="https://zovo.one">zovo.one</a> &middot; More tools: <a href="https://claudhq.com">ClaudHQ</a>, <a href="https://claudkit.com">ClaudKit</a>
+    <p>ClaudFlow &mdash; Visual AI workflow builder</p>
   </footer>
 </body>
 </html>

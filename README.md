@@ -20,9 +20,7 @@ Start with a blank canvas or select a preset template. Drag nodes onto the canva
 
 - Vanilla JavaScript (no frameworks, no dependencies)
 - Client-side only — your data never leaves your browser
-- Part of the [Zovo Tools](https://zovo.one) open network
 
-## Related Tools
 
 - [Claude Prompt Library](https://claudhq.com) — 30+ ready-to-use prompts for your workflow nodes
 - [Webhook Request Builder](https://invokebot.com) — build and test the API calls in your pipeline
