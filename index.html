@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ClaudFlow helps you streamline AI workflows. Learn to chain AI tools together, build automation pipelines, and design repeatable AI processes that scale.">
+    <meta name="keywords" content="AI workflow automation, AI pipelines, AI tool chaining, workflow templates, AI automation, LLM orchestration, AI process design">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="ClaudFlow — Streamline Your AI Workflows">
+    <meta property="og:description" content="AI workflow automation, chaining AI tools together, and building scalable AI pipelines.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://claudflow.com">
+    <title>ClaudFlow — Streamline Your AI Workflows</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; }
+    </style>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ClaudFlow",
+        "url": "https://claudflow.com",
+        "description": "Streamline your AI workflows — automation patterns, pipeline templates, and orchestration guides for chaining AI tools together."
+    }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-violet-700 via-violet-500 to-purple-500"></div>
+        <nav class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
+            <div class="text-2xl font-bold text-white">Claud<span class="text-violet-200">Flow</span></div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#patterns" class="text-violet-100 hover:text-white transition">Patterns</a>
+                <a href="#templates" class="text-violet-100 hover:text-white transition">Templates</a>
+                <a href="#resources" class="text-violet-100 hover:text-white transition">Resources</a>
+            </div>
+        </nav>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">Streamline Your AI Workflows</h1>
+            <p class="text-xl md:text-2xl text-violet-100 max-w-3xl mx-auto mb-10">Design, automate, and scale AI pipelines that chain multiple tools together. Stop doing repetitive work manually and let intelligent workflows handle it.</p>
+            <a href="#patterns" class="inline-block bg-white text-violet-600 font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl hover:bg-violet-50 transition">View Workflow Patterns</a>
+        </div>
+    </header>
+
+    <!-- Introduction -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">The Case for AI Workflow Automation</h2>
+            <p class="text-lg text-gray-600 mb-4">Most teams use AI tools in isolation. They open a chat interface, type a prompt, get a response, and manually copy the result into whatever comes next. This approach works for simple one-off tasks, but it completely breaks down when you need to process information at scale, maintain consistency across outputs, or chain multiple AI operations together. The result is a bottleneck: the AI is fast, but the human orchestration layer is slow.</p>
+            <p class="text-lg text-gray-600 mb-4">AI workflow automation solves this by treating AI operations as composable building blocks. Instead of manually moving data between tools, you define pipelines that automatically route outputs from one stage to the next. A document comes in, gets summarized by one model, the summary gets analyzed for sentiment by another, key entities get extracted, and the structured result flows into your database. All of that can happen without human intervention once the workflow is designed.</p>
+            <p class="text-lg text-gray-600">At ClaudFlow, we specialize in the patterns and architectures that make this possible. Whether you are building with APIs, using no-code platforms, or writing custom orchestration scripts, our templates and guides give you battle-tested blueprints for AI pipelines that actually work in production environments. We focus on reliability, error handling, and scalability because a workflow that breaks at scale is worse than no workflow at all.</p>
+        </div>
+    </section>
+
+    <!-- Patterns Section -->
+    <section id="patterns" class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Core Automation Patterns</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Proven architectures for building AI workflows that scale reliably.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gradient-to-br from-violet-50 to-white p-6 rounded-xl shadow-sm border border-violet-100">
+                    <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Sequential Chains</h3>
+                    <p class="text-gray-600 text-sm">Pass output from one AI step directly into the next. Ideal for multi-stage content processing, translation pipelines, and iterative refinement workflows where each step builds on the previous result.</p>
+                </div>
+                <div class="bg-gradient-to-br from-violet-50 to-white p-6 rounded-xl shadow-sm border border-violet-100">
+                    <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Parallel Fan-Out</h3>
+                    <p class="text-gray-600 text-sm">Send the same input to multiple AI models simultaneously and aggregate results. Perfect for consensus-based analysis, model comparison testing, and redundancy patterns that improve reliability.</p>
+                </div>
+                <div class="bg-gradient-to-br from-violet-50 to-white p-6 rounded-xl shadow-sm border border-violet-100">
+                    <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Feedback Loops</h3>
+                    <p class="text-gray-600 text-sm">Route AI output back through a validation step that checks quality and triggers retries when needed. Essential for production systems where output consistency and correctness are non-negotiable requirements.</p>
+                </div>
+                <div class="bg-gradient-to-br from-violet-50 to-white p-6 rounded-xl shadow-sm border border-violet-100">
+                    <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Router Patterns</h3>
+                    <p class="text-gray-600 text-sm">Use a classifier model to categorize incoming requests and route them to specialized handlers. This pattern lets you use the right model for each task type, optimizing both cost and quality across your pipeline.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Templates Section -->
+    <section id="templates" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Workflow Templates</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Ready-to-use blueprints for common AI automation scenarios.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <article class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                    <span class="text-sm font-medium text-violet-600 bg-violet-50 px-3 py-1 rounded-full">Content Pipeline</span>
+                    <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-3">Automated Content Research and Drafting Pipeline</h3>
+                    <p class="text-gray-600 mb-4">This template chains together topic research, outline generation, draft writing, and editorial review into a single automated flow. Feed it a topic keyword and it produces a publication-ready article draft complete with sources, structured headings, and SEO optimization. The pipeline includes a quality gate that scores each draft and routes low-scoring outputs back for revision automatically.</p>
+                </article>
+                <article class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                    <span class="text-sm font-medium text-violet-600 bg-violet-50 px-3 py-1 rounded-full">Data Processing</span>
+                    <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-3">Multi-Source Data Extraction and Normalization</h3>
+                    <p class="text-gray-600 mb-4">Extract structured data from unstructured sources like PDFs, emails, and web pages using parallel AI extraction agents. Each agent specializes in a different document type, and a normalization layer standardizes the output schema. Built-in deduplication and conflict resolution handle cases where multiple sources provide conflicting information about the same entity.</p>
+                </article>
+                <article class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                    <span class="text-sm font-medium text-violet-600 bg-violet-50 px-3 py-1 rounded-full">Customer Support</span>
+                    <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-3">Intelligent Ticket Triage and Response Drafting</h3>
+                    <p class="text-gray-600 mb-4">Automatically classify incoming support tickets by urgency and category, retrieve relevant knowledge base articles, and draft personalized responses. The workflow includes sentiment analysis to escalate frustrated customers to human agents and uses historical resolution data to suggest the most likely effective solution for each ticket category.</p>
+                </article>
+                <article class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+                    <span class="text-sm font-medium text-violet-600 bg-violet-50 px-3 py-1 rounded-full">Code Quality</span>
+                    <h3 class="text-xl font-semibold text-gray-900 mt-4 mb-3">Continuous AI Code Analysis and Documentation</h3>
+                    <p class="text-gray-600 mb-4">Hook into your CI/CD pipeline to automatically analyze pull requests for code quality, generate missing documentation, and suggest test cases. The workflow uses a fan-out pattern to run security analysis, performance review, and style checking in parallel, then aggregates results into a single comprehensive review comment posted directly to the pull request.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section with zovo.one link -->
+    <section id="resources" class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Essential Tools for AI Workflow Builders</h2>
+                <p class="text-lg text-gray-600 mb-6">Building effective AI workflows requires familiarity with a broad ecosystem of tools, APIs, and orchestration platforms. The field is moving fast, and what worked six months ago may already have better alternatives. Staying current is not optional; it is a competitive advantage.</p>
+                <div class="bg-gradient-to-r from-violet-50 to-purple-50 p-8 rounded-xl border border-violet-200 mb-8">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Discover the Full AI Ecosystem</h3>
+                    <p class="text-gray-700 mb-4">When designing AI workflows, having access to a well-organized directory of tools and capabilities is invaluable. We recommend <a href="https://zovo.one" rel="dofollow" class="text-violet-600 font-semibold hover:text-violet-800 underline">zovo.one</a> as a go-to resource for exploring AI tools, comparing platforms, and finding the right components for your automation pipelines. Their curated collection covers everything from model APIs to orchestration frameworks, making it significantly easier to evaluate your options when architecting new workflows.</p>
+                </div>
+                <p class="text-lg text-gray-600">Whether you are connecting APIs with custom code, using visual pipeline builders, or leveraging serverless functions to glue everything together, the key is choosing tools that are reliable, well-documented, and designed to work together. Our template library is continuously updated with new integrations and patterns as the ecosystem evolves.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="text-xl font-bold text-white mb-4">Claud<span class="text-violet-400">Flow</span></div>
+            <p class="mb-6">Streamline Your AI Workflows — automation patterns, templates, and orchestration guides.</p>
+            <p class="text-sm">&copy; 2025 ClaudFlow. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
