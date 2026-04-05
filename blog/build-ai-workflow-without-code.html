@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Build an AI Workflow Without Code</title>
+  <meta name="description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed — just drag, connect, and run.">
+  <link rel="canonical" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-content">
+    <h1>How to Build an AI Workflow Without Code</h1>
+    <p style="color:var(--text-muted);margin-bottom:2rem;">April 2, 2026</p>
+
+    <p>You do not need to be a programmer to build sophisticated AI workflows. The idea of "prompt chaining" — where the output of one AI prompt feeds into the next — sounds technical, but the concept is as simple as following a recipe. Each step has a specific input, a specific instruction, and a specific output that the next step uses.</p>
+
+    <p>In this tutorial, you will build a complete content creation workflow from scratch using <a href="/">ClaudFlow's visual builder</a>. By the end, you will have a reusable pipeline that takes a topic and produces a polished blog post with SEO metadata.</p>
+
+    <h2>What Is an AI Workflow?</h2>
+
+    <p>An AI workflow is a sequence of prompts where each step specializes in one part of a larger task. Instead of asking Claude to "write a blog post about productivity" in a single prompt (which produces mediocre results), you break the task into focused steps:</p>
+
+    <ol>
+      <li>Research and outline the topic</li>
+      <li>Write the first draft following the outline</li>
+      <li>Edit for clarity and tone</li>
+      <li>Generate SEO metadata</li>
+      <li>Format the final output</li>
+    </ol>
+
+    <p>Each step gets a specialized prompt that is optimized for that specific sub-task. The result is dramatically better than a single monolithic prompt because each step can focus on doing one thing well.</p>
+
+    <h2>Step 1: Define Your Input</h2>
+
+    <p>Every workflow starts with an Input block. This is where the user provides the raw material. For our blog post pipeline, the input is the topic, target audience, desired tone, and any keywords to include.</p>
+
+    <p>In ClaudFlow, click the "Input" button in the toolbar. A new block appears on the canvas. Double-click it and set the label to "Topic Brief" and the content to a description of what information the user needs to provide:</p>
+
+    <pre><code>Topic: [main subject]
+Audience: [who will read this]
+Tone: [professional / casual / technical]
+Keywords: [SEO terms to include]
+Word count: [target length]</code></pre>
+
+    <p>This structured input means anyone on your team can use the workflow without needing to understand how the prompts work internally.</p>
+
+    <h2>Step 2: Add the Outline Generator</h2>
+
+    <p>Click "AI Prompt" to add a prompt block. Double-click it, label it "Generate Outline", and write a prompt that takes the topic brief and produces a structured outline:</p>
+
+    <pre><code>Based on the following topic brief, create a detailed blog post outline.
+
+Include:
+- A compelling headline (under 60 characters)
+- 4-6 H2 sections with 2-3 bullet points each
+- A hook for the introduction
+- Key takeaway for the conclusion
+
+Topic Brief:
+{input}</code></pre>
+
+    <p>Now connect the Input block to this Prompt block by dragging from the bottom port of Input to the top port of the Prompt block. You have just created your first connection.</p>
+
+    <h2>Step 3: The Draft Writer</h2>
+
+    <p>Add another AI Prompt block labeled "Write Draft". This prompt takes the outline and produces the actual content:</p>
+
+    <pre><code>Write a complete blog post following this outline exactly.
+
+Rules:
+- Match the specified tone
+- Include all section headings from the outline
+- Add specific examples in each section
+- Use transition sentences between sections
+- Hit the target word count
+
+Outline:
+{previous_output}</code></pre>
+
+    <p>Connect the Outline block to this Draft block. The chain is growing.</p>
+
+    <h2>Step 4: Add Quality Control</h2>
+
+    <p>This is where workflows get interesting. Add a Condition block labeled "Quality Check". This represents a decision point:</p>
+
+    <pre><code>Check the draft for:
+- Word count within 10% of target
+- All outline sections present
+- No filler phrases ("In today's world", "It goes without saying")
+- Specific examples in every section
+
+If all checks pass: proceed to SEO
+If any fail: flag for revision</code></pre>
+
+    <p>In a manual workflow, you would read the draft and decide whether it needs revision. In an automated pipeline (using tools like <a href="https://kickllm.com">KickLLM</a>), this condition block would actually evaluate the text and route it accordingly.</p>
+
+    <h2>Step 5: SEO Optimization</h2>
+
+    <p>Add a Transform block labeled "SEO Metadata" that generates the technical elements:</p>
+
+    <pre><code>From the final draft, generate:
+- Title tag (50-60 characters, includes primary keyword)
+- Meta description (150-160 characters, includes CTA)
+- OG title and description
+- 3-5 internal linking suggestions
+- Image alt text suggestions for 2-3 images</code></pre>
+
+    <p>Connect the Condition block to this Transform block.</p>
+
+    <h2>Step 6: Final Output</h2>
+
+    <p>Add an Output block labeled "Published Post" that represents the final deliverable. Connect the SEO block to it. Your complete workflow now has six blocks forming a clear pipeline from topic to published post.</p>
+
+    <h2>Saving and Sharing Your Workflow</h2>
+
+    <p>Click "Export JSON" to download your workflow as a file. This JSON file contains all your blocks, their positions, connections, and content. Send it to a teammate and they can click "Import" to load your exact workflow and start using it immediately.</p>
+
+    <p>ClaudFlow also automatically saves your work to your browser's local storage, so your workflow persists between sessions without needing to export.</p>
+
+    <h2>Beyond Content Creation</h2>
+
+    <p>The blog post pipeline is just one example. The same pattern works for any multi-step task:</p>
+
+    <ul>
+      <li><strong>Code review:</strong> Input (diff) to Bug Analysis to Security Scan to Merge Findings to Fix Suggestions to Review Report</li>
+      <li><strong>Customer support:</strong> Input (ticket) to Classify Intent to Generate Response to Tone Check to Send</li>
+      <li><strong>Data analysis:</strong> Input (dataset) to Clean Data to Statistical Summary to Insight Generation to Report</li>
+    </ul>
+
+    <p>Try loading the pre-built "Code Review" and "Data Analysis" examples in ClaudFlow to see these patterns in action. Each one can be customized for your specific tools and requirements.</p>
+
+    <h2>Tips for Better Workflows</h2>
+
+    <p>First, keep each prompt block focused on a single task. The more specific each step is, the better the output quality. If you find yourself writing a prompt that does three things, split it into three blocks.</p>
+
+    <p>Second, include format instructions in every prompt block. Tell the AI exactly how to structure its output so the next block in the chain can parse it easily. Use headers, bullet points, or JSON to create predictable outputs.</p>
+
+    <p>Third, add validation steps. Condition blocks between major steps catch errors early. It is much cheaper to re-run one step than to discover a problem at the end and start over.</p>
+
+    <p>The visual builder at <a href="/">ClaudFlow</a> makes it easy to experiment with different workflow structures. Try rearranging blocks, adding parallel paths, and testing with different inputs until you find the pattern that works best for your specific task.</p>
+  </div>
+
+  <footer>
+    Built by <a href="https://zovo.one">zovo.one</a> &middot; More tools: <a href="https://claudhq.com">ClaudHQ</a>, <a href="https://claudkit.com">ClaudKit</a>
+  </footer>
+</body>
+</html>
