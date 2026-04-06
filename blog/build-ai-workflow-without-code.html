@@ -5,9 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How to Build an AI Workflow Without Code</title>
   <meta name="description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed — just drag, connect, and run.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="How to Build an AI Workflow Without Code">
+  <meta property="og:description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed.">
+  <meta property="og:url" content="https://claudflow.com/blog/build-ai-workflow-without-code.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How to Build an AI Workflow Without Code">
+  <meta name="twitter:description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
   <link rel="canonical" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
-    <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "How to Build an AI Workflow Without Code",
+    "description": "Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed — just drag, connect, and run.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-04-02",
+    "dateModified": "2026-04-06"
+  }
+  </script>
 </head>
 <body>
   <nav>
@@ -24,7 +48,8 @@
 
   <div class="page-content">
     <h1>How to Build an AI Workflow Without Code</h1>
-    <p style="color:var(--text-muted);margin-bottom:2rem;">April 2, 2026</p>
+    <p style="color:var(--text-muted);margin-bottom:0.5rem;">April 2, 2026</p>
+    <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:2rem;">By <a href="/about.html" style="color:var(--accent);">Michael Lip</a></p>
 
     <p>You do not need to be a programmer to build sophisticated AI workflows. The idea of "prompt chaining" — where the output of one AI prompt feeds into the next — sounds technical, but the concept is as simple as following a recipe. Each step has a specific input, a specific instruction, and a specific output that the next step uses.</p>
 
@@ -106,7 +131,7 @@ Outline:
 If all checks pass: proceed to SEO
 If any fail: flag for revision</code></pre>
 
-    <p>In a manual workflow, you would read the draft and decide whether it needs revision. In an automated pipeline (using tools like <a href="https://kickllm.com" rel="nofollow">KickLLM</a>), this condition block would actually evaluate the text and route it accordingly.</p>
+    <p>In a manual workflow, you would read the draft and decide whether it needs revision. In an automated pipeline, this condition block would actually evaluate the text and route it accordingly. If you need ready-made prompts for any of these steps, the <a href="https://claudhq.com">ClaudHQ prompt library</a> has tested templates for writing, editing, and analysis tasks.</p>
 
     <h2>Step 5: SEO Optimization</h2>
 
@@ -151,8 +176,8 @@ If any fail: flag for revision</code></pre>
 
     <p>Third, add validation steps. Condition blocks between major steps catch errors early. It is much cheaper to re-run one step than to discover a problem at the end and start over.</p>
 
-    <p>The visual builder at <a href="/">ClaudFlow</a> makes it easy to experiment with different workflow structures. Try rearranging blocks, adding parallel paths, and testing with different inputs until you find the pattern that works best for your specific task.</p>
-  
+    <p>The visual builder at <a href="/">ClaudFlow</a> makes it easy to experiment with different workflow structures. Try rearranging blocks, adding parallel paths, and testing with different inputs until you find the pattern that works best for your specific task. If you need to secure any API keys used in your workflow execution, <a href="https://lockml.com">LockML</a> provides encryption tools specifically designed for machine learning credentials.</p>
+
     <div class="further-reading">
       <h3>Further Reading</h3>
       <p>To dive deeper into this topic, start with <a href="https://en.wikipedia.org/wiki/Workflow_automation" target="_blank">workflow automation</a>, review <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/chain-prompts" target="_blank">Anthropic's guide to prompt chaining</a> and explore <a href="https://github.com/langchain-ai/langchain" rel="nofollow" target="_blank">LangChain framework on GitHub</a>.</p>

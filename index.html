@@ -5,12 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ClaudFlow — AI Workflow Builder | Visual Prompt Chains</title>
   <meta name="description" content="Build visual AI workflows by chaining prompts into flowcharts. Drag, connect, and export prompt pipelines. Free, no sign-up, runs in your browser.">
-  <meta property="og:title" content="ClaudFlow — AI Workflow Builder">
-  <meta property="og:description" content="Visual flowchart builder for chaining AI prompts into automated workflows.">
-  <meta property="og:url" content="https://claudflow.com/">
   <meta property="og:type" content="website">
+  <meta property="og:title" content="ClaudFlow — AI Workflow Builder | Visual Prompt Chains">
+  <meta property="og:description" content="Build visual AI workflows by chaining prompts into flowcharts. Drag, connect, and export prompt pipelines. Free, no sign-up, runs in your browser.">
+  <meta property="og:url" content="https://claudflow.com/">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ClaudFlow — AI Workflow Builder | Visual Prompt Chains">
+  <meta name="twitter:description" content="Build visual AI workflows by chaining prompts into flowcharts. Drag, connect, and export prompt pipelines.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
   <link rel="canonical" href="https://claudflow.com/">
-    <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <link rel="stylesheet" href="assets/style.css">
   <script type="application/ld+json">
   {
@@ -21,7 +29,84 @@
     "description": "Visual flowchart builder for chaining AI prompts into automated workflows with drag-and-drop blocks.",
     "applicationCategory": "Productivity",
     "operatingSystem": "Web",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "datePublished": "2026-04-05",
+    "dateModified": "2026-04-06",
+    "featureList": [
+      "Visual drag-and-drop workflow canvas",
+      "Five block types: Input, AI Prompt, Condition, Transform, Output",
+      "Pre-built example workflows for blog, code review, and data analysis",
+      "Export and import workflows as JSON",
+      "Auto-save to browser localStorage",
+      "SVG connection lines between blocks",
+      "No sign-up required",
+      "100% browser-based, no data sent to servers"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is an AI workflow builder?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An AI workflow builder is a visual tool that lets you chain multiple AI prompts into a flowchart. Each block in the flow performs one step — input, prompt, condition, transform, or output — and the output of one block feeds into the next. ClaudFlow lets you build these workflows by dragging and connecting blocks on a canvas."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does prompt chaining work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Prompt chaining takes the output of one AI prompt and feeds it as input to the next prompt. This breaks complex tasks into focused steps, where each prompt specializes in one sub-task. The result is significantly better than asking a single prompt to handle everything at once."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to code to use ClaudFlow?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. ClaudFlow is a visual builder — you drag blocks onto a canvas, connect them with lines, and write prompt text in each block. No programming knowledge is required. You can export your workflow as JSON to use in code later if you choose."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I export my workflows?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Click the Export JSON button to download your workflow as a portable JSON file. This file contains all blocks, positions, connections, and content. Share it with teammates or import it into other tools."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is ClaudFlow free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, ClaudFlow is completely free. No sign-up, no accounts, no usage limits. Everything runs in your browser and your workflows are saved locally. The source code is open on GitHub."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What types of blocks does ClaudFlow support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ClaudFlow has five block types: Input (defines starting data), AI Prompt (contains prompt text), Condition (adds branching logic), Transform (reformats data between steps), and Output (defines the final deliverable). These cover the full range of workflow patterns."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does ClaudFlow work with models other than Claude?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ClaudFlow is a workflow designer, not an execution engine. The prompt chains you build can be used with any AI model — Claude, GPT-4, Gemini, or open-source models. You design the flow visually and then execute the prompts in whatever tool or API you prefer."
+        }
+      }
+    ]
   }
   </script>
 </head>
@@ -41,6 +126,7 @@
   <section class="hero">
     <h1>AI Workflow Builder</h1>
     <p>Chain AI prompts into visual flowcharts. Drag, connect, export.</p>
+    <p style="font-size:0.9rem;color:var(--text-muted);">Built by <a href="/about.html" style="color:var(--accent);">Michael Lip</a></p>
   </section>
 
   <div class="canvas-toolbar">
@@ -84,6 +170,69 @@
       </div>
     </div>
   </div>
+
+  <div class="last-updated"><time datetime="2026-04-06">Last updated: April 6, 2026</time></div>
+
+  <section class="explainer" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How ClaudFlow Works</h2>
+
+    <p>ClaudFlow is a visual workflow builder that lets you design AI prompt chains as flowcharts. Instead of running one prompt at a time and manually copying outputs between steps, you map out your entire multi-step process on a drag-and-drop canvas. Each block in the flow represents a distinct step — an input, an AI prompt, a conditional branch, a data transformation, or a final output — and connections between blocks define how data flows through the pipeline.</p>
+
+    <p>The workflow builder uses five block types that cover every pattern you need for production AI workflows. Input blocks define the starting data and user-provided variables. AI Prompt blocks contain the actual prompt text with placeholders for dynamic content from upstream blocks. Condition blocks add branching logic so different inputs can follow different paths. Transform blocks reformat or restructure data between steps. Output blocks define what the final deliverable looks like. You build a workflow by clicking to add blocks, dragging them into position, and connecting them by drawing lines from output ports to input ports.</p>
+
+    <p>Three pre-built example workflows are included to help you get started immediately. The Blog Pipeline example chains topic research, outline generation, draft writing, and SEO optimization into a complete content creation flow. The Code Review example runs bug analysis, security scanning, and performance auditing in parallel, then merges findings into a unified report. The Data Analysis example processes raw data through cleaning, statistical summary, and insight generation steps. Load any example, customize the prompts for your use case, and export the result as a portable JSON file.</p>
+
+    <h3>Features</h3>
+
+    <p>ClaudFlow includes real-time canvas rendering with SVG connection lines that update as you drag blocks around. Every block is editable by double-clicking — change its label, update its prompt content, or modify condition logic at any time. The export system saves your entire workflow as a single JSON file containing all blocks, their positions, connections, and content, which you can share with teammates or import into automation tools. Auto-save stores your work in browser localStorage between sessions so you never lose progress. The canvas supports unlimited blocks and connections, allowing you to build workflows of any complexity from simple three-step chains to enterprise-grade branching pipelines.</p>
+
+    <h3>Who Uses This</h3>
+
+    <p>ClaudFlow is designed for AI practitioners, content teams, developers, and anyone who builds multi-step AI processes. Content teams use it to design blog post, email, and documentation pipelines that produce consistent quality. Developers use it to prototype prompt chains before implementing them in code. AI consultants use it to document and share workflow designs with clients. Product managers use it to visualize AI-powered features and communicate requirements to engineering teams. If you need prompt templates to use inside your workflow blocks, <a href="https://claudhq.com">ClaudHQ</a> provides a library of 30+ tested templates that pair directly with ClaudFlow's AI Prompt blocks. For teams building with the Claude API, <a href="https://claudkit.com">ClaudKit</a> offers developer tools that can execute the workflows you design here.</p>
+
+    <h3>Privacy</h3>
+
+    <p>Everything runs locally in your browser. ClaudFlow does not send any data to any server, does not use cookies for tracking, does not require authentication, and does not store any information about you or your workflows. The application is a static HTML, CSS, and JavaScript site hosted on GitHub Pages. Your workflows are stored in localStorage on your own device and are never transmitted anywhere. The complete source code is open source on <a href="https://github.com/theluckystrike/claudflow.com">GitHub</a>.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What is an AI workflow builder?</summary>
+      <p>An AI workflow builder is a visual tool that lets you chain multiple AI prompts into a flowchart. Each block in the flow performs one step — input, prompt, condition, transform, or output — and the output of one block feeds into the next. ClaudFlow lets you build these workflows by dragging and connecting blocks on a canvas.</p>
+    </details>
+
+    <details>
+      <summary>How does prompt chaining work?</summary>
+      <p>Prompt chaining takes the output of one AI prompt and feeds it as input to the next prompt. This breaks complex tasks into focused steps, where each prompt specializes in one sub-task. The result is significantly better than asking a single prompt to handle everything at once.</p>
+    </details>
+
+    <details>
+      <summary>Do I need to code to use ClaudFlow?</summary>
+      <p>No. ClaudFlow is a visual builder — you drag blocks onto a canvas, connect them with lines, and write prompt text in each block. No programming knowledge is required. You can export your workflow as JSON to use in code later if you choose.</p>
+    </details>
+
+    <details>
+      <summary>Can I export my workflows?</summary>
+      <p>Yes. Click the Export JSON button to download your workflow as a portable JSON file. This file contains all blocks, positions, connections, and content. Share it with teammates or import it into other tools that support JSON-based workflow definitions.</p>
+    </details>
+
+    <details>
+      <summary>Is ClaudFlow free to use?</summary>
+      <p>Yes, ClaudFlow is completely free. No sign-up, no accounts, no usage limits. Everything runs in your browser and your workflows are saved locally. The source code is open on GitHub.</p>
+    </details>
+
+    <details>
+      <summary>What types of blocks does ClaudFlow support?</summary>
+      <p>ClaudFlow has five block types: Input (defines starting data), AI Prompt (contains prompt text), Condition (adds branching logic), Transform (reformats data between steps), and Output (defines the final deliverable). These cover the full range of workflow patterns from linear chains to complex branching pipelines.</p>
+    </details>
+
+    <details>
+      <summary>Does ClaudFlow work with models other than Claude?</summary>
+      <p>ClaudFlow is a workflow designer, not an execution engine. The prompt chains you build can be used with any AI model — Claude, GPT-4, Gemini, or open-source models. You design the flow visually and then execute the prompts in whatever tool or API you prefer.</p>
+    </details>
+  </section>
 
   <footer>
     <div class="footer-inner">

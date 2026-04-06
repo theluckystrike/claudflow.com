@@ -5,9 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Prompt Chaining: Advanced Techniques for Complex Tasks</title>
   <meta name="description" content="Advanced prompt chaining techniques including conditional branching, error recovery, parallel processing, and production patterns for complex AI workflows.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="AI Prompt Chaining: Advanced Techniques for Complex Tasks">
+  <meta property="og:description" content="Advanced prompt chaining techniques including conditional branching, error recovery, parallel processing, and production patterns.">
+  <meta property="og:url" content="https://claudflow.com/blog/ai-prompt-chaining-advanced.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Prompt Chaining: Advanced Techniques for Complex Tasks">
+  <meta name="twitter:description" content="Advanced prompt chaining techniques including conditional branching, error recovery, and parallel processing.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
   <link rel="canonical" href="https://claudflow.com/blog/ai-prompt-chaining-advanced.html">
-    <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/blog/ai-prompt-chaining-advanced.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/blog/ai-prompt-chaining-advanced.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "AI Prompt Chaining: Advanced Techniques for Complex Tasks",
+    "description": "Advanced prompt chaining techniques including conditional branching, error recovery, parallel processing, and production patterns for complex AI workflows.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-03-25",
+    "dateModified": "2026-04-06"
+  }
+  </script>
 </head>
 <body>
   <nav>
@@ -24,7 +48,8 @@
 
   <div class="page-content">
     <h1>AI Prompt Chaining: Advanced Techniques for Complex Tasks</h1>
-    <p style="color:var(--text-muted);margin-bottom:2rem;">March 25, 2026</p>
+    <p style="color:var(--text-muted);margin-bottom:0.5rem;">March 25, 2026</p>
+    <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:2rem;">By <a href="/about.html" style="color:var(--accent);">Michael Lip</a></p>
 
     <p>Basic prompt chaining is straightforward: take the output of Step A and feed it as input to Step B. But real-world workflows are rarely that linear. They have decision points, error cases, parallel paths, and feedback loops. Mastering these advanced patterns is the difference between a prompt chain that works in demos and one that works in production.</p>
 
@@ -69,7 +94,7 @@ Step 2c: Analyze for performance (parallel)
 Step 3: Merge all findings
 Step 4: Generate report</code></pre>
 
-    <p>The code review workflow in <a href="/">ClaudFlow</a> uses this exact pattern. The bug analysis, security scan, and performance audit run independently on the same input, then a merge step combines their findings, deduplicates overlapping issues, and sorts everything by severity.</p>
+    <p>The code review workflow in <a href="/">ClaudFlow</a> uses this exact pattern. The bug analysis, security scan, and performance audit run independently on the same input, then a merge step combines their findings, deduplicates overlapping issues, and sorts everything by severity. If you need specific prompts for each parallel branch, the <a href="https://claudhq.com">ClaudHQ prompt library</a> has dedicated code review templates for bug detection, security auditing, and performance analysis.</p>
 
     <p>Parallel decomposition is especially valuable for analysis tasks where different aspects of the input need different expertise. Each parallel branch uses a prompt specialized for its specific concern, which produces better results than a single prompt trying to analyze everything at once.</p>
 
@@ -98,7 +123,7 @@ Step 4: Synthesize final output from aggregated data</code></pre>
 
     <p>The fallback prompt should be simpler than the primary prompt. If the primary prompt asks for detailed analysis with specific formatting, the fallback asks for a basic summary with minimal formatting constraints. You trade quality for reliability.</p>
 
-    <p>This pattern is directly inspired by error handling in software engineering: try the ideal path, catch failures, fall back to a simpler approach, and always return something useful rather than nothing. Tools like <a href="https://epochpilot.com" rel="nofollow">EpochPilot</a> use this pattern extensively for monitoring AI systems in production.</p>
+    <p>This pattern is directly inspired by error handling in software engineering: try the ideal path, catch failures, fall back to a simpler approach, and always return something useful rather than nothing. Tools like <a href="https://epochpilot.com">EpochPilot</a> use this pattern extensively for monitoring AI systems in production.</p>
 
     <h2>Putting It All Together</h2>
 
@@ -130,8 +155,8 @@ Step 4: Synthesize final output from aggregated data</code></pre>
 
     <p>Document each block's expected input and output format. When a chain breaks, the most common cause is a format mismatch between steps: one step produces a bullet list but the next step expects numbered items, or one step includes a preamble that the next step cannot parse. Explicit format contracts between steps prevent most chain failures.</p>
 
-    <p>Finally, version your workflows. When you export a workflow JSON from ClaudFlow, save it with a meaningful name and date. Workflows evolve over time as you optimize prompts and adjust routing logic, and being able to roll back to a previous version is invaluable when an optimization makes things worse. The <a href="https://zovo.one">more AI tools</a> network of tools is designed to support this iterative approach to workflow development.</p>
-  
+    <p>Finally, version your workflows. When you export a workflow JSON from ClaudFlow, save it with a meaningful name and date. Workflows evolve over time as you optimize prompts and adjust routing logic, and being able to roll back to a previous version is invaluable when an optimization makes things worse. The <a href="https://zovo.one/tools">Zovo Tools</a> network is designed to support this iterative approach to workflow development.</p>
+
     <div class="further-reading">
       <h3>Further Reading</h3>
       <p>To dive deeper into this topic, start with <a href="https://arxiv.org/abs/2201.11903" target="_blank">chain-of-thought prompting research</a>, review <a href="https://en.wikipedia.org/wiki/Large_language_model" target="_blank">large language models</a> and explore <a href="https://python.langchain.com/docs/how_to/sequence/" rel="nofollow" target="_blank">LangChain's chaining documentation</a>.</p>
