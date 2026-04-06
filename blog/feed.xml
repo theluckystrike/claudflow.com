@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ClaudFlow — AI Workflow Builder Blog</title>
+  <link href="https://claudflow.com/blog/" rel="alternate"/>
+  <link href="https://claudflow.com/blog/feed.xml" rel="self"/>
+  <id>https://claudflow.com/blog/</id>
+  <updated>2026-04-06T00:00:00Z</updated>
+  <author><name>ClaudFlow — AI Workflow Builder</name></author>
+  <entry>
+    <title>How to Build an AI Workflow Without Code</title>
+    <link href="https://claudflow.com/blog/build-ai-workflow-without-code.html" rel="alternate"/>
+    <id>https://claudflow.com/blog/build-ai-workflow-without-code.html</id>
+    <updated>2026-04-06T00:00:00Z</updated>
+    <summary>Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed — just drag, connect, and run.</summary>
+  </entry>
+  <entry>
+    <title>AI Prompt Chaining: Advanced Techniques for Complex Tasks</title>
+    <link href="https://claudflow.com/blog/ai-prompt-chaining-advanced.html" rel="alternate"/>
+    <id>https://claudflow.com/blog/ai-prompt-chaining-advanced.html</id>
+    <updated>2026-04-06T00:00:00Z</updated>
+    <summary>Advanced prompt chaining techniques including conditional branching, error recovery, parallel processing, and production patterns for complex AI workflows.</summary>
+  </entry>
+</feed>
