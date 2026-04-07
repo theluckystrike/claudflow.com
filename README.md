@@ -1,34 +1,36 @@
-# AI Workflow Builder — Visual Flowchart Editor for LLM Chains & AI Pipelines
+# ClaudFlow -- AI Workflow Builder & Visual Prompt Chain Editor
 
-**[Build Workflows →](https://claudflow.com)** | [About](https://claudflow.com/about.html) | [Blog](https://claudflow.com/blog/)
+**[-> Use ClaudFlow (live tool)](https://claudflow.com/)**
 
-AI Workflow Builder lets you design multi-step AI workflows using a visual drag-and-drop flowchart editor. Map out LLM chains, RAG pipelines, and agent architectures without writing code. Export your workflow as JSON, use built-in presets for common patterns, and share designs with your team. Perfect for AI engineers planning complex prompt chains and automation flows.
+ClaudFlow is a free visual workflow builder for designing AI prompt chains as flowcharts. Drag and drop blocks onto a canvas, connect them to define data flow, and export your workflow as JSON. Five block types cover every workflow pattern: Input, AI Prompt, Condition, Transform, and Output. Includes pre-built examples for blog pipelines, code review, and data analysis.
 
 ## Features
 
-- **Visual drag-and-drop flowchart editor** — build AI pipelines on an infinite canvas
-- **Export workflows as JSON** — import into your codebase or share with collaborators
-- **Built-in workflow presets** — RAG pipeline, chain-of-thought, multi-agent, and more
-- **Custom node types** — prompt nodes, API calls, conditional branches, data transforms
-- **Real-time preview** — see your workflow structure update as you build
+- Visual drag-and-drop workflow canvas with SVG connection lines
+- Five block types: Input, AI Prompt, Condition, Transform, Output
+- Pre-built example workflows: Blog Pipeline, Code Review, Data Analysis
+- Export and import workflows as portable JSON files
+- Auto-save to browser localStorage between sessions
+- Double-click to edit block labels and prompt content
+- 100% client-side -- your data never leaves your browser
+- Open source -- inspect the code yourself
 
-## How It Works
+## Tech Stack
 
-Start with a blank canvas or select a preset template. Drag nodes onto the canvas to represent each step of your AI pipeline — prompts, API calls, decision points, or data transformations. Connect nodes by drawing edges between them. Configure each node's parameters in the side panel. When your workflow is ready, export it as structured JSON that maps directly to your implementation.
+- Vanilla JavaScript (no frameworks, no build step)
+- Static HTML hosted on GitHub Pages
+- Cloudflare DNS + SSL
+- Zero dependencies, zero tracking, zero cookies
 
-## Built With
+## Part of Zovo Tools
 
-- Vanilla JavaScript (no frameworks, no dependencies)
-- Client-side only — your data never leaves your browser
+ClaudFlow is part of [Zovo Tools](https://zovo.one/tools) -- a collection of free developer tools.
 
-
-- [Claude Prompt Library](https://claudhq.com) — 30+ ready-to-use prompts for your workflow nodes
-- [Webhook Request Builder](https://invokebot.com) — build and test the API calls in your pipeline
-- [JSON Explorer](https://kappafy.com) — inspect and validate your exported workflow JSON
-
-## Contributing
-
-Found a bug or have a feature request? [Open an issue](https://github.com/theluckystrike/claudflow.com/issues).
+**Other tools in the network:**
+- [EpochPilot](https://epochpilot.com) -- 30+ timestamp and timezone tools
+- [HeyTensor](https://heytensor.com) -- PyTorch tensor shape calculator
+- [LochBot](https://lochbot.com) -- Prompt injection vulnerability checker
+- [KappaKit](https://kappakit.com) -- Developer toolkit (Base64, JWT, hash, UUID)
 
 ## License
 
