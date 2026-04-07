@@ -14,7 +14,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: var(--font-body); background: var(--bg); color: var(--text); line-height: 1.6; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
 h1, h2, h3 { font-family: var(--font-display); }
 
 /* Nav */
