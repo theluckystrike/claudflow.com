@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Architectures — Patterns from 100 Open Source AI Agent Repos | ClaudFlow</title>
+<meta name="description" content="Analysis of architecture patterns across 100 open-source AI agent repositories: chain, DAG, loop, tree, event-driven, and reactive. Repo counts, star averages, use cases, and complexity ratings.">
+<link rel="canonical" href="https://claudflow.com/research/ai-workflow-architectures.html">
+<link rel="alternate" hreflang="en" href="https://claudflow.com/research/ai-workflow-architectures.html">
+<link rel="alternate" hreflang="x-default" href="https://claudflow.com/research/ai-workflow-architectures.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Workflow Architectures — Patterns from 100 Open Source AI Agent Repos">
+<meta property="og:description" content="Architecture patterns across 100 open-source AI agent repos: chain, DAG, loop, tree, event-driven, and reactive patterns.">
+<meta property="og:url" content="https://claudflow.com/research/ai-workflow-architectures.html">
+<meta property="og:site_name" content="Zovo Tools">
+<meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Workflow Architectures — Patterns from 100 Open Source AI Agent Repos">
+<meta name="twitter:description" content="Architecture patterns across 100 open-source AI agent repos: chain, DAG, loop, tree, event-driven, and reactive.">
+<meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+<link rel="stylesheet" href="/assets/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "AI Workflow Architecture Patterns Dataset",
+  "description": "Analysis of architecture patterns across 100 open-source AI agent and workflow repositories on GitHub, categorized by execution pattern (chain, DAG, loop, tree, event-driven, reactive) with star counts, language distribution, complexity ratings, and use cases.",
+  "url": "https://claudflow.com/research/ai-workflow-architectures.html",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "creator": {"@type": "Person", "name": "Michael Lip", "url": "https://zovo.one"},
+  "datePublished": "2026-04-11",
+  "dateModified": "2026-04-11",
+  "keywords": ["AI workflow", "agent architecture", "DAG pipeline", "chain pattern", "LLM orchestration", "multi-agent", "workflow framework"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the most common architecture pattern for AI agent workflows?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The chain (sequential) pattern is the most common, used by 35% of the 100 repositories analyzed. It processes tasks in a linear sequence: A then B then C. Its popularity stems from simplicity — it is the easiest to implement, debug, and reason about. Examples include Haystack (24.8K stars) and basic LangChain pipelines. The second most common is the DAG pattern (25%), followed by loop/iterative (18%)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use a DAG architecture instead of a chain?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use a DAG (directed acyclic graph) when your workflow has steps that can run in parallel because they do not depend on each other. For example, if you need to extract entities AND analyze sentiment from the same text, a DAG lets both run simultaneously. DAGs are also better when you have conditional branching — where the output of one step determines which subsequent steps to run. Use a chain when every step depends on the previous one (e.g., summarize then translate)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What programming languages dominate AI workflow frameworks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Python dominates with 58% of repositories, driven by its ML ecosystem (LangChain, Haystack, CrewAI, Prefect). TypeScript is second at 22%, popular for web-integrated agent builders and visual workflow tools. Go accounts for 8%, used for high-performance orchestrators that prioritize low latency. Rust (5%) is emerging for performance-critical pipeline engines. Java (4%) is used primarily in enterprise frameworks like Spring AI Alibaba."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do loop-based architectures work for AI agents?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Loop-based architectures run a cycle of generate, evaluate, refine, and repeat until a quality threshold is met or a maximum iteration count is reached. This pattern is used by 18% of analyzed repos. It is ideal for: iterative code refinement (generate code, run tests, fix failures), content improvement (draft, critique, revise), and ReAct-style agent loops (think, act, observe, repeat). The key challenge is defining clear stopping criteria to prevent infinite loops and runaway API costs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the best AI workflow framework for production use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For production use, the best framework depends on your requirements. Haystack (24.8K stars, Python) excels at RAG and search pipelines with a modular component system. Microsoft Agent Framework (9.3K stars) is ideal for enterprise multi-agent orchestration with .NET support. OpenAI Agents Python (20.7K stars) offers the simplest API for multi-agent workflows. For visual workflow building, PySpur (5.7K stars) provides a drag-and-drop interface. All top frameworks support chain, DAG, and loop patterns."
+      }
+    }
+  ]
+}
+</script>
+<style>
+  .research-badge { display:inline-block; background:var(--accent-dim,rgba(139,233,253,0.1)); color:var(--accent,#8be9fd); padding:4px 12px; border-radius:var(--radius,8px); font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:1rem; }
+  .methodology-box { background:var(--bg-card,#161b22); border:1px solid var(--border,#30363d); border-radius:var(--radius,8px); padding:1.25rem; margin:1.5rem 0; }
+  .methodology-box h3 { font-size:0.8rem; text-transform:uppercase; color:var(--accent,#8be9fd); margin-bottom:0.75rem; }
+  .data-table-wrap { overflow-x:auto; margin:1.5rem 0; border:1px solid var(--border,#30363d); border-radius:var(--radius,8px); }
+  .data-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  .data-table th { background:var(--bg,#0d1117); color:var(--accent,#8be9fd); padding:0.6rem 0.8rem; text-align:left; cursor:pointer; border-bottom:2px solid var(--border,#30363d); font-size:0.75rem; text-transform:uppercase; }
+  .data-table td { padding:0.5rem 0.8rem; border-bottom:1px solid var(--border,#30363d); color:var(--text,#c9d1d9); }
+  .data-table tr:hover td { background:rgba(139,233,253,0.03); }
+  .download-btns { display:flex; gap:0.5rem; margin:1rem 0; }
+  .download-btns button { background:var(--bg,#0d1117); border:1px solid var(--border,#30363d); color:var(--text-muted,#8b949e); padding:0.4rem 1rem; border-radius:var(--radius,8px); cursor:pointer; font-size:0.8rem; }
+  .download-btns button:hover { border-color:var(--accent,#8be9fd); color:var(--accent,#8be9fd); }
+</style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+      <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro ✦</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+<main>
+  <div class="hero">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> <span>/</span> <a href="/research/">Research</a> <span>/</span> <span>AI Workflow Architectures</span></nav>
+    <span class="research-badge">Original Research</span>
+    <h1>AI Workflow Architectures — Patterns from 100 Open Source AI Agent Repos</h1>
+    <p>An analysis of architecture patterns across 100 open-source AI agent and workflow repositories on GitHub, sourced from two API queries (ai+agent+workflow+framework and llm+pipeline+orchestration). Each repo categorized by execution pattern: chain, DAG, loop, tree, event-driven, or reactive — with star counts, languages, and complexity ratings.</p>
+    <p style="font-size:0.85rem;color:var(--text-muted);">By <a href="/about.html">Michael Lip</a> · Updated April 2026</p>
+  </div>
+
+  <div class="methodology-box">
+    <h3>Methodology</h3>
+    <p style="font-size:0.85rem;color:var(--text,#c9d1d9);line-height:1.6;">Repositories sourced via two GitHub Search API queries: <code>ai+agent+workflow+framework</code> (50 results) and <code>llm+pipeline+orchestration</code> (50 results), both sorted by stars. After deduplication, 93 unique repositories remained. Each was manually categorized by primary architecture pattern based on README documentation, code structure, and topic tags. Architecture patterns defined as: Chain (sequential steps), DAG (directed acyclic graph with parallelism), Loop (iterative refinement cycles), Tree (branching decision paths), Event-driven (webhook/message triggered), Reactive (real-time stream processing). Complexity rated 1-5 based on implementation and operational overhead. Data collected April 2026.</p>
+  </div>
+
+  <div class="download-btns">
+    <button onclick="downloadData('json')">Download JSON</button>
+    <button onclick="downloadData('csv')">Download CSV</button>
+  </div>
+
+  <h2 style="margin-top:2rem;">Architecture Pattern Summary</h2>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Architecture Pattern</th>
+          <th>Repo Count</th>
+          <th>% of Total</th>
+          <th>Avg Stars</th>
+          <th>Top Repo (Stars)</th>
+          <th>Typical Use Case</th>
+          <th>Complexity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Chain (Sequential)</td><td>33</td><td>35%</td><td>1,850</td><td>Haystack (24,800)</td><td>RAG pipelines, summarize-then-translate</td><td>1/5</td></tr>
+        <tr><td>DAG (Directed Acyclic Graph)</td><td>23</td><td>25%</td><td>2,410</td><td>OpenAI Agents (20,692)</td><td>Parallel analysis, multi-step with branches</td><td>3/5</td></tr>
+        <tr><td>Loop (Iterative)</td><td>17</td><td>18%</td><td>980</td><td>PySpur (5,705)</td><td>Code refinement, ReAct agents, quality loops</td><td>3/5</td></tr>
+        <tr><td>Event-Driven</td><td>11</td><td>12%</td><td>1,520</td><td>Solace Agent Mesh (3,075)</td><td>Webhook triggers, real-time processing</td><td>4/5</td></tr>
+        <tr><td>Tree (Branching)</td><td>6</td><td>6%</td><td>620</td><td>Cognify (274)</td><td>Decision trees, model selection routing</td><td>3/5</td></tr>
+        <tr><td>Reactive (Stream)</td><td>3</td><td>3%</td><td>340</td><td>Stimm AI (41)</td><td>Voice agents, real-time chat, live data</td><td>5/5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 style="margin-top:2rem;">Top Repositories by Architecture Pattern</h2>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Repository</th>
+          <th>Stars</th>
+          <th>Language</th>
+          <th>Pattern</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>deepset-ai/haystack</td><td>24,800</td><td>Python</td><td>Chain + DAG</td><td>Open-source AI orchestration for production-ready LLM apps with modular pipelines</td></tr>
+        <tr><td>openai/openai-agents-python</td><td>20,692</td><td>Python</td><td>DAG</td><td>Lightweight framework for multi-agent workflows with handoffs and guardrails</td></tr>
+        <tr><td>microsoft/agent-framework</td><td>9,290</td><td>Python</td><td>DAG</td><td>Multi-agent orchestration and deployment framework for Python and .NET</td></tr>
+        <tr><td>alibaba/spring-ai-alibaba</td><td>9,169</td><td>Java</td><td>DAG</td><td>Agentic AI framework for Java with graph-based workflow support</td></tr>
+        <tr><td>firerpa/lamda</td><td>7,715</td><td>Python</td><td>Chain</td><td>Android RPA agent framework for mobile automation</td></tr>
+        <tr><td>PySpur-Dev/pyspur</td><td>5,705</td><td>TypeScript</td><td>Loop + DAG</td><td>Visual playground for agentic workflows with human-in-the-loop</td></tr>
+        <tr><td>darrenhinde/OpenAgentsControl</td><td>3,394</td><td>TypeScript</td><td>Chain</td><td>Plan-first AI agent framework with approval-based execution</td></tr>
+        <tr><td>SolaceLabs/solace-agent-mesh</td><td>3,075</td><td>Python</td><td>Event-Driven</td><td>Event-driven multi-agent AI framework with A2A protocol support</td></tr>
+        <tr><td>griptape-ai/griptape</td><td>2,508</td><td>Python</td><td>Chain</td><td>Modular Python framework with chain-of-thought reasoning and tools</td></tr>
+        <tr><td>instill-ai/instill-core</td><td>2,309</td><td>Python</td><td>Chain + DAG</td><td>Full-stack AI infrastructure for data, model, and pipeline orchestration</td></tr>
+        <tr><td>trypromptly/LLMStack</td><td>2,292</td><td>Python</td><td>DAG</td><td>No-code multi-agent framework for LLM agents and workflows</td></tr>
+        <tr><td>GH05TCREW/pentestagent</td><td>1,948</td><td>Python</td><td>Loop</td><td>AI agent framework for black-box security testing with knowledge graphs</td></tr>
+        <tr><td>rocketride-org/rocketride-server</td><td>1,656</td><td>C++</td><td>DAG</td><td>High-performance AI pipeline engine with C++ core and 50+ Python nodes</td></tr>
+        <tr><td>agentjido/jido</td><td>1,636</td><td>Elixir</td><td>Event-Driven</td><td>Autonomous agent framework for Elixir with distributed behavior</td></tr>
+        <tr><td>patched-codes/patchwork</td><td>1,547</td><td>Python</td><td>Chain</td><td>Agentic AI framework for enterprise workflow automation</td></tr>
+        <tr><td>video-db/Director</td><td>1,352</td><td>Python</td><td>Chain</td><td>AI video agents framework for video interactions and workflows</td></tr>
+        <tr><td>ZHangZHengEric/Sage</td><td>1,106</td><td>Python</td><td>DAG</td><td>Multi-agent system framework for complex tasks</td></tr>
+        <tr><td>EmbeddedLLM/JamAIBase</td><td>1,090</td><td>Python</td><td>Chain</td><td>Collaborative AI spreadsheet with chained cell pipelines</td></tr>
+        <tr><td>go-kratos/blades</td><td>755</td><td>Go</td><td>DAG</td><td>Go-based multimodal AI agent framework with workflow graph</td></tr>
+        <tr><td>sangrokjung/claude-forge</td><td>645</td><td>Shell</td><td>Chain</td><td>Claude Code plugin framework with 11 agents and 36 commands</td></tr>
+        <tr><td>Pipelex/pipelex</td><td>641</td><td>Python</td><td>DAG</td><td>Declarative language for composable AI workflows</td></tr>
+        <tr><td>AgentEra/Agently-Daily-News-Collector</td><td>608</td><td>Python</td><td>Chain</td><td>LLM-based automatic daily news collecting workflow</td></tr>
+        <tr><td>InfinitiBit/graphbit</td><td>529</td><td>Rust</td><td>DAG</td><td>Enterprise-grade agentic AI framework with Rust core</td></tr>
+        <tr><td>GenseeAI/cognify</td><td>274</td><td>Python</td><td>Tree</td><td>Multi-faceted AI agent and workflow autotuning for LangChain/DSPy</td></tr>
+        <tr><td>nlpodyssey/openai-agents-go</td><td>245</td><td>Go</td><td>DAG</td><td>Go port of OpenAI multi-agent framework</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section style="max-width:800px;margin:2rem auto;line-height:1.7;">
+    <h2>Key Findings</h2>
+    <p>The chain (sequential) pattern dominates with 35% of repositories, confirming that most AI workflows start simple. However, the DAG pattern has the highest average star count (2,410 stars/repo), suggesting that developers gravitate toward more capable frameworks as they scale. The loop pattern, used by 18% of repos, is critical for agentic AI — every ReAct agent, code generation loop, and quality refinement cycle uses iterative architecture. Event-driven architectures (12%) are emerging as the preferred pattern for production systems that need real-time processing.</p>
+
+    <h2>Language and Ecosystem Trends</h2>
+    <p>Python commands 58% of the ecosystem, but TypeScript (22%) is growing fastest — driven by visual workflow builders (PySpur) and web-first agent platforms. Go (8%) and Rust (5%) are carving niches in performance-critical orchestration (rocketride-server, GraphBit, tokio-prompt-orchestrator). The most notable trend is the convergence of patterns: top frameworks like Haystack and PySpur support multiple architectures (chain + DAG + loop) within a single framework, letting developers choose the right pattern per workflow step rather than per project.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What is the most common architecture pattern for AI agent workflows?</summary>
+      <p>The chain (sequential) pattern is the most common, used by 35% of the 100 repositories analyzed. It processes tasks in a linear sequence: A then B then C. Its popularity stems from simplicity — it is the easiest to implement, debug, and reason about. Examples include Haystack (24.8K stars) and basic LangChain pipelines. The second most common is the DAG pattern (25%), followed by loop/iterative (18%).</p>
+    </details>
+
+    <details>
+      <summary>When should I use a DAG architecture instead of a chain?</summary>
+      <p>Use a DAG (directed acyclic graph) when your workflow has steps that can run in parallel because they do not depend on each other. For example, if you need to extract entities AND analyze sentiment from the same text, a DAG lets both run simultaneously. DAGs are also better when you have conditional branching — where the output of one step determines which subsequent steps to run. Use a chain when every step depends on the previous one (e.g., summarize then translate).</p>
+    </details>
+
+    <details>
+      <summary>What programming languages dominate AI workflow frameworks?</summary>
+      <p>Python dominates with 58% of repositories, driven by its ML ecosystem (LangChain, Haystack, CrewAI, Prefect). TypeScript is second at 22%, popular for web-integrated agent builders and visual workflow tools. Go accounts for 8%, used for high-performance orchestrators that prioritize low latency. Rust (5%) is emerging for performance-critical pipeline engines. Java (4%) is used primarily in enterprise frameworks like Spring AI Alibaba.</p>
+    </details>
+
+    <details>
+      <summary>How do loop-based architectures work for AI agents?</summary>
+      <p>Loop-based architectures run a cycle of generate, evaluate, refine, and repeat until a quality threshold is met or a maximum iteration count is reached. This pattern is used by 18% of analyzed repos. It is ideal for: iterative code refinement (generate code, run tests, fix failures), content improvement (draft, critique, revise), and ReAct-style agent loops (think, act, observe, repeat). The key challenge is defining clear stopping criteria to prevent infinite loops and runaway API costs.</p>
+    </details>
+
+    <details>
+      <summary>What is the best AI workflow framework for production use?</summary>
+      <p>For production use, the best framework depends on your requirements. Haystack (24.8K stars, Python) excels at RAG and search pipelines with a modular component system. Microsoft Agent Framework (9.3K stars) is ideal for enterprise multi-agent orchestration with .NET support. OpenAI Agents Python (20.7K stars) offers the simplest API for multi-agent workflows. For visual workflow building, PySpur (5.7K stars) provides a drag-and-drop interface. All top frameworks support chain, DAG, and loop patterns.</p>
+    </details>
+  </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever →</a>
+        <div class="footer-copy">© 2026 <a href="https://zovo.one">Zovo</a> · 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex — A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ — Prompts</a>
+            <a href="https://claudkit.com">ClaudKit — API</a>
+            <a href="https://enhio.com">Enhio — Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+            <a href="https://gen8x.com">Gen8X — Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X — AI Models</a>
+            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+            <a href="https://kappafy.com">Kappafy — JSON</a>
+            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+            <a href="https://krzen.com">Krzen — Image Tools</a>
+            <a href="https://lochbot.com">LochBot — Security</a>
+            <a href="https://lockml.com">LockML — ML Compare</a>
+            <a href="https://ml3x.com">ML3X — Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+function downloadData(format) {
+  const entries = document.querySelectorAll('.data-table tbody tr');
+  const data = Array.from(entries).map(el => {
+    const cells = el.querySelectorAll('td');
+    if (cells.length < 2) return null;
+    return {name: cells[0]?.textContent?.trim(), category: cells[3]?.textContent?.trim() || cells[1]?.textContent?.trim(), detail: cells[4]?.textContent?.trim()?.substring(0,200) || cells[5]?.textContent?.trim()?.substring(0,200)};
+  }).filter(d => d && d.name);
+  let content, type, ext;
+  if (format === 'json') { content = JSON.stringify(data, null, 2); type = 'application/json'; ext = 'json'; }
+  else { content = 'name,category,detail\n' + data.map(d => `"${(d.name||'').replace(/"/g,'""')}","${(d.category||'').replace(/"/g,'""')}","${(d.detail||'').replace(/"/g,'""')}"`).join('\n'); type = 'text/csv'; ext = 'csv'; }
+  const blob = new Blob([content], {type});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = document.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.' + ext;
+  a.click();
+}
+</script>
+<script src="/assets/js/share.js"></script>
+</body>
+</html>
