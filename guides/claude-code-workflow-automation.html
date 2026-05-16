@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Code Workflow Automation — 7 Patterns for Faster Development | ClaudFlow</title>
+  <meta name="description" content="Master Claude code automation with 7 proven workflow patterns. Build reusable prompt templates for code review, refactoring, testing, and documentation. Interactive template builder included.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude Code Workflow Automation — 7 Patterns for Faster Development">
+  <meta property="og:description" content="Master Claude code automation with 7 proven workflow patterns. Build reusable prompt templates for code review, refactoring, testing, and documentation.">
+  <meta property="og:url" content="https://claudflow.com/guides/claude-code-workflow-automation.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude Code Workflow Automation — 7 Patterns for Faster Development">
+  <meta name="twitter:description" content="Master Claude code automation with 7 proven workflow patterns. Build reusable prompt templates for code review, refactoring, testing, and documentation.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/guides/claude-code-workflow-automation.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/claude-code-workflow-automation.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/claude-code-workflow-automation.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Claude Code Workflow Automation — 7 Patterns for Faster Development",
+    "description": "Master Claude code automation with 7 proven workflow patterns. Build reusable prompt templates for code review, refactoring, testing, and documentation.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-16",
+    "dateModified": "2026-05-16",
+    "mainEntityOfPage": "https://claudflow.com/guides/claude-code-workflow-automation.html",
+    "image": "https://claudflow.com/assets/og-image.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Automate Coding Tasks with Claude AI Workflows",
+    "description": "A step-by-step guide to building reusable Claude code automation workflows for software development teams.",
+    "totalTime": "PT30M",
+    "estimatedCost": { "@type": "MonetaryCost", "currency": "USD", "value": "0" },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Choose a workflow pattern",
+        "text": "Select one of the 7 workflow patterns — code review, refactoring, test generation, documentation, bug fix, migration, or security audit — based on your development task."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Configure your parameters",
+        "text": "Set the programming language, framework, coding style guide, and output format for your chosen workflow pattern."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Build prompt templates",
+        "text": "Use the interactive template builder to generate step-by-step Claude prompt templates. Each template is a reusable chain of prompts optimized for the task."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Add quality gates",
+        "text": "Insert verification steps between workflow stages to catch errors early and ensure output meets your standards before proceeding."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Execute and iterate",
+        "text": "Run the workflow, review the output at each gate, and refine your prompt templates based on results."
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Claude code workflow automation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude code workflow automation is the practice of structuring AI prompts into repeatable, multi-step pipelines for software development tasks. Instead of writing ad-hoc prompts, you create reusable templates that chain together — for example, a code review workflow that first analyzes logic, then checks security, then verifies style, and finally produces a summary report."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do Claude code hooks work in workflow automation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude code hooks are integration points where automated actions trigger before or after specific workflow steps. For example, a pre-commit hook can run a Claude-powered security scan on changed files, while a post-merge hook can generate updated documentation. Hooks turn manual checkpoints into automated quality gates."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I automate coding tasks with AI without writing code?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Visual workflow builders like ClaudFlow let you design AI-powered coding pipelines by connecting blocks on a canvas. You write the prompt instructions in natural language, configure parameters like language and framework, and the workflow handles the orchestration. No programming is required to build or run the workflow."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between a single prompt and a workflow pipeline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A single prompt tries to accomplish everything in one shot, which often produces shallow or inconsistent results. A workflow pipeline breaks the task into 3-7 focused steps, where each step specializes in one aspect. Pipeline outputs are typically 40-60% more accurate because each step can apply focused analysis rather than trying to juggle multiple concerns simultaneously."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which development tasks benefit most from AI workflow automation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Code review, test generation, and documentation benefit most because they involve repetitive, structured analysis. Refactoring and bug fixing also gain significantly when broken into diagnosis-then-fix pipelines. Tasks that require deep architectural reasoning or creative design decisions benefit least from automation and work better as human-AI collaboration."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I build reusable prompt templates for my team?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Start by identifying your three most common development tasks. For each task, write the steps you follow manually, then convert each step into a prompt template with placeholders for language, framework, and project-specific details. Store templates as JSON exports from ClaudFlow or as markdown files in your repository. Version control them alongside your code so the team can iterate on them together."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Mono', 'Fira Code', monospace;
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e4e4ef;
+      --text-muted: #8888aa;
+      --accent: #06B6D4;
+      --accent-dim: rgba(6, 182, 212, 0.12);
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --purple: #a855f7;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .nav-zovo {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-zovo:hover { border-color: var(--accent); color: var(--accent); }
+
+    .article-container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    .article-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .article-meta {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .article-meta a { color: var(--accent); text-decoration: none; }
+    .article-meta a:hover { text-decoration: underline; }
+
+    .article-container h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .article-container h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+    .article-container p {
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+    .article-container ul, .article-container ol {
+      margin: 0 0 1.25rem 1.5rem;
+    }
+    .article-container li {
+      margin-bottom: 0.5rem;
+    }
+    .article-container strong { color: #fff; }
+    .article-container a { color: var(--accent); text-decoration: none; }
+    .article-container a:hover { text-decoration: underline; }
+
+    .article-container pre {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+      font-size: 0.88rem;
+    }
+    .article-container code {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+    }
+    .article-container p code, .article-container li code {
+      background: var(--bg-card);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .key-takeaway {
+      background: var(--accent-dim);
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+    .key-takeaway strong { color: var(--accent); }
+
+    /* --- Interactive Tool --- */
+    .tool-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2.5rem 0;
+    }
+    .tool-section h3 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .tool-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 600px) {
+      .tool-row { grid-template-columns: 1fr; }
+    }
+    .tool-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+    .tool-select, .tool-input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .tool-select:focus, .tool-input:focus { border-color: var(--accent); }
+    .tool-select option { background: var(--bg); }
+
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 0.5rem;
+    }
+    .tool-btn:hover { opacity: 0.85; }
+
+    .workflow-output {
+      margin-top: 1.5rem;
+      display: none;
+    }
+    .workflow-output.active { display: block; }
+
+    .workflow-step {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .workflow-step::before {
+      content: '';
+      position: absolute;
+      left: 1.75rem;
+      top: -1rem;
+      width: 2px;
+      height: 1rem;
+      background: var(--border);
+    }
+    .workflow-step:first-child::before { display: none; }
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .step-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .step-type {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .step-type.input { background: rgba(34,197,94,0.15); color: var(--green); }
+    .step-type.prompt { background: rgba(6,182,212,0.15); color: var(--accent); }
+    .step-type.gate { background: rgba(234,179,8,0.15); color: var(--yellow); }
+    .step-type.output { background: rgba(239,68,68,0.15); color: var(--red); }
+    .step-type.transform { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+    .step-prompt {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+    .step-prompt .placeholder {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .copy-btn {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.6rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 600px) {
+      .pattern-grid { grid-template-columns: 1fr; }
+      .article-header h1 { font-size: 1.7rem; }
+      .article-container { padding: 2rem 1rem 3rem; }
+      .tool-section { padding: 1.25rem; }
+    }
+    .pattern-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .pattern-card:hover { border-color: var(--accent); }
+    .pattern-card h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    .pattern-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .toc {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .toc h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .toc ol {
+      list-style: decimal;
+      margin: 0 0 0 1.25rem;
+    }
+    .toc li {
+      margin-bottom: 0.35rem;
+      font-size: 0.95rem;
+    }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    .further-reading {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .further-reading h3 { margin-top: 0; }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .footer-inner { max-width: 600px; margin: 0 auto; }
+    .footer-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); margin-bottom: 0.25rem; }
+    .footer-tagline { margin-bottom: 1rem; }
+    .footer-cta {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      background: var(--accent);
+      color: #000;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .footer-copy { font-size: 0.8rem; }
+    .footer-copy a { color: var(--accent); text-decoration: none; }
+
+    .zovo-network {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+    .zovo-network-inner { max-width: 900px; margin: 0 auto; }
+    .zovo-network-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .zovo-network-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .zovo-network-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .zovo-network-links a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav class="nav"><a href="/" class="nav-logo">claudflow</a><ul class="nav-links"><li><a href="/">Tool</a></li><li><a href="/guides/">Guides</a></li><li><a href="/blog/">Blog</a></li></ul><div class="nav-right"><a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a></div></nav>
+
+<main class="article-container">
+  <header class="article-header">
+    <h1>Claude Code Workflow Automation — 7 Patterns for Faster Development</h1>
+    <div class="article-meta">
+      <span>May 16, 2026</span>
+      <span>By <a href="https://zovo.one">Michael Lip</a></span>
+      <span>15 min read</span>
+    </div>
+  </header>
+
+  <div class="toc">
+    <h4>In This Guide</h4>
+    <ol>
+      <li><a href="#what-is-workflow-automation">What Is AI-Powered Workflow Automation</a></li>
+      <li><a href="#seven-patterns">7 Workflow Patterns for Software Development</a></li>
+      <li><a href="#template-builder">Interactive Workflow Template Builder</a></li>
+      <li><a href="#building-templates">Building Reusable Prompt Templates</a></li>
+      <li><a href="#quality-gates">Quality Gates and Verification Steps</a></li>
+      <li><a href="#best-practices">Best Practices for AI-Assisted Development</a></li>
+      <li><a href="#pitfalls">Common Pitfalls and How to Avoid Them</a></li>
+    </ol>
+  </div>
+
+  <p>Software development has always been about finding repeatable processes and automating them. Compilers automated assembly code translation. Build systems automated compilation. CI/CD automated deployment. The next layer in this progression is automating the cognitive work of development itself — code review, refactoring, test writing, documentation — using AI workflow pipelines.</p>
+
+  <p>Claude code automation does not mean handing your entire codebase to an AI and hoping for the best. It means building structured, multi-step workflows where each prompt in the chain specializes in one focused task. A code review workflow, for example, might have five separate stages: logic analysis, security scanning, style checking, performance profiling, and summary generation. Each stage uses a tailored prompt that produces consistent, reliable output.</p>
+
+  <p>This guide covers seven proven workflow patterns for software development, shows you how to build reusable prompt templates, and includes an interactive tool that generates ready-to-use workflow configurations for your specific stack. Whether you work in Python, TypeScript, Go, Rust, or Java, these patterns adapt to your language and framework.</p>
+
+  <h2 id="what-is-workflow-automation">What Is AI-Powered Workflow Automation</h2>
+
+  <p>AI-powered workflow automation is the practice of structuring AI prompts into repeatable, multi-step pipelines that execute development tasks with consistent quality. Unlike ad-hoc prompting — where you type a question and get back a single response — workflow automation chains multiple specialized prompts together, where the output of each step feeds into the next.</p>
+
+  <p>The key insight is decomposition. A single prompt that says "review this code" produces shallow, inconsistent results. But a pipeline that first analyzes logic correctness, then scans for security vulnerabilities, then checks style compliance, then evaluates performance characteristics, and finally synthesizes a structured report produces dramatically better output every time.</p>
+
+  <p>This approach works because of three principles:</p>
+
+  <ul>
+    <li><strong>Focus:</strong> Each prompt in the chain handles exactly one concern. A security-focused prompt does not waste tokens on style issues. A performance prompt does not get distracted by naming conventions.</li>
+    <li><strong>Context accumulation:</strong> Later prompts in the chain receive the analysis from earlier stages. The summary step has access to every finding from every previous stage, enabling cross-cutting insights that no single prompt could produce.</li>
+    <li><strong>Repeatability:</strong> Once you build a workflow, any team member can run it on any code change. The quality bar is consistent regardless of who triggers the pipeline, what time of day it runs, or how tired the reviewer is.</li>
+  </ul>
+
+  <p>Claude workflow automation fits into your existing development process as a force multiplier. Your CI pipeline already runs linting, type checking, and tests automatically. Adding AI-powered review steps extends that automation into territories that previously required human judgment — architectural analysis, documentation quality, and design pattern recognition.</p>
+
+  <div class="key-takeaway">
+    <strong>Key principle:</strong> The best Claude code automation workflows replace repetitive cognitive work, not creative decision-making. Automate reviews, test generation, and documentation. Keep architectural decisions, API design, and user experience work as human-AI collaboration.
+  </div>
+
+  <h2 id="seven-patterns">7 Workflow Patterns for Software Development</h2>
+
+  <p>These seven patterns cover the most common development tasks that benefit from Claude workflow automation. Each pattern follows the same structure: define inputs, chain specialized prompts, insert quality gates, and produce structured output.</p>
+
+  <div class="pattern-grid">
+    <div class="pattern-card">
+      <h4>1. Code Review Pipeline</h4>
+      <p>Analyzes diffs across five dimensions — logic, security, style, performance, and test coverage — then synthesizes a unified review with severity-ranked findings.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>2. Refactoring Workflow</h4>
+      <p>Identifies code smells, proposes refactoring strategies, generates the refactored code, and verifies behavior preservation through before/after analysis.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>3. Test Generation Chain</h4>
+      <p>Analyzes function signatures and implementation, identifies edge cases and boundary conditions, generates unit tests, and validates coverage completeness.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>4. Documentation Builder</h4>
+      <p>Extracts function contracts, generates JSDoc/docstring annotations, creates usage examples, and builds README sections from code analysis.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>5. Bug Diagnosis Pipeline</h4>
+      <p>Takes an error trace and codebase context, isolates the root cause, proposes fixes ranked by risk, and generates regression test cases.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>6. Migration Workflow</h4>
+      <p>Maps source patterns to target equivalents, generates migration code, identifies breaking changes, and produces a rollback strategy.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>7. Security Audit Chain</h4>
+      <p>Scans for OWASP Top 10 vulnerabilities, checks dependency versions, analyzes authentication flows, and generates a remediation priority list.</p>
+    </div>
+  </div>
+
+  <h3>Pattern 1: Code Review Pipeline</h3>
+
+  <p>The code review pipeline is the most commonly automated workflow because every pull request needs review, and the review criteria are consistent. The pipeline takes a git diff as input and produces a structured review document.</p>
+
+  <p>Stage one analyzes logical correctness: Does the code do what the commit message claims? Are there edge cases that are unhandled? Does the control flow make sense? Stage two runs a security pass: Are there injection vulnerabilities, hardcoded secrets, or insecure defaults? Stage three checks style against your team's conventions. Stage four evaluates performance: Are there unnecessary allocations, N+1 queries, or blocking operations in async code? Stage five synthesizes everything into a prioritized report.</p>
+
+  <pre><code># Stage 1 prompt template — Logic Analysis
+Analyze this code diff for logical correctness.
+
+Language: {language}
+Framework: {framework}
+
+Focus exclusively on:
+- Whether the implementation matches the stated intent
+- Unhandled edge cases or boundary conditions
+- Off-by-one errors in loops and array access
+- Null/undefined handling in data flows
+- Race conditions in concurrent code
+
+Do NOT comment on style, naming, or formatting.
+
+Diff:
+{diff}</code></pre>
+
+  <p>The critical detail is the instruction "Do NOT comment on style, naming, or formatting." Without this negative constraint, the logic analysis stage wastes half its output on superficial observations. Each stage in the pipeline must have explicit boundaries that prevent it from drifting into another stage's territory.</p>
+
+  <h3>Pattern 2: Refactoring Workflow</h3>
+
+  <p>The refactoring workflow operates in four stages: smell detection, strategy proposal, code generation, and behavior verification. The first stage identifies specific code smells — long methods, deep nesting, feature envy, primitive obsession, and shotgun surgery. The second stage proposes refactoring strategies for each smell, ranked by impact and risk. The third stage generates the actual refactored code. The fourth stage compares the before and after versions to verify that external behavior is preserved.</p>
+
+  <p>The behavior verification stage is the quality gate that makes this workflow trustworthy. It explicitly checks that public interfaces remain unchanged, that side effects are preserved, and that error handling paths still function. Without this gate, developers must manually verify every refactoring suggestion, which defeats the purpose of automation.</p>
+
+  <h3>Pattern 3: Test Generation Chain</h3>
+
+  <p>Test generation is particularly well-suited to Claude workflow automation because the task is inherently systematic. The chain starts by analyzing function signatures, return types, and implementation logic. It then generates a test plan that identifies the happy path, edge cases, error conditions, and boundary values. Finally, it produces the actual test code using your framework of choice — Jest, pytest, Go testing, or whatever your stack requires.</p>
+
+  <p>The key to high-quality test generation is the intermediate test plan stage. When you skip directly from "here is a function" to "write tests," the AI tends to produce obvious happy-path tests. The explicit planning stage forces it to enumerate edge cases systematically before writing any test code.</p>
+
+  <h3>Patterns 4-7: Documentation, Bug Diagnosis, Migration, Security</h3>
+
+  <p>Documentation workflows extract contracts from code and generate standardized annotations. Bug diagnosis workflows take error traces and narrow down root causes through systematic elimination. Migration workflows map patterns between source and target frameworks. Security audit workflows apply OWASP-structured analysis to specific code sections.</p>
+
+  <p>Each of these follows the same fundamental structure: specialized input, focused analysis stages, quality gates between stages, and structured output. The interactive builder below lets you generate the specific prompt templates for any of these patterns configured for your stack.</p>
+
+  <h2 id="template-builder">Interactive Workflow Template Builder</h2>
+
+  <p>Select a workflow type, configure your parameters, and generate a complete set of step-by-step prompt templates. Each template is ready to use in <a href="/">ClaudFlow's visual builder</a> or as standalone prompts in your development workflow.</p>
+
+  <div class="tool-section">
+    <h3>Workflow Template Builder</h3>
+    <div class="tool-row">
+      <div>
+        <label class="tool-label" for="taskType">Task Type</label>
+        <select class="tool-select" id="taskType">
+          <option value="code-review">Code Review Pipeline</option>
+          <option value="refactoring">Refactoring Workflow</option>
+          <option value="testing">Test Generation Chain</option>
+          <option value="documentation">Documentation Builder</option>
+          <option value="bug-fix">Bug Diagnosis Pipeline</option>
+          <option value="migration">Migration Workflow</option>
+          <option value="security">Security Audit Chain</option>
+        </select>
+      </div>
+      <div>
+        <label class="tool-label" for="language">Programming Language</label>
+        <select class="tool-select" id="language">
+          <option value="Python">Python</option>
+          <option value="TypeScript">TypeScript</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="Go">Go</option>
+          <option value="Rust">Rust</option>
+          <option value="Java">Java</option>
+          <option value="C#">C#</option>
+          <option value="Ruby">Ruby</option>
+          <option value="PHP">PHP</option>
+          <option value="Swift">Swift</option>
+        </select>
+      </div>
+    </div>
+    <div class="tool-row">
+      <div>
+        <label class="tool-label" for="framework">Framework / Library</label>
+        <input class="tool-input" id="framework" type="text" placeholder="e.g., React, Django, FastAPI, Express" value="">
+      </div>
+      <div>
+        <label class="tool-label" for="styleGuide">Style / Convention</label>
+        <select class="tool-select" id="styleGuide">
+          <option value="standard">Standard / Default</option>
+          <option value="airbnb">Airbnb Style Guide</option>
+          <option value="google">Google Style Guide</option>
+          <option value="pep8">PEP 8 (Python)</option>
+          <option value="effective-go">Effective Go</option>
+          <option value="custom">Custom (describe in prompt)</option>
+        </select>
+      </div>
+    </div>
+    <button class="tool-btn" id="generateBtn" onclick="generateWorkflow()">Generate Workflow Templates</button>
+
+    <div class="workflow-output" id="workflowOutput"></div>
+  </div>
+
+  <h2 id="building-templates">Building Reusable Prompt Templates</h2>
+
+  <p>A prompt template is a prompt with placeholders that get filled in at runtime. Instead of writing a new prompt every time you review code, you maintain a template that accepts the diff, language, framework, and style guide as parameters. This turns prompt engineering from an art into an engineering discipline — templates are versioned, tested, and improved over time.</p>
+
+  <p>The anatomy of a good prompt template has five sections:</p>
+
+  <ol>
+    <li><strong>Role declaration:</strong> Tell Claude what role to assume. "You are a senior {language} engineer conducting a code review" sets the expertise level and perspective.</li>
+    <li><strong>Task specification:</strong> State exactly what the prompt should produce. "Analyze the following diff for security vulnerabilities" is better than "review this code."</li>
+    <li><strong>Scope boundaries:</strong> Explicitly state what is in scope and what is out of scope. "Focus on SQL injection, XSS, and CSRF. Do not comment on code style" prevents drift.</li>
+    <li><strong>Output format:</strong> Define the exact structure of the output. "Return a JSON array where each finding has severity (critical/high/medium/low), location (file:line), description, and suggested fix" ensures machine-parseable results.</li>
+    <li><strong>Context injection:</strong> The placeholder where runtime data gets inserted. "{diff}" for code changes, "{error_trace}" for bug reports, "{function_source}" for documentation targets.</li>
+  </ol>
+
+  <p>Here is a complete template for the security analysis stage of a code review pipeline:</p>
+
+  <pre><code>You are a senior security engineer reviewing {language} code
+that uses {framework}.
+
+Analyze the following diff exclusively for security vulnerabilities.
+
+Check for:
+- Injection attacks (SQL, NoSQL, command, LDAP)
+- Cross-site scripting (XSS) in any rendered output
+- Authentication and authorization bypasses
+- Hardcoded secrets, API keys, or credentials
+- Insecure cryptographic usage
+- Path traversal in file operations
+- Deserialization of untrusted data
+- Missing input validation on user-facing endpoints
+
+Do NOT comment on:
+- Code style or formatting
+- Performance characteristics
+- Business logic correctness
+- Test coverage
+
+Output format:
+For each finding, provide:
+1. Severity: CRITICAL / HIGH / MEDIUM / LOW
+2. Location: file path and line number
+3. Vulnerability type: category from the list above
+4. Description: what the vulnerability is
+5. Fix: specific code change to remediate
+
+If no vulnerabilities are found, state "No security issues
+identified" and explain what was checked.
+
+Diff:
+{diff}</code></pre>
+
+  <p>Notice the explicit negative constraints ("Do NOT comment on...") and the structured output format. These two elements are what separate templates that produce consistent results from templates that produce unpredictable output.</p>
+
+  <h3>Template Organization</h3>
+
+  <p>Store your templates in your repository alongside your code. A common structure is a <code>.claude/workflows/</code> directory with one JSON file per workflow. Each file contains the workflow metadata and an ordered array of prompt templates. This makes templates subject to the same code review, version control, and iteration cycle as your application code.</p>
+
+  <pre><code>.claude/
+  workflows/
+    code-review.json
+    test-generation.json
+    documentation.json
+    security-audit.json
+  hooks/
+    pre-commit.sh
+    pre-push.sh</code></pre>
+
+  <p>Claude code hooks integrate these workflows into your git lifecycle. A pre-commit hook can run the security audit workflow on staged files. A pre-push hook can run the full code review pipeline. This turns your Claude workflow automation from a manual tool into an automated part of your development pipeline that runs every time code changes.</p>
+
+  <h3>Template Versioning and Iteration</h3>
+
+  <p>Templates improve over time. When a workflow misses a bug category or produces a false positive, you update the template and commit the change. Over weeks and months, your templates accumulate the collective review knowledge of your team. They become better than any individual reviewer because they encode every lesson learned into explicit instructions.</p>
+
+  <p>Track template performance with a simple scoring system. For each workflow run, mark whether the output was useful (did it find real issues?), accurate (were there false positives?), and complete (did it miss anything obvious?). Review these scores monthly and update templates that score below your threshold.</p>
+
+  <h2 id="quality-gates">Quality Gates and Verification Steps</h2>
+
+  <p>Quality gates are the checkpoints between workflow stages that verify the output meets your standards before it flows to the next step. Without quality gates, errors in early stages compound through the pipeline, producing garbage at the end. With quality gates, you catch problems early and either fix them or halt the pipeline.</p>
+
+  <p>There are three types of quality gates in Claude workflow automation:</p>
+
+  <h3>1. Format Validation Gates</h3>
+
+  <p>These verify that the output from a stage matches the expected structure. If you told the security stage to produce JSON findings, the format gate checks that the output is valid JSON with the required fields. This is the simplest type of gate and can be implemented as a deterministic check without AI involvement.</p>
+
+  <pre><code># Format validation gate — Python example
+import json
+
+def validate_security_findings(output):
+    try:
+        findings = json.loads(output)
+        required = ['severity', 'location', 'type', 'description', 'fix']
+        for finding in findings:
+            missing = [f for f in required if f not in finding]
+            if missing:
+                return False, f"Missing fields: {missing}"
+            if finding['severity'] not in ['CRITICAL','HIGH','MEDIUM','LOW']:
+                return False, f"Invalid severity: {finding['severity']}"
+        return True, "Valid"
+    except json.JSONDecodeError as e:
+        return False, f"Invalid JSON: {e}"</code></pre>
+
+  <h3>2. Consistency Gates</h3>
+
+  <p>These use a separate Claude prompt to check whether the output from one stage is consistent with the input. For example, after a refactoring stage generates new code, a consistency gate can verify that all public method signatures are preserved, that no imports were removed that are still needed, and that error handling paths still exist. This is an AI-powered check that catches semantic errors that format validation cannot detect.</p>
+
+  <h3>3. Human Review Gates</h3>
+
+  <p>These pause the pipeline and present the output to a human reviewer for approval before continuing. Not every step needs human review — the whole point of automation is reducing human involvement — but critical decision points benefit from human oversight. A refactoring workflow might auto-approve small changes but pause for human review when the refactoring touches more than 50 lines or modifies a public API.</p>
+
+  <div class="key-takeaway">
+    <strong>Gate placement rule:</strong> Place a quality gate after any stage that generates code. Code generation stages (refactoring, test writing, migration) have the highest error rates and the highest cost of undetected errors. Analysis stages (review, documentation, diagnosis) can usually flow into the next stage without a gate because their output is informational, not executable.
+  </div>
+
+  <h3>Implementing Gates with Claude Code Hooks</h3>
+
+  <p>Claude code hooks provide the infrastructure for quality gates in your git workflow. A pre-commit hook can run a lightweight security scan that takes under 10 seconds. A pre-push hook can run a more comprehensive review that takes 30-60 seconds. The key is matching the gate's thoroughness to the cost of the interruption — developers tolerate a 5-second pre-commit check but will disable a 2-minute one.</p>
+
+  <p>Structure your hooks as progressive levels of review. Level 1 (pre-commit) catches obvious issues: hardcoded secrets, syntax errors, missing imports. Level 2 (pre-push) runs the full code review pipeline. Level 3 (CI pipeline) runs security audits, documentation generation, and comprehensive test analysis. Each level runs less frequently but performs deeper analysis.</p>
+
+  <h2 id="best-practices">Best Practices for AI-Assisted Development</h2>
+
+  <p>These practices are distilled from teams that have successfully integrated Claude workflow automation into their daily development process. They represent patterns that consistently work, not theoretical ideals.</p>
+
+  <h3>Start with one workflow, perfect it, then expand</h3>
+
+  <p>Teams that try to automate five workflows simultaneously end up with five mediocre workflows. Pick your highest-frequency task — usually code review — and build a complete pipeline with quality gates. Run it for two weeks. Fix every false positive. Add every missed category. Only after the first workflow consistently produces useful output should you build the second one.</p>
+
+  <h3>Keep prompts under 500 words</h3>
+
+  <p>Prompts longer than 500 words tend to have conflicting instructions that confuse the model. If your prompt is getting long, you are probably asking for too much in one step. Split it into two stages. A 200-word prompt that does one thing well is always better than a 800-word prompt that tries to do four things.</p>
+
+  <h3>Use negative constraints aggressively</h3>
+
+  <p>Telling Claude what not to do is as important as telling it what to do. Without negative constraints, a security analysis prompt will drift into style commentary because style issues are easier to find. Explicit boundaries ("Do NOT comment on code style, naming conventions, or formatting") keep each stage focused on its designated concern.</p>
+
+  <h3>Version control your templates</h3>
+
+  <p>Prompt templates are code. They should live in your repository, go through pull request review, and have a changelog. When someone discovers that the test generation template misses async error handling, they fix the template and submit a PR. The entire team benefits from the improvement on the next run.</p>
+
+  <h3>Measure and iterate</h3>
+
+  <p>Track three metrics for each workflow: precision (what percentage of findings are real issues), recall (what percentage of real issues does the workflow catch), and speed (how long does the pipeline take). Review these weekly for the first month, then monthly after that. Workflows that drop below 80% precision need template refinement. Workflows that take more than 60 seconds for pre-push hooks need optimization.</p>
+
+  <h3>Design for composability</h3>
+
+  <p>Build your workflow stages as independent, reusable units. The security analysis stage should work whether it is part of a code review pipeline, a standalone security audit, or a pre-deployment check. This means each stage should accept standardized input (code + metadata) and produce standardized output (structured findings). When stages are composable, you can assemble new workflows from existing components instead of building everything from scratch.</p>
+
+  <h3>Fail gracefully</h3>
+
+  <p>Workflows will encounter unexpected input — a binary file in a diff, a 10,000-line function, a language the template does not cover. Design your workflows to degrade gracefully rather than crash. A stage that encounters unexpected input should log a warning and pass through to the next stage rather than halt the entire pipeline. Save hard failures for quality gates that detect genuinely dangerous output.</p>
+
+  <h2 id="pitfalls">Common Pitfalls and How to Avoid Them</h2>
+
+  <p>After observing hundreds of teams adopt Claude workflow automation, these are the six most common failure modes and their solutions.</p>
+
+  <h3>Pitfall 1: The monolithic prompt</h3>
+
+  <p>Teams write a single massive prompt that tries to review code, generate tests, update documentation, and check security in one shot. The output is mediocre across all dimensions because the model cannot prioritize competing concerns. The fix is decomposition: one prompt per concern, chained into a pipeline.</p>
+
+  <h3>Pitfall 2: Missing negative constraints</h3>
+
+  <p>Without explicit "do not" instructions, Claude's helpfulness works against you. A performance analysis prompt will mention that variable names could be more descriptive. A documentation prompt will suggest code refactoring. Every stage drifts into the territory of every other stage, producing redundant, unfocused output. Add "Do NOT comment on [X, Y, Z]" to every stage template.</p>
+
+  <h3>Pitfall 3: No quality gates</h3>
+
+  <p>The pipeline runs end-to-end without any verification. A hallucinated finding in stage two cascades into a nonsensical fix in stage four. The developer sees the final output, concludes the tool is unreliable, and stops using it. Add at least one quality gate — even a simple format validation — between code generation stages.</p>
+
+  <h3>Pitfall 4: Over-automation</h3>
+
+  <p>Teams automate tasks that require human judgment — API design decisions, architecture choices, user experience tradeoffs. The automated output misses context that only a human familiar with the project would have. The fix is to clearly separate automatable tasks (review, testing, documentation) from collaborative tasks (design, architecture, prioritization). Use Claude as a thinking partner for the second category, not as an autonomous agent.</p>
+
+  <h3>Pitfall 5: Static templates</h3>
+
+  <p>Teams write their templates once and never update them. Over months, the templates drift out of alignment with the codebase as new patterns, libraries, and conventions are adopted. The fix is scheduled template reviews — once per month, review each template against the last 20 workflow runs and update based on false positives and missed issues.</p>
+
+  <h3>Pitfall 6: Ignoring context windows</h3>
+
+  <p>Feeding a 5,000-line diff into a prompt designed for focused analysis overwhelms the model and produces vague, generic findings. The fix is to chunk large inputs into manageable segments — analyze each file independently, then synthesize findings in a summary stage. A good rule of thumb is to keep individual prompt inputs under 2,000 lines of code. Larger inputs should be split across multiple parallel pipeline runs.</p>
+
+  <h2>Bringing It All Together</h2>
+
+  <p>Claude code workflow automation transforms development tasks from inconsistent manual processes into reliable, repeatable pipelines. The seven patterns in this guide — code review, refactoring, test generation, documentation, bug diagnosis, migration, and security audit — cover the tasks that most teams perform daily and that benefit most from structured automation.</p>
+
+  <p>Start with the interactive template builder above to generate workflows configured for your specific stack. Load the generated templates into <a href="/">ClaudFlow's visual builder</a> to see the pipeline structure and customize each stage. Add quality gates between code generation stages. Version control your templates alongside your application code. Measure precision and recall, and iterate monthly.</p>
+
+  <p>The compound effect is significant. A team that spends 20% of its time on code review, testing, and documentation can realistically automate 60-70% of that work within six weeks. That is 12-14% of total engineering capacity recovered and redirected toward building features and solving problems that require human creativity.</p>
+
+  <p>The workflows are not a replacement for developer expertise. They are a force multiplier that ensures every code change gets the same thorough, consistent review that your best engineer would give on their best day, every single time.</p>
+
+  <div class="further-reading">
+    <h3>Further Reading</h3>
+    <p>For deeper exploration of these concepts, review <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/chain-prompts" target="_blank" rel="noopener">Anthropic's guide to prompt chaining</a>, explore <a href="https://en.wikipedia.org/wiki/Continuous_integration" target="_blank" rel="noopener">continuous integration patterns</a>, and learn about <a href="https://en.wikipedia.org/wiki/Software_design_pattern" target="_blank" rel="noopener">software design patterns</a> that inform workflow architecture. For visual workflow building, try the <a href="/">ClaudFlow workflow designer</a>.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">Zovo Tools</div>
+    <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+    <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+    <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a></div>
+  </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+  <div class="zovo-network-inner">
+    <h3 class="zovo-network-title">Explore More Tools</h3>
+    <div class="zovo-network-links">
+      <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+      <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools</a>
+      <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+      <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+      <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+      <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+      <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+      <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+      <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+      <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+      <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+      <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+      <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+      <a href="https://lochbot.com">LochBot &mdash; Security</a>
+      <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+      <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+var WORKFLOWS = {
+  "code-review": {
+    name: "Code Review Pipeline",
+    steps: [
+      {
+        title: "Input Collection",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect the following inputs for review:\n- Git diff of changed files\n- Commit message / PR description\n- Language: " + lang + (fw ? "\n- Framework: " + fw : "") + "\n- Style guide: " + style + "\n- Files changed: list all modified files";
+        }
+      },
+      {
+        title: "Logic & Correctness Analysis",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a senior " + lang + " engineer" + (fw ? " specializing in " + fw : "") + ".\n\nAnalyze the following code diff for logical correctness.\n\nFocus exclusively on:\n- Whether the implementation matches the stated intent\n- Unhandled edge cases or boundary conditions\n- Off-by-one errors in loops and array/slice access\n- Null/undefined/nil handling in data flows\n- Race conditions in concurrent or async code\n- Incorrect error propagation\n\nDo NOT comment on style, naming, formatting, or performance.\n\nOutput each finding as:\n  SEVERITY: [HIGH/MEDIUM/LOW]\n  LOCATION: [file:line]\n  ISSUE: [description]\n  FIX: [suggested correction]\n\nDiff:\n{diff}";
+        }
+      },
+      {
+        title: "Security Scan",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a security engineer reviewing " + lang + " code" + (fw ? " using " + fw : "") + ".\n\nAnalyze the diff for security vulnerabilities.\n\nCheck for:\n- Injection attacks (SQL, NoSQL, command, LDAP)\n- Cross-site scripting (XSS) in rendered output\n- Authentication/authorization bypasses\n- Hardcoded secrets, API keys, or credentials\n- Insecure cryptographic usage\n- Path traversal in file operations\n- Deserialization of untrusted data\n- Missing input validation on user-facing endpoints\n\nDo NOT comment on code style, performance, or business logic.\n\nOutput format:\n  SEVERITY: [CRITICAL/HIGH/MEDIUM/LOW]\n  TYPE: [vulnerability category]\n  LOCATION: [file:line]\n  DESCRIPTION: [what the vulnerability is]\n  REMEDIATION: [specific code fix]\n\nDiff:\n{diff}";
+        }
+      },
+      {
+        title: "Style & Convention Check",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a " + lang + " developer enforcing the " + style + " style guide" + (fw ? " for " + fw + " projects" : "") + ".\n\nReview the diff for style and convention violations.\n\nCheck for:\n- Naming convention violations (variables, functions, classes)\n- Import ordering and grouping\n- Comment quality and placement\n- Function length and complexity\n- Consistent error handling patterns\n- Magic numbers or hardcoded strings\n- Dead code or unused variables\n\nDo NOT analyze security, performance, or logical correctness.\n\nOutput each finding as:\n  LOCATION: [file:line]\n  RULE: [which convention is violated]\n  CURRENT: [what the code does]\n  EXPECTED: [what it should do]\n\nDiff:\n{diff}";
+        }
+      },
+      {
+        title: "Quality Gate: Finding Validation",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Review all findings from the previous three stages.\n\nFor each finding, verify:\n1. The location reference (file:line) exists in the diff\n2. The finding is not a duplicate of another finding\n3. The severity rating is proportional to actual risk\n4. The suggested fix is syntactically valid " + lang + "\n\nRemove any findings that:\n- Reference lines not in the diff\n- Are duplicates (keep the higher-severity version)\n- Have incorrect severity (adjust if needed)\n- Have syntactically invalid fix suggestions\n\nOutput the validated, deduplicated list of findings.";
+        }
+      },
+      {
+        title: "Review Summary Report",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "Synthesize all validated findings into a structured review report.\n\nFormat:\n\n## Review Summary\n- Files reviewed: [count]\n- Total findings: [count by severity]\n- Recommendation: [APPROVE / REQUEST CHANGES / BLOCK]\n\n## Critical & High Findings\n[List each with location, description, and fix]\n\n## Medium & Low Findings\n[List each with location and description]\n\n## Positive Observations\n[2-3 things the code does well]\n\n## Suggested Follow-ups\n[Non-blocking improvements for future PRs]";
+        }
+      }
+    ]
+  },
+  "refactoring": {
+    name: "Refactoring Workflow",
+    steps: [
+      {
+        title: "Code Input & Context",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect the following for refactoring analysis:\n- Source code file(s) to refactor\n- Language: " + lang + (fw ? "\n- Framework: " + fw : "") + "\n- Style guide: " + style + "\n- Refactoring goals (e.g., reduce complexity, improve testability)\n- Constraints (must preserve public API, must not change DB schema)";
+        }
+      },
+      {
+        title: "Code Smell Detection",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a senior " + lang + " architect" + (fw ? " experienced with " + fw : "") + ".\n\nAnalyze the following code for code smells and anti-patterns.\n\nCheck for:\n- Long methods (>30 lines)\n- Deep nesting (>3 levels)\n- Feature envy (method uses another class more than its own)\n- Primitive obsession (using primitives instead of value objects)\n- Shotgun surgery (one change requires edits in many places)\n- God class / God function\n- Duplicated logic\n- Inappropriate coupling\n\nFor each smell found:\n  SMELL: [category]\n  LOCATION: [file:line range]\n  SEVERITY: [HIGH/MEDIUM/LOW]\n  DESCRIPTION: [why this is problematic]\n  IMPACT: [what breaks or degrades because of this]\n\nCode:\n{source_code}";
+        }
+      },
+      {
+        title: "Refactoring Strategy",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Based on the identified code smells, propose refactoring strategies.\n\nFor each smell, suggest:\n  SMELL: [reference from previous stage]\n  STRATEGY: [Extract Method / Extract Class / Introduce Parameter Object / etc.]\n  RISK: [LOW/MEDIUM/HIGH — chance of introducing bugs]\n  EFFORT: [SMALL/MEDIUM/LARGE — implementation time]\n  BENEFIT: [what improves after refactoring]\n  ORDER: [recommended sequence — do this 1st, 2nd, etc.]\n\nPrioritize strategies that are:\n1. Low risk, high benefit\n2. Required before other refactorings can proceed\n3. Aligned with " + style + " conventions\n\nGroup related refactorings that should be done together.";
+        }
+      },
+      {
+        title: "Generate Refactored Code",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Implement the recommended refactoring strategies in " + lang + ".\n\nRules:\n- Preserve all public method signatures exactly\n- Preserve all side effects and return values\n- Follow " + style + " conventions strictly\n- Add inline comments only where the refactoring changes control flow\n- Do NOT add new dependencies or imports unless required by the strategy" + (fw ? "\n- Follow " + fw + " idioms and patterns" : "") + "\n\nFor each refactored section, provide:\n  BEFORE: [original code]\n  AFTER: [refactored code]\n  STRATEGY APPLIED: [which strategy from previous stage]\n\nGenerate the complete refactored file(s).";
+        }
+      },
+      {
+        title: "Behavior Verification Gate",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Compare the original and refactored code to verify behavior preservation.\n\nVerify:\n1. All public method signatures are identical\n2. All return types are unchanged\n3. Error handling paths still exist and behave the same\n4. Side effects (DB writes, file I/O, API calls) are preserved\n5. No imports were removed that are still needed\n6. No new dependencies were introduced unnecessarily\n\nFor each verification point, state PASS or FAIL with evidence.\n\nIf any FAIL: describe exactly what changed and why it may break behavior.\nIf all PASS: confirm safe to proceed.";
+        }
+      },
+      {
+        title: "Refactoring Report",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "Generate the final refactoring report.\n\n## Changes Summary\n- Smells addressed: [count]\n- Lines changed: [approximate]\n- Risk level: [overall assessment]\n\n## Refactoring Details\n[Each refactoring with before/after and rationale]\n\n## Verification Results\n[Pass/fail status of behavior checks]\n\n## Remaining Technical Debt\n[Smells not addressed and why]\n\n## Recommended Follow-up\n[Next refactoring cycle priorities]";
+        }
+      }
+    ]
+  },
+  "testing": {
+    name: "Test Generation Chain",
+    steps: [
+      {
+        title: "Function Analysis Input",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect for test generation:\n- Source code of function(s) to test\n- Language: " + lang + (fw ? "\n- Framework: " + fw : "") + "\n- Test framework: " + (lang === 'Python' ? 'pytest' : lang === 'TypeScript' || lang === 'JavaScript' ? 'Jest / Vitest' : lang === 'Go' ? 'Go testing + testify' : lang === 'Rust' ? 'cargo test' : lang === 'Java' ? 'JUnit 5' : 'standard test framework') + "\n- Existing test files (if any)\n- Coverage targets (line %, branch %)";
+        }
+      },
+      {
+        title: "Signature & Behavior Analysis",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a " + lang + " testing specialist.\n\nAnalyze the following function(s) and document:\n\n1. INPUTS: parameter types, valid ranges, nullable fields\n2. OUTPUTS: return types, possible return values, error types\n3. SIDE EFFECTS: DB operations, file I/O, API calls, mutations\n4. DEPENDENCIES: external services, imported modules, global state\n5. BRANCHES: every if/else, switch/match, try/catch path\n6. EDGE CASES: empty inputs, max values, type boundaries, concurrent access\n\nDo NOT write any test code yet. Focus only on analysis.\n\nCode:\n{source_code}";
+        }
+      },
+      {
+        title: "Test Plan Generation",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Based on the function analysis, create a comprehensive test plan.\n\nFor each function, list test cases in these categories:\n\n1. HAPPY PATH: standard successful execution (2-3 cases)\n2. EDGE CASES: boundary values, empty inputs, max limits (3-5 cases)\n3. ERROR CASES: invalid inputs, missing data, timeout scenarios (2-4 cases)\n4. INTEGRATION: interaction with dependencies (1-2 cases)\n\nFor each test case:\n  NAME: descriptive test name following " + style + " conventions\n  INPUT: exact test data\n  EXPECTED: exact expected output or behavior\n  MOCKS: what needs to be mocked/stubbed\n  PRIORITY: [P0-critical / P1-important / P2-nice-to-have]\n\nTarget: cover every branch identified in the analysis.";
+        }
+      },
+      {
+        title: "Test Code Generation",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          var testFw = lang === 'Python' ? 'pytest' : lang === 'TypeScript' || lang === 'JavaScript' ? 'Jest' : lang === 'Go' ? 'Go testing' : lang === 'Rust' ? '#[test]' : lang === 'Java' ? 'JUnit 5' : 'standard framework';
+          return "Generate complete test code in " + lang + " using " + testFw + ".\n\nImplement every test case from the test plan.\n\nRules:\n- One test function per test case\n- Descriptive test names that document behavior\n- Arrange-Act-Assert structure in every test\n- Use " + (lang === 'Python' ? 'unittest.mock / pytest-mock' : lang === 'TypeScript' || lang === 'JavaScript' ? 'jest.mock / vi.mock' : lang === 'Go' ? 'interfaces and test doubles' : 'appropriate mocking library') + " for dependencies\n- Include setup and teardown where needed\n- Add inline comments explaining non-obvious assertions\n- Follow " + style + " conventions for test file organization\n\nGenerate the complete, runnable test file.";
+        }
+      },
+      {
+        title: "Coverage Verification Gate",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Review the generated tests against the function analysis.\n\nVerify:\n1. Every branch identified in analysis has at least one test\n2. Every edge case identified has a test\n3. Every error path has a test\n4. Mock setup matches actual dependency signatures\n5. Assertions check the right values (not just that code runs)\n6. No tests are redundant (testing the same path twice)\n\nFor each gap:\n  MISSING: [what branch/case is not tested]\n  SUGGESTED TEST: [test case to add]\n\nCoverage estimate: [percentage of branches covered]";
+        }
+      },
+      {
+        title: "Final Test Suite",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "Output the final test suite with:\n\n## Test File\n[Complete, runnable test code incorporating gap fixes]\n\n## Coverage Report\n- Branches covered: [X/Y]\n- Edge cases covered: [X/Y]\n- Error paths covered: [X/Y]\n- Estimated line coverage: [%]\n\n## Test Run Instructions\n[Exact command to run these tests]\n\n## Notes\n[Any tests that require environment setup or external services]";
+        }
+      }
+    ]
+  },
+  "documentation": {
+    name: "Documentation Builder",
+    steps: [
+      {
+        title: "Source Code Input",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect for documentation generation:\n- Source code files to document\n- Language: " + lang + (fw ? "\n- Framework: " + fw : "") + "\n- Documentation format: " + (lang === 'Python' ? 'Google-style docstrings' : lang === 'TypeScript' || lang === 'JavaScript' ? 'JSDoc / TSDoc' : lang === 'Go' ? 'GoDoc comments' : lang === 'Rust' ? '/// doc comments' : lang === 'Java' ? 'Javadoc' : 'standard doc comments') + "\n- Target audience: [internal team / public API / open source]\n- Existing docs to update (if any)";
+        }
+      },
+      {
+        title: "API Contract Extraction",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a " + lang + " documentation specialist.\n\nAnalyze the code and extract the API contract for every public function, method, and class.\n\nFor each:\n  NAME: [fully qualified name]\n  PURPOSE: [one-sentence description of what it does]\n  PARAMETERS: [name, type, required/optional, description, constraints]\n  RETURNS: [type, description, possible values]\n  THROWS/ERRORS: [error types and conditions that trigger them]\n  SIDE EFFECTS: [any state changes, I/O, or mutations]\n  EXAMPLES: [1-2 usage examples with realistic data]\n  RELATED: [other functions/methods this works with]\n\nDo NOT modify the source code. Extract information only.\n\nCode:\n{source_code}";
+        }
+      },
+      {
+        title: "Documentation Generation",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          var docFormat = lang === 'Python' ? 'Google-style docstrings' : lang === 'TypeScript' || lang === 'JavaScript' ? 'JSDoc' : lang === 'Go' ? 'GoDoc' : lang === 'Rust' ? 'rustdoc' : lang === 'Java' ? 'Javadoc' : 'inline doc comments';
+          return "Generate " + docFormat + " documentation for every public API element.\n\nRules:\n- First line is a concise summary (imperative mood: \"Return\" not \"Returns\")\n- Include all parameters with types and descriptions\n- Include return value documentation\n- Include error/exception documentation\n- Add 1-2 usage examples per function\n- Follow " + style + " conventions\n- Keep descriptions factual — no marketing language\n- Document non-obvious behavior and edge cases\n\nAlso generate a module/package-level overview that explains:\n- What this module does\n- When to use it\n- Key concepts\n- Quick start example\n\nOutput the complete documented source code.";
+        }
+      },
+      {
+        title: "Documentation Quality Gate",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Review the generated documentation for completeness and accuracy.\n\nVerify:\n1. Every public function/method has documentation\n2. Every parameter is documented with correct type\n3. Return values are documented\n4. Examples are syntactically valid " + lang + "\n5. No placeholder text or TODO markers remain\n6. Descriptions match actual code behavior\n\nFlag any documentation that:\n- Contradicts the source code\n- Uses incorrect types\n- Has examples that would not compile/run\n- Is missing for a public API element";
+        }
+      },
+      {
+        title: "Final Documentation Package",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "Output the final documentation package:\n\n## Documented Source Files\n[Complete source with inline documentation]\n\n## API Reference\n[Standalone API reference organized by module/class]\n\n## Quick Start Guide\n[3-5 step guide to start using this module]\n\n## Coverage\n- Public functions documented: [X/Y]\n- Parameters documented: [X/Y]\n- Examples provided: [X/Y]";
+        }
+      }
+    ]
+  },
+  "bug-fix": {
+    name: "Bug Diagnosis Pipeline",
+    steps: [
+      {
+        title: "Bug Report Input",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect the following for bug diagnosis:\n- Error message / stack trace\n- Steps to reproduce\n- Expected vs. actual behavior\n- Language: " + lang + (fw ? "\n- Framework: " + fw : "") + "\n- Relevant source code files\n- Environment details (OS, runtime version, dependencies)\n- Recent changes (git log of last 5-10 commits)";
+        }
+      },
+      {
+        title: "Root Cause Analysis",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a senior " + lang + " debugger" + (fw ? " experienced with " + fw : "") + ".\n\nAnalyze the error trace and source code to identify the root cause.\n\nMethodology:\n1. Parse the stack trace to identify the crash point\n2. Trace the data flow backward from the crash point\n3. Identify where the data first becomes invalid\n4. Check for common " + lang + " pitfalls at that location\n5. Verify assumptions about input data\n\nProvide:\n  ROOT CAUSE: [one-sentence description]\n  CRASH POINT: [file:line where the error occurs]\n  ORIGIN POINT: [file:line where the bug is introduced]\n  DATA FLOW: [how bad data propagates from origin to crash]\n  CONFIDENCE: [HIGH/MEDIUM/LOW with reasoning]\n\nDo NOT suggest fixes yet. Focus on diagnosis only.\n\nError trace:\n{error_trace}\n\nSource code:\n{source_code}";
+        }
+      },
+      {
+        title: "Fix Proposals",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Based on the root cause analysis, propose fixes ranked by risk and completeness.\n\nFor each fix:\n  APPROACH: [description of the fix]\n  RISK: [LOW/MEDIUM/HIGH — chance of introducing new bugs]\n  COMPLETENESS: [FULL/PARTIAL — does this fix the root cause or just the symptom?]\n  CODE CHANGE: [exact code diff]\n  SIDE EFFECTS: [what else this change affects]\n  TESTING: [how to verify the fix works]\n\nPropose at least 2 alternatives:\n1. Minimal fix (smallest possible change)\n2. Comprehensive fix (addresses root cause and related issues)\n\nFollow " + style + " conventions in all code changes.";
+        }
+      },
+      {
+        title: "Fix Validation Gate",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Validate each proposed fix:\n\n1. Does the fix address the root cause identified in diagnosis?\n2. Is the code syntactically valid " + lang + "?\n3. Does the fix handle the specific edge case that triggered the bug?\n4. Could the fix introduce new edge cases?\n5. Are there other code paths that have the same bug pattern?\n\nFor each fix, state VALIDATED or REJECTED with reasoning.\nIf rejected, explain what is wrong and how to correct it.";
+        }
+      },
+      {
+        title: "Regression Test Generation",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Generate regression tests that:\n1. Reproduce the original bug (should fail before fix, pass after)\n2. Cover the edge case that triggered the bug\n3. Cover similar edge cases that could trigger the same pattern\n4. Verify the fix does not break existing functionality\n\nUse " + (lang === 'Python' ? 'pytest' : lang === 'TypeScript' || lang === 'JavaScript' ? 'Jest' : lang === 'Go' ? 'Go testing' : 'standard test framework') + ".\n\nEach test should have a descriptive name referencing the bug.";
+        }
+      },
+      {
+        title: "Bug Fix Report",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "## Bug Fix Report\n\n### Root Cause\n[One-paragraph explanation]\n\n### Fix Applied\n[Selected fix with code diff]\n\n### Regression Tests Added\n[List of new test cases]\n\n### Related Code Paths\n[Other locations with the same bug pattern]\n\n### Prevention\n[What process or check would have caught this earlier]";
+        }
+      }
+    ]
+  },
+  "migration": {
+    name: "Migration Workflow",
+    steps: [
+      {
+        title: "Migration Scope Input",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect for migration planning:\n- Source code to migrate\n- Source: " + lang + (fw ? " / " + fw : "") + "\n- Target: [target language/framework/version]\n- Migration constraints (timeline, backward compatibility)\n- Breaking changes acceptable? [yes/no]\n- Dependency mapping (source deps to target equivalents)";
+        }
+      },
+      {
+        title: "Pattern Mapping",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a " + lang + " migration specialist.\n\nAnalyze the source code and map every pattern to its target equivalent.\n\nFor each pattern:\n  SOURCE PATTERN: [code snippet from source]\n  TARGET PATTERN: [equivalent in target language/framework]\n  COMPLEXITY: [DIRECT (1:1 mapping) / ADAPTED (needs restructuring) / MISSING (no equivalent)]\n  NOTES: [special considerations, behavioral differences]\n\nCategories to map:\n- Data types and structures\n- Control flow patterns\n- Error handling\n- Async/concurrent patterns\n- Framework-specific APIs\n- Testing patterns\n- Build/config files\n\nHighlight any patterns marked MISSING that require architectural decisions.";
+        }
+      },
+      {
+        title: "Migration Code Generation",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Generate the migrated code using the pattern mapping.\n\nRules:\n- Follow " + style + " conventions for the target language\n- Preserve all business logic exactly\n- Use idiomatic target language patterns (do not just transliterate)\n- Maintain the same public API surface where possible\n- Add TODO comments for MISSING patterns that need manual resolution\n- Update import/dependency declarations\n\nFor each file:\n  SOURCE FILE: [original path]\n  TARGET FILE: [new path]\n  MIGRATED CODE: [complete target code]";
+        }
+      },
+      {
+        title: "Breaking Change Analysis Gate",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Analyze the migrated code for breaking changes.\n\n1. Public API changes (renamed, removed, or retyped functions)\n2. Behavioral differences (different error types, different defaults)\n3. Dependency changes (removed deps, added deps, version conflicts)\n4. Configuration changes (env vars, config files, build scripts)\n\nFor each breaking change:\n  CHANGE: [what changed]\n  IMPACT: [what breaks]\n  MIGRATION PATH: [how consumers should update]\n  SEVERITY: [BREAKING / DEPRECATION / COMPATIBLE]\n\nGenerate a MIGRATION_GUIDE.md outline for downstream consumers.";
+        }
+      },
+      {
+        title: "Migration Package",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "## Migration Package\n\n### Migrated Files\n[Complete list with source and target paths]\n\n### Breaking Changes\n[Prioritized list with migration paths]\n\n### Rollback Strategy\n[How to revert if migration causes issues]\n\n### Verification Checklist\n[Step-by-step validation of migrated code]\n\n### Dependency Changes\n[Added, removed, and updated dependencies]";
+        }
+      }
+    ]
+  },
+  "security": {
+    name: "Security Audit Chain",
+    steps: [
+      {
+        title: "Audit Scope Input",
+        type: "input",
+        template: function(lang, fw, style) {
+          return "Collect for security audit:\n- Source code files to audit\n- Language: " + lang + (fw ? "\n- Framework: " + fw : "") + "\n- Application type: [web app / API / CLI / library]\n- Authentication method: [JWT / session / OAuth / API key]\n- Data sensitivity: [PII / financial / public / internal]\n- Dependency manifest (package.json / requirements.txt / go.mod)";
+        }
+      },
+      {
+        title: "OWASP Top 10 Scan",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "You are a security auditor specializing in " + lang + (fw ? " / " + fw : "") + " applications.\n\nAudit the code against the OWASP Top 10:\n\n1. A01 Broken Access Control\n2. A02 Cryptographic Failures\n3. A03 Injection\n4. A04 Insecure Design\n5. A05 Security Misconfiguration\n6. A06 Vulnerable Components\n7. A07 Authentication Failures\n8. A08 Data Integrity Failures\n9. A09 Logging & Monitoring Failures\n10. A10 Server-Side Request Forgery\n\nFor each category, provide:\n  STATUS: [VULNERABLE / CONCERN / PASS / N/A]\n  EVIDENCE: [specific code location and pattern]\n  RISK: [description of attack scenario]\n  REMEDIATION: [specific code fix]\n\nDo NOT flag theoretical risks without code evidence.\n\nCode:\n{source_code}";
+        }
+      },
+      {
+        title: "Authentication Flow Analysis",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Trace every authentication and authorization flow in the codebase.\n\nFor each protected endpoint/function:\n  ENDPOINT: [path or function name]\n  AUTH REQUIRED: [what credentials are checked]\n  AUTH METHOD: [how credentials are validated]\n  AUTHORIZATION: [what permissions are checked]\n  BYPASS RISK: [can auth be bypassed? how?]\n\nAlso check:\n- Session management (expiry, rotation, invalidation)\n- Password handling (hashing algorithm, salt, complexity)\n- Token management (signing, expiry, revocation)\n- Rate limiting on auth endpoints\n- Account lockout after failed attempts";
+        }
+      },
+      {
+        title: "Dependency Vulnerability Check",
+        type: "prompt",
+        template: function(lang, fw, style) {
+          return "Analyze the dependency manifest for known security concerns.\n\nFor each dependency:\n  PACKAGE: [name@version]\n  KNOWN ISSUES: [any known CVEs or security advisories]\n  STATUS: [CURRENT / OUTDATED / DEPRECATED / UNMAINTAINED]\n  RECOMMENDATION: [keep / update to X.Y.Z / replace with alternative]\n\nAlso check:\n- Are there dependencies with excessive permissions?\n- Are there deprecated packages still in use?\n- Is there a lockfile enforcing exact versions?\n- Are dev dependencies separated from production?";
+        }
+      },
+      {
+        title: "Audit Validation Gate",
+        type: "gate",
+        template: function(lang, fw, style) {
+          return "Review all security findings for accuracy.\n\n1. Verify each VULNERABLE finding has specific code evidence\n2. Verify the attack scenario is realistic, not theoretical\n3. Verify remediation code is syntactically valid " + lang + "\n4. Check for false positives (safe patterns flagged as dangerous)\n5. Check for missed findings in areas not covered\n\nRemove false positives. Adjust severity if needed.\nAdd any missed findings.";
+        }
+      },
+      {
+        title: "Security Audit Report",
+        type: "output",
+        template: function(lang, fw, style) {
+          return "## Security Audit Report\n\n### Executive Summary\n[Overall risk rating: CRITICAL / HIGH / MEDIUM / LOW]\n[Count of findings by severity]\n\n### Critical Findings (Fix Immediately)\n[Detailed findings with remediation code]\n\n### High Findings (Fix This Sprint)\n[Detailed findings with remediation code]\n\n### Medium/Low Findings (Backlog)\n[Summary findings with recommendations]\n\n### Dependency Status\n[Packages requiring updates]\n\n### Remediation Priority\n[Ordered list: what to fix first and why]\n\n### Recommendations\n[Process improvements to prevent future issues]";
+        }
+      }
+    ]
+  }
+};
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function generateWorkflow() {
+  var taskType = document.getElementById('taskType').value;
+  var lang = document.getElementById('language').value;
+  var fw = document.getElementById('framework').value.trim();
+  var style = document.getElementById('styleGuide').value;
+  var workflow = WORKFLOWS[taskType];
+
+  if (!workflow) return;
+
+  var styleLabels = {
+    'standard': 'Standard',
+    'airbnb': 'Airbnb',
+    'google': 'Google',
+    'pep8': 'PEP 8',
+    'effective-go': 'Effective Go',
+    'custom': 'Custom'
+  };
+
+  var html = '<h4 style="color:var(--accent);margin-bottom:0.5rem;">' + escapeHtml(workflow.name) + '</h4>';
+  html += '<p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">' + escapeHtml(lang) + (fw ? ' / ' + escapeHtml(fw) : '') + ' &middot; ' + escapeHtml(styleLabels[style] || style) + ' style &middot; ' + workflow.steps.length + ' steps</p>';
+
+  for (var i = 0; i < workflow.steps.length; i++) {
+    var step = workflow.steps[i];
+    var promptText = step.template(lang, fw, styleLabels[style] || style);
+    var typeClass = step.type;
+    var typeLabel = step.type === 'prompt' ? 'AI Prompt' : step.type === 'gate' ? 'Quality Gate' : step.type === 'input' ? 'Input' : step.type === 'output' ? 'Output' : step.type.charAt(0).toUpperCase() + step.type.slice(1);
+
+    html += '<div class="workflow-step">';
+    html += '<div class="step-header">';
+    html += '<span class="step-number">' + (i + 1) + '</span>';
+    html += '<span class="step-title">' + escapeHtml(step.title) + '</span>';
+    html += '<span class="step-type ' + typeClass + '">' + escapeHtml(typeLabel) + '</span>';
+    html += '</div>';
+    html += '<div class="step-prompt" id="prompt-' + i + '">' + escapeHtml(promptText) + '</div>';
+    html += '<button class="copy-btn" onclick="copyPrompt(' + i + ')">Copy prompt</button>';
+    html += '</div>';
+  }
+
+  var output = document.getElementById('workflowOutput');
+  output.innerHTML = html;
+  output.classList.add('active');
+  output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyPrompt(index) {
+  var el = document.getElementById('prompt-' + index);
+  if (!el) return;
+  var text = el.textContent || el.innerText;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      var btns = document.querySelectorAll('.copy-btn');
+      if (btns[index]) {
+        btns[index].textContent = 'Copied!';
+        setTimeout(function() { btns[index].textContent = 'Copy prompt'; }, 1500);
+      }
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    var btns = document.querySelectorAll('.copy-btn');
+    if (btns[index]) {
+      btns[index].textContent = 'Copied!';
+      setTimeout(function() { btns[index].textContent = 'Copy prompt'; }, 1500);
+    }
+  }
+}
+</script>
+</body>
+</html>
