@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Token Cost Tracker — Claude API Usage Dashboard &amp; Budget Alerts | ClaudFlow</title>
+  <meta name="description" content="Track Claude API token usage and costs in real time. Set budget alerts, compare model pricing, forecast monthly spend, and identify cost optimization opportunities. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Token Cost Tracker — Claude API Usage Dashboard & Budget Alerts">
+  <meta property="og:description" content="Track Claude API token usage and costs. Set budget alerts, compare model pricing, forecast monthly spend, and identify optimization opportunities.">
+  <meta property="og:url" content="https://claudflow.com/tools/token-cost-tracker.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Token Cost Tracker — Claude API Usage Dashboard & Budget Alerts">
+  <meta name="twitter:description" content="Track Claude API token usage and costs. Set budget alerts, compare model pricing, and forecast monthly spend.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/tools/token-cost-tracker.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/tools/token-cost-tracker.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/tools/token-cost-tracker.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Token Cost Tracker",
+    "url": "https://claudflow.com/tools/token-cost-tracker.html",
+    "description": "Track Claude API token usage and costs with budget alerts. Log API calls, compare model pricing across Claude, GPT-4o, and Gemini. Forecast monthly spend and identify cost optimization opportunities.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "Manual API call logging with input/output token tracking",
+      "Real-time cost calculation across Claude, GPT-4o, and Gemini models",
+      "Monthly budget setting with visual progress bar and alerts",
+      "Daily and weekly cost trend visualization",
+      "Model-by-model cost breakdown with pie chart",
+      "Cost forecasting based on current usage patterns",
+      "What-if model switching calculator for cost comparison",
+      "Export usage data as JSON or CSV",
+      "100% browser-based with localStorage persistence, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How much does Claude API cost per token?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude API pricing varies by model. Claude 3.5 Sonnet costs $3 per million input tokens and $15 per million output tokens. Claude 4 Opus costs $15 per million input tokens and $75 per million output tokens. Claude 3.5 Haiku costs $0.25 per million input tokens and $1.25 per million output tokens. Prompt caching reduces cached input token costs by 90%. The Token Cost Tracker calculates exact costs for each API call based on the model used and token counts."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I set a budget for Claude API usage?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Set a monthly budget in the Token Cost Tracker by entering your target dollar amount. The tool tracks your cumulative spend against this budget and shows a visual progress bar. When you reach 80% of your budget, the bar turns yellow as a warning. At 100%, it turns red. For programmatic budget enforcement, set spending limits directly in the Anthropic API console. The tracker helps you forecast whether your current usage rate will exceed the budget before month end."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the cheapest way to use Claude for production applications?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The cheapest approach combines three strategies: use Claude 3.5 Haiku for simple tasks like classification and extraction at $0.25 per million input tokens, use prompt caching to reduce repeated system prompt costs by 90%, and set max_tokens to cap output length. Route complex reasoning tasks to Claude 3.5 Sonnet and reserve Claude 4 Opus for tasks that truly need it. Most production workloads can use Haiku for 70% of requests, reducing average cost by 80% compared to using Sonnet for everything."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I track token usage across multiple Claude projects?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Token Cost Tracker lets you tag each logged API call with a project name. You can then filter the dashboard to see costs for a specific project or view all projects together. For automated tracking, log the usage metadata returned in each Claude API response (input_tokens and output_tokens fields) to your own database. The Anthropic API console also provides usage dashboards broken down by API key, which you can use to separate projects by assigning different keys."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does this tracker connect to the Claude API?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. The Token Cost Tracker is a manual logging and calculation tool that runs entirely in your browser. You enter your API call details (model, input tokens, output tokens) and the tool calculates costs using current published pricing. Data is stored in your browser's localStorage and never sent to any server. For automated tracking that connects to your actual API usage, use the Anthropic usage dashboard or build a middleware layer that logs each API response."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Token Cost Tracker" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .tct-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .tct-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .tct-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .tct-card h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .tct-card label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.25rem; margin-top:0.75rem; }
+    .tct-card label:first-of-type { margin-top:0; }
+    .tct-card select, .tct-card input { width:100%; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.88rem; box-sizing:border-box; }
+    .tct-card input:focus, .tct-card select:focus { outline:none; border-color:var(--accent); }
+
+    .tct-budget-bar { width:100%; height:32px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin:0.75rem 0; position:relative; }
+    .tct-budget-fill { height:100%; border-radius:var(--radius); transition:width 0.3s,background 0.3s; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:600; color:#000; }
+
+    .tct-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .tct-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; text-align:center; }
+    .tct-stat .val { font-size:1.4rem; font-weight:700; color:var(--accent); }
+    .tct-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .tct-log-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .tct-log-table th { text-align:left; padding:0.5rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .tct-log-table td { padding:0.5rem; border-bottom:1px solid var(--border); color:var(--text); }
+    .tct-log-table tr:hover td { background:rgba(6,182,212,0.05); }
+
+    .tct-chart { width:100%; height:180px; display:flex; align-items:end; gap:2px; padding:0 0.25rem; box-sizing:border-box; }
+    .tct-chart-bar { flex:1; border-radius:3px 3px 0 0; transition:height 0.3s; min-height:2px; position:relative; }
+    .tct-chart-bar:hover::after { content:attr(data-label); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:var(--bg-card); border:1px solid var(--border); padding:0.2rem 0.4rem; border-radius:3px; font-size:0.68rem; white-space:nowrap; color:var(--text); }
+
+    .tct-model-table { width:100%; border-collapse:collapse; font-size:0.82rem; margin:0.75rem 0; }
+    .tct-model-table th { text-align:left; padding:0.5rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .tct-model-table td { padding:0.5rem; border-bottom:1px solid var(--border); color:var(--text); }
+
+    .tct-tips { margin-top:1.5rem; }
+    .tct-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .tct-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .tct-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .tct-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .tct-tip .tip-text strong { color:var(--text); }
+
+    .tct-export-bar { display:flex; gap:0.5rem; margin-top:1rem; }
+    .tct-alert { background:#ef4444; color:#fff; padding:0.75rem 1rem; border-radius:var(--radius); font-size:0.85rem; font-weight:600; margin-bottom:1rem; display:none; }
+
+    @media (max-width:768px) {
+      .tct-grid { grid-template-columns:1fr; }
+      .tct-stats { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/tools/" style="color:var(--accent);text-decoration:none;">Tools</a> &rsaquo;
+      <span style="color:var(--text-muted);">Token Cost Tracker</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Token Cost Tracker</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Track Claude API token usage and costs. Set budgets, compare model pricing, forecast monthly spend, and identify optimization opportunities.</p>
+    </section>
+  </main>
+
+  <div class="tct-wrap">
+    <div class="tct-alert" id="tct-alert"></div>
+
+    <div class="tct-card" style="margin-bottom:1.5rem;">
+      <h3>Budget Overview</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.75rem;">
+        <div>
+          <label>Monthly Budget ($)</label>
+          <input type="number" id="tct-budget" value="500" min="1" step="10" oninput="tctUpdate()">
+        </div>
+        <div>
+          <label>Budget Period</label>
+          <select id="tct-period" onchange="tctUpdate()">
+            <option value="monthly" selected>Monthly</option>
+            <option value="weekly">Weekly</option>
+            <option value="daily">Daily</option>
+          </select>
+        </div>
+      </div>
+      <div class="tct-budget-bar"><div class="tct-budget-fill" id="tct-budget-fill" style="width:0%;background:var(--accent);">0%</div></div>
+      <div class="tct-stats" id="tct-budget-stats"></div>
+    </div>
+
+    <div class="tct-grid">
+      <div class="tct-card">
+        <h3>Log API Call</h3>
+        <label>Model</label>
+        <select id="tct-model">
+          <option value="claude-3.5-haiku">Claude 3.5 Haiku ($0.25 / $1.25)</option>
+          <option value="claude-3.5-sonnet" selected>Claude 3.5 Sonnet ($3 / $15)</option>
+          <option value="claude-4-opus">Claude 4 Opus ($15 / $75)</option>
+          <option value="gpt-4o">GPT-4o ($2.50 / $10)</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro ($1.25 / $5)</option>
+        </select>
+        <label>Input Tokens</label>
+        <input type="number" id="tct-input" value="2000" min="0">
+        <label>Output Tokens</label>
+        <input type="number" id="tct-output" value="500" min="0">
+        <label>Project Tag (optional)</label>
+        <input type="text" id="tct-project" placeholder="e.g. chatbot-v2">
+        <label>Cached Input Tokens (optional)</label>
+        <input type="number" id="tct-cached" value="0" min="0">
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+          <button class="btn btn-accent" style="flex:1;" onclick="tctLogCall()">Log Call</button>
+          <button class="btn" onclick="tctLogBatch()">Log Batch (x100)</button>
+        </div>
+      </div>
+
+      <div class="tct-card">
+        <h3>Daily Cost Trend</h3>
+        <div class="tct-chart" id="tct-chart"></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;">
+          <span id="tct-chart-start">-</span>
+          <span id="tct-chart-end">Today</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tct-card" style="margin-bottom:1.5rem;">
+      <h3>Usage Summary</h3>
+      <div class="tct-stats" id="tct-stats">
+        <div class="tct-stat"><div class="val">0</div><div class="lbl">Total Calls</div></div>
+        <div class="tct-stat"><div class="val">0</div><div class="lbl">Input Tokens</div></div>
+        <div class="tct-stat"><div class="val">0</div><div class="lbl">Output Tokens</div></div>
+        <div class="tct-stat"><div class="val">$0.00</div><div class="lbl">Total Cost</div></div>
+        <div class="tct-stat"><div class="val">$0.00</div><div class="lbl">Avg Cost / Call</div></div>
+        <div class="tct-stat"><div class="val">$0.00</div><div class="lbl">Forecasted Monthly</div></div>
+      </div>
+    </div>
+
+    <div class="tct-card" style="margin-bottom:1.5rem;">
+      <h3>Model Pricing Reference</h3>
+      <table class="tct-model-table">
+        <thead><tr><th>Model</th><th>Input $/1M</th><th>Output $/1M</th><th>Cached Input $/1M</th><th>Context</th></tr></thead>
+        <tbody>
+          <tr><td>Claude 3.5 Haiku</td><td>$0.25</td><td>$1.25</td><td>$0.025</td><td>200K</td></tr>
+          <tr><td>Claude 3.5 Sonnet</td><td>$3.00</td><td>$15.00</td><td>$0.30</td><td>200K</td></tr>
+          <tr><td>Claude 4 Opus</td><td>$15.00</td><td>$75.00</td><td>$1.50</td><td>200K</td></tr>
+          <tr><td>GPT-4o</td><td>$2.50</td><td>$10.00</td><td>$1.25</td><td>128K</td></tr>
+          <tr><td>Gemini 2.5 Pro</td><td>$1.25</td><td>$5.00</td><td>$0.32</td><td>1M</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tct-card" style="margin-bottom:1.5rem;">
+      <h3>What-If Model Switching</h3>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">See how your costs would change if you switched all calls to a different model:</p>
+      <div id="tct-whatif"></div>
+    </div>
+
+    <div class="tct-card" style="margin-bottom:1.5rem;">
+      <h3>Recent Calls</h3>
+      <div style="max-height:250px;overflow-y:auto;">
+        <table class="tct-log-table">
+          <thead><tr><th>Time</th><th>Model</th><th>Input</th><th>Output</th><th>Cost</th><th>Project</th></tr></thead>
+          <tbody id="tct-log-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tct-export-bar">
+      <button class="btn btn-accent" onclick="tctExport('json')">Export JSON</button>
+      <button class="btn" onclick="tctExport('csv')">Export CSV</button>
+      <button class="btn" onclick="tctClearAll()">Clear All Data</button>
+    </div>
+
+    <div class="tct-tips" style="margin-top:1.5rem;">
+      <h3>Cost Optimization Tips</h3>
+      <div class="tct-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Use Haiku for 70% of your requests.</strong> Most classification, extraction, and simple Q&A tasks perform equally well on Claude 3.5 Haiku at $0.25/1M input tokens versus $3/1M on Sonnet. Route only complex reasoning to more expensive models. This single change typically reduces monthly costs by 60-80%.</div>
+      </div>
+      <div class="tct-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Enable prompt caching immediately.</strong> If your system prompt is 1,000 tokens and you make 10,000 requests per day, prompt caching saves 9 million tokens daily at 90% reduced cost. That is $27/day saved with Claude 3.5 Sonnet pricing. Over a month, that is $810 from one configuration change.</div>
+      </div>
+      <div class="tct-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Set max_tokens on every request.</strong> Without max_tokens, the model can generate up to its maximum output length. If you only need 200 tokens of output, set max_tokens to 300 (with buffer). This prevents runaway generation that inflates output token costs, which are 3-5x more expensive than input tokens.</div>
+      </div>
+      <div class="tct-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Batch non-urgent requests.</strong> Anthropic offers batch processing at 50% reduced cost with a 24-hour SLA. If your workflow can tolerate delayed responses for tasks like content generation, analysis reports, or offline processing, batching halves the cost with no quality change.</div>
+      </div>
+      <div class="tct-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Monitor cost per project, not just total spend.</strong> Tag every API call with a project identifier. Often one project consumes 80% of the budget due to inefficient prompts or unnecessary model choices. Identifying the top-spending project lets you focus optimization where it has the most impact.</div>
+      </div>
+      <div class="tct-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Review the input-to-output token ratio.</strong> If your average call uses 10,000 input tokens and generates 200 output tokens, you are paying for context that might not be needed. Reduce input tokens by compressing system prompts, limiting few-shot examples, and filtering irrelevant context before sending the request.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Token Cost Tracker Works</h2>
+
+    <p>The Token Cost Tracker is a browser-based dashboard for monitoring Claude API token usage and costs. Every API call to Claude or any other language model consumes tokens that translate directly to dollars. Without tracking, costs can spiral unexpectedly as usage scales. A developer testing with 100 requests per day at $0.01 each barely notices the $3 monthly bill. But when that same application goes to production handling 10,000 requests per day, the bill jumps to $300 per month. And if the prompts are not optimized, it could easily be $1,000 or more. This tool makes token consumption and costs visible so you can optimize before the bill arrives.</p>
+
+    <p>Log each API call by selecting the model, entering input and output token counts, and optionally tagging it with a project name. The tool calculates the exact cost using current published pricing and adds it to your running total. The budget progress bar shows how much of your monthly budget you have consumed. Daily cost trend charts reveal usage patterns, helping you identify spikes and plan capacity. The what-if calculator shows how your costs would change if you switched models, making it easy to evaluate cost optimization strategies.</p>
+
+    <h2>Understanding Claude API Pricing</h2>
+
+    <p>Claude API pricing is split between input tokens and output tokens, with output tokens costing significantly more. Claude 3.5 Sonnet charges $3 per million input tokens and $15 per million output tokens, making output five times more expensive per token. Claude 4 Opus charges $15 per million input tokens and $75 per million output tokens. Claude 3.5 Haiku offers the lowest prices at $0.25 per million input tokens and $1.25 per million output tokens. These price differences mean that model selection is the single biggest lever for cost control.</p>
+
+    <p>Prompt caching adds another pricing tier. When you enable caching on a system prompt or few-shot examples, the first request pays full price. Subsequent requests that include the same cached prefix pay only 10% of the normal input token rate for the cached portion. For Claude 3.5 Sonnet, cached input tokens cost $0.30 per million instead of $3.00. This 90% reduction makes caching the most impactful optimization for high-volume applications with stable system prompts. The Token Cost Tracker includes a cached token field so you can accurately model costs with caching enabled.</p>
+
+    <p>Comparing across providers reveals important tradeoffs. GPT-4o charges $2.50 per million input tokens and $10 per million output tokens, slightly cheaper than Claude 3.5 Sonnet. Gemini 2.5 Pro charges $1.25 per million input tokens and $5 per million output tokens, the cheapest option for bulk processing. However, price per token is only one factor. If Claude 3.5 Sonnet produces the correct answer in one call while a cheaper model needs two attempts, the cheaper model actually costs more. The what-if calculator in this tool helps you model these scenarios by showing the per-call cost difference without accounting for quality differences, which you need to evaluate separately.</p>
+
+    <h2>Setting Effective Budget Alerts</h2>
+
+    <p>Budget alerts prevent surprise bills by warning you before you exceed your spending target. Set your monthly budget to match your team's approved AI spending allocation. The tracker shows a green progress bar when you are under 80% of budget, yellow between 80% and 100%, and red when you exceed 100%. For production applications, set the budget at 80% of your actual limit so the yellow warning gives you time to investigate and optimize before hitting the hard cap.</p>
+
+    <p>Daily and weekly budget views help catch problems faster than monthly views. A monthly budget of $500 averages to roughly $17 per day. If you see daily spend jump to $40, you know immediately that something changed rather than discovering at month end that you overspent by 2x. Common causes of sudden cost spikes include: a new feature that makes more API calls than expected, a prompt change that increased token usage, a retry loop that calls the API hundreds of times on failures, or a testing environment that accidentally uses the production API key.</p>
+
+    <p>Per-project tracking makes budget management actionable. When total costs rise, you need to know which project is responsible. Tag every API call with a project identifier and review per-project costs weekly. Often a single project consumes a disproportionate share of the budget. Identifying it lets you focus optimization efforts on the highest-impact area rather than trying to reduce costs everywhere equally. The most common finding is that one project's system prompt is unnecessarily long, consuming thousands of extra tokens on every call.</p>
+
+    <h2>Forecasting and Capacity Planning</h2>
+
+    <p>The cost forecaster extrapolates your current usage rate to estimate the monthly total. If you have logged calls for 10 days and spent $150, the forecast projects $450 for the full 30-day month. This simple projection catches budget overruns early. If your budget is $500 and the 10-day forecast shows $600, you have 20 days to optimize rather than discovering the overrun at month end. The forecast becomes more accurate as you log more data, especially if your usage is consistent day to day.</p>
+
+    <p>For applications with variable demand, look at the daily cost trend chart rather than the simple average. If weekday usage is 3x weekend usage, the simple average will underestimate weekday costs and overestimate weekends. Plan for peak usage, not average usage. If your peak daily cost is $25 and your budget allows $17 per day, you need either a larger budget or cost optimizations that reduce peak-day spending. The <a href="/tools/context-window-optimizer.html">Context Window Optimizer</a> helps identify where tokens are being spent and how to reduce per-request consumption.</p>
+
+    <p>Scaling projections require accounting for growth. If you expect user traffic to double next month, double your cost forecast. Token costs scale linearly with request volume assuming the same prompt design. However, optimizations often scale better than linearly. Implementing prompt caching saves $0.30 per call on a 1,000-token system prompt with Sonnet pricing. At 1,000 requests per day, that saves $9 per day. At 10,000 requests per day, the same optimization saves $90 per day. The fixed effort of implementing caching delivers increasing savings as volume grows.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Token Cost Tracker runs entirely in your browser. API call logs, budget settings, cost calculations, and forecast data are processed and stored client-side using JavaScript and localStorage. No data is sent to any server. Exported data files are generated and downloaded locally. There are no accounts, no cookies, no analytics, and no server-side processing. Your API usage patterns and cost data remain completely private on your device. Clearing your browser data removes all stored logs, so export regularly if you need to preserve historical data.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>How much does Claude API cost per token?</summary>
+      <p>Claude 3.5 Sonnet costs $3/1M input and $15/1M output. Claude 4 Opus costs $15/1M input and $75/1M output. Claude 3.5 Haiku costs $0.25/1M input and $1.25/1M output. Prompt caching reduces cached input costs by 90%.</p>
+    </details>
+
+    <details>
+      <summary>How do I set a budget for Claude API usage?</summary>
+      <p>Enter your monthly target in the Token Cost Tracker. The progress bar turns yellow at 80% and red at 100%. For programmatic enforcement, set limits in the Anthropic API console. The tracker forecasts whether current usage will exceed budget before month end.</p>
+    </details>
+
+    <details>
+      <summary>What is the cheapest way to use Claude for production?</summary>
+      <p>Use Claude 3.5 Haiku for simple tasks (70% of requests), enable prompt caching for 90% input cost reduction, and set max_tokens to cap output. Route only complex reasoning to Sonnet or Opus. This typically reduces costs by 60-80%.</p>
+    </details>
+
+    <details>
+      <summary>How do I track usage across multiple projects?</summary>
+      <p>Tag each logged API call with a project name. Filter the dashboard to see per-project costs. For automated tracking, log the usage metadata returned in each API response to your database. Use separate API keys per project in the Anthropic console.</p>
+    </details>
+
+    <details>
+      <summary>Does this tracker connect to the Claude API?</summary>
+      <p>No. The tracker is a manual logging tool running entirely in your browser. You enter API call details and it calculates costs using published pricing. Data is stored in localStorage, never sent to any server.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/tools/system-prompt-tester.html">System Prompt A/B Tester</a></li>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration</a></li>
+          <li><a href="/answers/claude-memory-strategies.html">Claude Memory Strategies</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+          <li><a href="/research/claude-use-case-gallery.html">Claude Use Case Gallery</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var MODELS = {
+    'claude-3.5-haiku':  {name:'Claude 3.5 Haiku',  input:0.25, output:1.25, cached:0.025},
+    'claude-3.5-sonnet': {name:'Claude 3.5 Sonnet', input:3.00, output:15.00, cached:0.30},
+    'claude-4-opus':     {name:'Claude 4 Opus',     input:15.00, output:75.00, cached:1.50},
+    'gpt-4o':            {name:'GPT-4o',            input:2.50, output:10.00, cached:1.25},
+    'gemini-2.5-pro':    {name:'Gemini 2.5 Pro',    input:1.25, output:5.00, cached:0.32}
+  };
+  var calls = JSON.parse(localStorage.getItem('tct-calls')||'[]');
+  function fmt(n){ return n.toLocaleString(); }
+  function calcCost(model, inp, out, cached){
+    var m = MODELS[model];
+    if(!m) return 0;
+    var uncachedInput = Math.max(0, inp - (cached||0));
+    return (uncachedInput/1000000)*m.input + ((cached||0)/1000000)*m.cached + (out/1000000)*m.output;
+  }
+
+  window.tctLogCall = function(){
+    var model = document.getElementById('tct-model').value;
+    var inp = parseInt(document.getElementById('tct-input').value)||0;
+    var out = parseInt(document.getElementById('tct-output').value)||0;
+    var project = document.getElementById('tct-project').value.trim()||'default';
+    var cached = parseInt(document.getElementById('tct-cached').value)||0;
+    var cost = calcCost(model, inp, out, cached);
+    calls.push({ts:Date.now(), model:model, input:inp, output:out, cached:cached, project:project, cost:cost});
+    save();
+    tctUpdate();
+  };
+
+  window.tctLogBatch = function(){
+    var model = document.getElementById('tct-model').value;
+    var inp = parseInt(document.getElementById('tct-input').value)||0;
+    var out = parseInt(document.getElementById('tct-output').value)||0;
+    var project = document.getElementById('tct-project').value.trim()||'default';
+    var cached = parseInt(document.getElementById('tct-cached').value)||0;
+    for(var i=0;i<100;i++){
+      var jitter = 0.8 + Math.random()*0.4;
+      var ci = Math.round(inp*jitter);
+      var co = Math.round(out*jitter);
+      var cost = calcCost(model, ci, co, cached);
+      calls.push({ts:Date.now()-Math.random()*86400000*7, model:model, input:ci, output:co, cached:cached, project:project, cost:cost});
+    }
+    save();
+    tctUpdate();
+  };
+
+  function save(){
+    try{ localStorage.setItem('tct-calls', JSON.stringify(calls.slice(-5000))); }catch(e){}
+  }
+
+  window.tctUpdate = function(){
+    var budget = parseFloat(document.getElementById('tct-budget').value)||500;
+    var period = document.getElementById('tct-period').value;
+
+    var now = Date.now();
+    var periodMs = period==='daily'?86400000:(period==='weekly'?604800000:2592000000);
+    var periodCalls = calls.filter(function(c){ return now-c.ts < periodMs; });
+
+    var totalCost=0, totalInput=0, totalOutput=0;
+    for(var i=0;i<periodCalls.length;i++){
+      totalCost += periodCalls[i].cost;
+      totalInput += periodCalls[i].input;
+      totalOutput += periodCalls[i].output;
+    }
+
+    var pct = budget>0?Math.min(100,(totalCost/budget)*100):0;
+    var fill = document.getElementById('tct-budget-fill');
+    fill.style.width = pct+'%';
+    fill.textContent = pct.toFixed(1)+'%';
+    fill.style.background = pct<80?'var(--accent)':(pct<100?'#eab308':'#ef4444');
+
+    var remaining = Math.max(0, budget-totalCost);
+    var daysElapsed = Math.max(1, periodMs===2592000000?((now-Math.min.apply(null,periodCalls.map(function(c){return c.ts;}).concat([now])))/86400000):1);
+    var forecast = periodMs===2592000000?(totalCost/Math.max(1,daysElapsed))*30:totalCost;
+
+    document.getElementById('tct-budget-stats').innerHTML = '<div class="tct-stat"><div class="val">$'+totalCost.toFixed(2)+'</div><div class="lbl">Spent</div></div>'
+      +'<div class="tct-stat"><div class="val" style="color:'+(remaining<budget*0.2?'#ef4444':'#22c55e')+';">$'+remaining.toFixed(2)+'</div><div class="lbl">Remaining</div></div>'
+      +'<div class="tct-stat"><div class="val">$'+budget.toFixed(0)+'</div><div class="lbl">Budget</div></div>'
+      +'<div class="tct-stat"><div class="val">'+pct.toFixed(1)+'%</div><div class="lbl">Utilized</div></div>';
+
+    var alert = document.getElementById('tct-alert');
+    if(pct>=100){ alert.style.display='block'; alert.textContent='BUDGET EXCEEDED: You have spent $'+totalCost.toFixed(2)+' against a $'+budget.toFixed(0)+' budget. Review usage and optimize prompts immediately.'; }
+    else if(pct>=80){ alert.style.display='block'; alert.style.background='#eab308'; alert.textContent='WARNING: Budget is '+pct.toFixed(1)+'% utilized. Consider optimizing before exceeding the limit.'; }
+    else { alert.style.display='none'; }
+
+    var avgCost = periodCalls.length>0?(totalCost/periodCalls.length):0;
+    document.getElementById('tct-stats').innerHTML = '<div class="tct-stat"><div class="val">'+fmt(periodCalls.length)+'</div><div class="lbl">Total Calls</div></div>'
+      +'<div class="tct-stat"><div class="val">'+fmt(totalInput)+'</div><div class="lbl">Input Tokens</div></div>'
+      +'<div class="tct-stat"><div class="val">'+fmt(totalOutput)+'</div><div class="lbl">Output Tokens</div></div>'
+      +'<div class="tct-stat"><div class="val">$'+totalCost.toFixed(2)+'</div><div class="lbl">Total Cost</div></div>'
+      +'<div class="tct-stat"><div class="val">$'+avgCost.toFixed(4)+'</div><div class="lbl">Avg Cost / Call</div></div>'
+      +'<div class="tct-stat"><div class="val" style="color:'+(forecast>budget?'#ef4444':'#22c55e')+';">$'+forecast.toFixed(2)+'</div><div class="lbl">Forecasted Monthly</div></div>';
+
+    renderChart(periodCalls);
+    renderLog();
+    renderWhatIf(totalInput, totalOutput);
+  };
+
+  function renderChart(periodCalls){
+    var days = {};
+    for(var i=0;i<periodCalls.length;i++){
+      var d = new Date(periodCalls[i].ts).toISOString().slice(0,10);
+      days[d] = (days[d]||0) + periodCalls[i].cost;
+    }
+    var sorted = Object.keys(days).sort();
+    var maxCost = Math.max.apply(null, sorted.map(function(d){return days[d];}).concat([0.01]));
+    var chart = document.getElementById('tct-chart');
+    var html = '';
+    for(var i=0;i<sorted.length;i++){
+      var h = Math.max(2, (days[sorted[i]]/maxCost)*100);
+      html += '<div class="tct-chart-bar" style="height:'+h+'%;background:var(--accent);" data-label="'+sorted[i]+': $'+days[sorted[i]].toFixed(2)+'"></div>';
+    }
+    chart.innerHTML = html || '<div style="display:flex;align-items:center;justify-content:center;width:100%;color:var(--text-muted);font-size:0.82rem;">No data yet. Log API calls to see trends.</div>';
+    document.getElementById('tct-chart-start').textContent = sorted[0]||'-';
+  }
+
+  function renderLog(){
+    var recent = calls.slice(-20).reverse();
+    var body = document.getElementById('tct-log-body');
+    var html = '';
+    for(var i=0;i<recent.length;i++){
+      var c = recent[i];
+      var t = new Date(c.ts);
+      var time = t.toLocaleDateString()+' '+t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      html += '<tr><td>'+time+'</td><td>'+(MODELS[c.model]?MODELS[c.model].name:c.model)+'</td><td>'+fmt(c.input)+'</td><td>'+fmt(c.output)+'</td><td>$'+c.cost.toFixed(4)+'</td><td>'+c.project+'</td></tr>';
+    }
+    body.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No calls logged yet</td></tr>';
+  }
+
+  function renderWhatIf(totalInput, totalOutput){
+    var el = document.getElementById('tct-whatif');
+    var html = '<table class="tct-model-table"><thead><tr><th>Model</th><th>Projected Cost</th><th>vs Current</th></tr></thead><tbody>';
+    var currentCost = 0;
+    for(var i=0;i<calls.length;i++) currentCost += calls[i].cost;
+    var keys = Object.keys(MODELS);
+    for(var k=0;k<keys.length;k++){
+      var m = MODELS[keys[k]];
+      var projected = (totalInput/1000000)*m.input + (totalOutput/1000000)*m.output;
+      var diff = projected - currentCost;
+      var diffStr = diff>=0?'+$'+diff.toFixed(2):'-$'+Math.abs(diff).toFixed(2);
+      var color = diff<=0?'#22c55e':'#ef4444';
+      html += '<tr><td>'+m.name+'</td><td>$'+projected.toFixed(2)+'</td><td style="color:'+color+';font-weight:600;">'+diffStr+'</td></tr>';
+    }
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  window.tctExport = function(format){
+    if(format==='csv'){
+      var csv = 'timestamp,model,input_tokens,output_tokens,cached_tokens,project,cost\n';
+      for(var i=0;i<calls.length;i++){
+        var c = calls[i];
+        csv += new Date(c.ts).toISOString()+','+c.model+','+c.input+','+c.output+','+(c.cached||0)+','+c.project+','+c.cost.toFixed(6)+'\n';
+      }
+      var blob = new Blob([csv],{type:'text/csv'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'token-cost-export-'+Date.now()+'.csv';
+      a.click();
+    } else {
+      var json = JSON.stringify({version:'1.0',exportedAt:new Date().toISOString(),calls:calls},null,2);
+      var blob = new Blob([json],{type:'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'token-cost-export-'+Date.now()+'.json';
+      a.click();
+    }
+  };
+
+  window.tctClearAll = function(){
+    if(!confirm('Clear all logged calls? This cannot be undone.')) return;
+    calls = [];
+    save();
+    tctUpdate();
+  };
+
+  tctUpdate();
+})();
+</script>
+</body>
+</html>

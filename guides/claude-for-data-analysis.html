@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude for Data Analysis — Workflow Builder &amp; CSV Integration Patterns | ClaudFlow</title>
+  <meta name="description" content="Build data analysis workflows with Claude. Upload CSV data, design analysis pipelines, generate Python code for pandas and visualization. Explore integration patterns for automated reporting. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude for Data Analysis — Workflow Builder & CSV Integration Patterns">
+  <meta property="og:description" content="Build data analysis workflows with Claude. Upload CSV data, design analysis pipelines, and generate Python code for pandas and visualization.">
+  <meta property="og:url" content="https://claudflow.com/guides/claude-for-data-analysis.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude for Data Analysis — Workflow Builder & CSV Integration Patterns">
+  <meta name="twitter:description" content="Build data analysis workflows with Claude. Upload CSV, design pipelines, generate Python code for pandas.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/guides/claude-for-data-analysis.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/claude-for-data-analysis.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/claude-for-data-analysis.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Claude Data Analysis Workflow Builder",
+    "url": "https://claudflow.com/guides/claude-for-data-analysis.html",
+    "description": "Build data analysis workflows with Claude. Upload CSV data, design multi-step analysis pipelines, generate Python code for pandas and visualization. Explore integration patterns for automated reporting and data exploration.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "CSV upload with automatic schema detection and preview",
+      "Multi-step analysis pipeline builder with drag-and-drop stages",
+      "Prompt template library for common analysis tasks",
+      "Python code generation for pandas, matplotlib, and seaborn",
+      "Token budget calculator for sending data to Claude",
+      "Data sampling strategies for large datasets exceeding context windows",
+      "Integration patterns for Jupyter notebooks and automated reports",
+      "Cost estimation for analysis pipeline execution",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can Claude analyze CSV data directly?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Claude can analyze CSV data pasted directly into the prompt. For small datasets (under 10,000 tokens, roughly 2,500 rows of simple data), paste the CSV directly and ask questions about it. For larger datasets, send a sample of the data plus the schema and ask Claude to generate Python code that processes the full dataset locally. Claude excels at understanding data structures, suggesting analysis approaches, writing pandas code, and interpreting statistical results. It cannot execute code directly, but it generates production-ready analysis scripts."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much CSV data can I send to Claude at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude's context window of 200K tokens can hold approximately 50,000 rows of simple CSV data (4-5 short columns) or 10,000-20,000 rows of complex data with many columns and longer text fields. However, sending massive datasets directly is usually not the best approach. Instead, send the column schema, summary statistics (mean, median, min, max, count, null percentage per column), and a representative sample of 50-100 rows. This gives Claude enough context to write accurate analysis code while using only a few thousand tokens."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What analysis tasks is Claude best at?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude excels at: exploratory data analysis (suggesting what to look at and why), writing pandas data transformation code, creating visualization code for matplotlib and seaborn, interpreting statistical test results in plain language, generating SQL queries from natural language descriptions, building data cleaning pipelines, suggesting feature engineering approaches for ML, and writing documentation for datasets and analysis procedures. It is less effective at performing complex numerical computation directly (use Python for that) but excellent at designing the computation pipeline."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I build an automated data analysis pipeline with Claude?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Build a pipeline in four stages: (1) Data ingestion - load and validate the data, generate schema metadata. (2) Analysis prompt - send schema, summary stats, and sample rows to Claude with a specific analysis request. (3) Code execution - run the Python code Claude generates against the full dataset locally. (4) Report generation - send the execution results back to Claude for interpretation and report writing. This pipeline can be automated with a Python script that orchestrates the Claude API calls and local code execution. For recurring analyses, cache the analysis code and only regenerate when the data schema changes."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my data safe when using Claude for analysis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Data sent to the Claude API is processed according to Anthropic's data usage policy. For the API (not the consumer product), Anthropic does not train on your data by default. However, if your data is sensitive, consider these approaches: send only the schema and summary statistics (no actual records), use synthetic data with the same structure for prompt development, anonymize or pseudonymize records before sending, or generate analysis code locally and never send the raw data at all. The workflow builder in this tool runs entirely in your browser and never sends data to any server."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://claudflow.com/guides/" },
+      { "@type": "ListItem", "position": 3, "name": "Claude for Data Analysis" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .cda-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .cda-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .cda-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .cda-card h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cda-card label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.25rem; margin-top:0.75rem; }
+    .cda-card label:first-of-type { margin-top:0; }
+    .cda-card select, .cda-card input, .cda-card textarea { width:100%; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.88rem; box-sizing:border-box; }
+    .cda-card textarea { min-height:80px; resize:vertical; }
+    .cda-card input:focus, .cda-card textarea:focus, .cda-card select:focus { outline:none; border-color:var(--accent); }
+
+    .cda-upload { border:2px dashed var(--border); border-radius:var(--radius); padding:2rem; text-align:center; cursor:pointer; transition:border-color 0.15s; }
+    .cda-upload:hover { border-color:var(--accent); }
+    .cda-upload.has-data { border-style:solid; border-color:var(--accent); }
+
+    .cda-preview { max-height:250px; overflow:auto; margin:0.75rem 0; }
+    .cda-preview table { width:100%; border-collapse:collapse; font-size:0.78rem; }
+    .cda-preview th { position:sticky; top:0; background:var(--bg-card); text-align:left; padding:0.4rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .cda-preview td { padding:0.4rem; border-bottom:1px solid var(--border); color:var(--text); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .cda-schema { font-family:monospace; font-size:0.78rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; color:var(--text); overflow-x:auto; white-space:pre; line-height:1.5; }
+
+    .cda-pipeline { display:flex; gap:0.5rem; flex-wrap:wrap; margin:0.75rem 0; }
+    .cda-stage { background:var(--bg); border:2px solid var(--border); border-radius:var(--radius); padding:0.6rem 1rem; cursor:pointer; transition:border-color 0.15s; display:flex; align-items:center; gap:0.4rem; }
+    .cda-stage:hover { border-color:var(--accent); }
+    .cda-stage.active { border-color:var(--accent); box-shadow:0 0 0 2px rgba(6,182,212,0.25); }
+    .cda-stage .snum { width:20px; height:20px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700; color:#000; }
+    .cda-stage .sname { font-size:0.82rem; font-weight:600; color:var(--text); }
+    .cda-arrow { color:var(--text-muted); font-size:1.2rem; display:flex; align-items:center; }
+
+    .cda-template-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:0.5rem; margin:0.75rem 0; }
+    .cda-template { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.6rem; cursor:pointer; transition:border-color 0.15s; }
+    .cda-template:hover { border-color:var(--accent); }
+    .cda-template .tname { font-size:0.82rem; font-weight:600; color:var(--text); }
+    .cda-template .tdesc { font-size:0.68rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .cda-code { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; font-family:monospace; font-size:0.78rem; color:var(--text); overflow-x:auto; white-space:pre; line-height:1.5; max-height:300px; overflow-y:auto; }
+
+    .cda-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .cda-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; text-align:center; }
+    .cda-stat .val { font-size:1.4rem; font-weight:700; color:var(--accent); }
+    .cda-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .cda-tips { margin-top:1.5rem; }
+    .cda-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cda-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .cda-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .cda-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .cda-tip .tip-text strong { color:var(--text); }
+
+    .cda-export-bar { display:flex; gap:0.5rem; margin-top:1rem; }
+
+    @media (max-width:768px) {
+      .cda-grid { grid-template-columns:1fr; }
+      .cda-stats { grid-template-columns:1fr 1fr; }
+      .cda-template-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/guides/" style="color:var(--accent);text-decoration:none;">Guides</a> &rsaquo;
+      <span style="color:var(--text-muted);">Claude for Data Analysis</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Claude for Data Analysis</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Build data analysis workflows with Claude. Upload CSV data, design analysis pipelines, and generate Python code for pandas, visualization, and automated reporting.</p>
+    </section>
+  </main>
+
+  <div class="cda-wrap">
+    <div class="cda-grid">
+      <div class="cda-card">
+        <h3>Upload CSV Data</h3>
+        <div class="cda-upload" id="cda-upload" onclick="document.getElementById('cda-file').click();">
+          <input type="file" id="cda-file" accept=".csv" style="display:none;" onchange="cdaLoadFile(event)">
+          <div style="font-size:0.92rem;color:var(--text);margin-bottom:0.25rem;">Click to upload CSV or drag and drop</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Max 5MB. Processed locally in your browser.</div>
+        </div>
+        <div class="cda-stats" id="cda-file-stats" style="display:none;"></div>
+      </div>
+
+      <div class="cda-card">
+        <h3>Detected Schema</h3>
+        <div class="cda-schema" id="cda-schema">Upload a CSV file to see detected column types and statistics...</div>
+      </div>
+    </div>
+
+    <div class="cda-card" style="margin-bottom:1.5rem;">
+      <h3>Data Preview</h3>
+      <div class="cda-preview" id="cda-preview">
+        <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:2rem;">Upload a CSV to preview data here</div>
+      </div>
+    </div>
+
+    <div class="cda-card" style="margin-bottom:1.5rem;">
+      <h3>Analysis Pipeline Builder</h3>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem;">Build a multi-step analysis pipeline. Click stages to configure, or use a template below.</p>
+      <div class="cda-pipeline" id="cda-pipeline">
+        <div class="cda-stage active" data-stage="clean" onclick="cdaSelectStage('clean')"><span class="snum">1</span><span class="sname">Clean</span></div>
+        <div class="cda-arrow">&#8594;</div>
+        <div class="cda-stage" data-stage="explore" onclick="cdaSelectStage('explore')"><span class="snum">2</span><span class="sname">Explore</span></div>
+        <div class="cda-arrow">&#8594;</div>
+        <div class="cda-stage" data-stage="analyze" onclick="cdaSelectStage('analyze')"><span class="snum">3</span><span class="sname">Analyze</span></div>
+        <div class="cda-arrow">&#8594;</div>
+        <div class="cda-stage" data-stage="visualize" onclick="cdaSelectStage('visualize')"><span class="snum">4</span><span class="sname">Visualize</span></div>
+        <div class="cda-arrow">&#8594;</div>
+        <div class="cda-stage" data-stage="report" onclick="cdaSelectStage('report')"><span class="snum">5</span><span class="sname">Report</span></div>
+      </div>
+      <div id="cda-stage-config" style="margin-top:1rem;"></div>
+    </div>
+
+    <div class="cda-card" style="margin-bottom:1.5rem;">
+      <h3>Prompt Templates</h3>
+      <div class="cda-template-grid" id="cda-templates">
+        <div class="cda-template" onclick="cdaUseTemplate('eda')"><div class="tname">Exploratory Data Analysis</div><div class="tdesc">Summary stats, distributions, correlations</div></div>
+        <div class="cda-template" onclick="cdaUseTemplate('cleaning')"><div class="tname">Data Cleaning Script</div><div class="tdesc">Handle nulls, types, outliers, duplicates</div></div>
+        <div class="cda-template" onclick="cdaUseTemplate('viz')"><div class="tname">Visualization Dashboard</div><div class="tdesc">Matplotlib/seaborn charts for key metrics</div></div>
+        <div class="cda-template" onclick="cdaUseTemplate('regression')"><div class="tname">Regression Analysis</div><div class="tdesc">Linear/logistic regression with diagnostics</div></div>
+        <div class="cda-template" onclick="cdaUseTemplate('timeseries')"><div class="tname">Time Series Analysis</div><div class="tdesc">Trends, seasonality, forecasting</div></div>
+        <div class="cda-template" onclick="cdaUseTemplate('sql')"><div class="tname">SQL Query Generator</div><div class="tdesc">Generate SQL from natural language</div></div>
+      </div>
+    </div>
+
+    <div class="cda-card" style="margin-bottom:1.5rem;">
+      <h3>Generated Analysis Prompt</h3>
+      <textarea id="cda-prompt" style="width:100%;min-height:120px;padding:0.75rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:monospace;font-size:0.82rem;resize:vertical;box-sizing:border-box;" placeholder="Select a template or configure pipeline stages to generate an analysis prompt..."></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
+        <span style="font-size:0.75rem;color:var(--text-muted);">Token estimate: <span id="cda-token-est">0</span></span>
+        <button class="btn btn-accent" onclick="cdaCopyPrompt()">Copy Prompt</button>
+      </div>
+    </div>
+
+    <div class="cda-card" style="margin-bottom:1.5rem;">
+      <h3>Generated Python Code</h3>
+      <div class="cda-code" id="cda-code">Select a template or build a pipeline to generate Python analysis code...</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+        <button class="btn btn-accent" onclick="cdaCopyCode()">Copy Code</button>
+        <button class="btn" onclick="cdaDownloadCode()">Download .py</button>
+      </div>
+    </div>
+
+    <div class="cda-card" style="margin-bottom:1.5rem;">
+      <h3>Token Budget for Data Analysis</h3>
+      <div class="cda-stats" id="cda-budget-stats">
+        <div class="cda-stat"><div class="val">0</div><div class="lbl">Data Tokens</div></div>
+        <div class="cda-stat"><div class="val">0</div><div class="lbl">Prompt Tokens</div></div>
+        <div class="cda-stat"><div class="val">200,000</div><div class="lbl">Window Size</div></div>
+        <div class="cda-stat"><div class="val">0%</div><div class="lbl">Window Used</div></div>
+        <div class="cda-stat"><div class="val">$0.00</div><div class="lbl">Est. Cost</div></div>
+      </div>
+      <div id="cda-sampling-note" style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;display:none;"></div>
+    </div>
+
+    <div class="cda-export-bar">
+      <button class="btn btn-accent" onclick="cdaExportPipeline()">Export Pipeline Config</button>
+      <button class="btn" onclick="cdaLoadSample()">Load Sample Dataset</button>
+      <button class="btn" onclick="cdaReset()">Reset All</button>
+    </div>
+
+    <div class="cda-tips" style="margin-top:1.5rem;">
+      <h3>Data Analysis Tips</h3>
+      <div class="cda-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Send schema and stats, not raw data.</strong> For datasets larger than 1,000 rows, send the column schema, summary statistics, and a 50-row sample instead of the full dataset. Claude generates equally accurate analysis code from metadata as it does from the full data, but at 1% of the token cost.</div>
+      </div>
+      <div class="cda-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Use Claude for code generation, not computation.</strong> Claude excels at writing pandas code, creating visualizations, and suggesting analysis approaches. It does not execute code or perform reliable arithmetic on large datasets. Generate the code with Claude, then run it locally in Python. This separation produces better results than asking Claude to analyze numbers directly.</div>
+      </div>
+      <div class="cda-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Break complex analyses into stages.</strong> Instead of one prompt asking for "complete analysis," use separate prompts for data cleaning, exploration, statistical testing, visualization, and interpretation. Each stage produces focused, higher-quality output. Pass the results of each stage as context to the next.</div>
+      </div>
+      <div class="cda-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Include data types in your prompt.</strong> Always tell Claude the data type of each column: "date (YYYY-MM-DD), revenue (float, USD), category (string, 5 unique values), is_active (boolean)." Without type information, Claude may write code that treats numeric strings as numbers or dates as plain text.</div>
+      </div>
+      <div class="cda-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Ask Claude to explain its analysis choices.</strong> Add "Explain why you chose this analysis approach and what alternative approaches would be appropriate" to your prompt. This catches cases where Claude defaults to a common technique that is not the best fit for your specific data characteristics.</div>
+      </div>
+      <div class="cda-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Validate generated code before running on production data.</strong> Run Claude-generated analysis code on a small test dataset first. Check for correct column name references, appropriate handling of null values, and sensible statistical choices. Claude sometimes generates syntactically correct code that makes analytically incorrect assumptions about the data.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Data Analysis Workflow Builder Works</h2>
+
+    <p>The Data Analysis Workflow Builder is a browser-based tool for designing Claude-powered data analysis pipelines. Upload a CSV file and the tool automatically detects column types, computes summary statistics, and generates a data preview. Build a multi-step analysis pipeline by configuring stages for data cleaning, exploration, statistical analysis, visualization, and reporting. Select from prompt templates for common analysis tasks. The tool generates both a Claude prompt optimized for the analysis and ready-to-run Python code that performs the analysis locally using pandas, matplotlib, and seaborn.</p>
+
+    <p>The core principle behind this tool is that Claude should design the analysis, not execute it. Claude excels at understanding data structures, suggesting appropriate statistical tests, writing pandas transformation code, and creating visualization scripts. But computation should happen locally in Python where you have access to the full dataset, numpy's numerical precision, and real plotting libraries. The workflow builder automates the prompt engineering for data analysis so you get high-quality analysis code without manually crafting complex prompts.</p>
+
+    <h2>Sending Data to Claude: Strategies and Tradeoffs</h2>
+
+    <p>The simplest approach is pasting raw CSV data directly into the prompt. This works for small datasets under approximately 2,500 rows of simple data, which fits within 10,000 tokens. Claude can directly answer questions about the data, compute statistics, and identify patterns. The advantage is immediacy: no preprocessing, no code generation, just answers. The disadvantage is token cost and the risk of Claude making arithmetic errors on large tables. For production workflows, always prefer code generation over direct computation for anything involving more than 50 rows.</p>
+
+    <p>The metadata approach sends the column schema, summary statistics, and a small sample rather than the full dataset. This is the recommended approach for datasets with more than 1,000 rows. The prompt includes: column names and data types, row count, null counts per column, numeric column statistics (min, max, mean, median, standard deviation), categorical column value distributions, and a representative sample of 50 rows. This metadata typically fits in 2,000 to 5,000 tokens regardless of dataset size. Claude generates equally accurate analysis code from metadata because the code references column names and applies transformations, neither of which requires seeing every row.</p>
+
+    <p>The sampling approach sends a stratified random sample of the data. For datasets with complex patterns that summary statistics cannot capture (like seasonal trends, cluster structures, or anomalous records), a sample of 100 to 500 representative rows provides Claude with enough context to understand the data's character. Stratified sampling ensures the sample reflects the distribution of key categorical variables. This approach uses more tokens than metadata alone but captures nuances that statistics miss. The tool's sampling strategy selector helps you choose the right sample size and stratification method for your data.</p>
+
+    <h2>Building Multi-Stage Analysis Pipelines</h2>
+
+    <p>The five-stage pipeline (Clean, Explore, Analyze, Visualize, Report) is a proven workflow for comprehensive data analysis. Each stage has a specific purpose and produces output that feeds the next stage. Breaking the analysis into stages allows you to review intermediate results, catch errors early, and iterate on individual stages without rerunning the entire pipeline. It also produces better code because each prompt is focused on a single task rather than trying to do everything at once.</p>
+
+    <p>The cleaning stage handles missing values, data type conversion, outlier detection, and duplicate removal. The prompt for this stage should specify your missing data policy (drop, fill with mean, fill with median, forward fill), your outlier definition (IQR method, z-score threshold), and any known data quality issues. The generated code produces a clean dataframe that subsequent stages can trust. Skipping the cleaning stage is the most common cause of downstream analysis errors because pandas operations on messy data produce silently incorrect results rather than obvious errors.</p>
+
+    <p>The exploration stage generates summary statistics, distribution plots, correlation matrices, and identifies the most interesting patterns in the data. This stage is where Claude's ability to suggest what to look at is most valuable. A well-crafted exploration prompt produces a comprehensive overview that guides the deeper analysis stage. The analysis stage applies statistical tests, regression models, or machine learning algorithms based on what the exploration revealed. The visualization stage creates publication-quality charts. The report stage generates a narrative interpretation of the findings.</p>
+
+    <h2>Prompt Templates for Common Analysis Tasks</h2>
+
+    <p>The Exploratory Data Analysis (EDA) template generates a comprehensive first-look analysis. It produces code for computing summary statistics per column, plotting histograms for numeric columns, bar charts for categorical columns, a correlation heatmap, scatter plots for the most correlated variable pairs, and a missing data visualization. This template is the starting point for any new dataset. Run the generated code and use the output to decide which deeper analyses to pursue.</p>
+
+    <p>The Data Cleaning template generates a robust preprocessing pipeline. It produces code that identifies and handles missing values based on your specified policy, converts columns to appropriate data types (parsing dates, converting string numbers to floats), detects outliers using the IQR method, removes exact and near-duplicate rows, and validates data constraints (non-negative values, valid date ranges, categorical values within expected sets). The generated code includes inline comments explaining each cleaning decision so you can review and adjust the logic.</p>
+
+    <p>The Visualization Dashboard template generates a multi-panel figure with the key charts for your dataset. It detects numeric versus categorical columns and selects appropriate chart types automatically: histograms and box plots for numeric distributions, bar charts for categorical frequencies, scatter plots for numeric-numeric relationships, and time series line charts when a date column is present. The generated code uses matplotlib for layout and seaborn for styling, producing charts that are ready for presentations or reports.</p>
+
+    <h2>Integration with Jupyter Notebooks and Automated Reports</h2>
+
+    <p>The generated Python code is designed to run directly in a Jupyter notebook. Paste it into a code cell and execute. The code imports all required libraries, loads the data, performs the analysis, and displays results inline. For recurring analyses, save the generated code as a .py module that you import into your standard reporting notebook. When the dataset updates, rerun the notebook to refresh the analysis. For fully automated reporting, wrap the analysis in a script that runs on a schedule, generates output files, and sends them to stakeholders.</p>
+
+    <p>For teams using the analysis pipeline at scale, consider building a lightweight orchestration layer. The pipeline loads the dataset, generates the analysis prompt using the metadata approach, sends it to Claude via the API, executes the returned code in a sandboxed Python environment, captures the output, and sends the results back to Claude for interpretation. This full loop from data to report can run unattended. Cache the generated code and only regenerate when the data schema changes to minimize API costs. For teams already using <a href="/tools/workflow-builder.html">the visual workflow designer</a>, the analysis pipeline integrates as a specialized workflow block.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Data Analysis Workflow Builder runs entirely in your browser. CSV files are parsed and analyzed client-side using JavaScript. No data is sent to any server. Schema detection, preview generation, prompt building, and code generation all happen locally. Exported pipeline configurations and Python scripts are downloaded to your local machine. There are no accounts, no cookies, no analytics, and no server-side processing. Your datasets remain completely private on your device at all times. When you use the generated prompt with the Claude API, data privacy depends on your API usage agreement with Anthropic.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>Can Claude analyze CSV data directly?</summary>
+      <p>Yes, for small datasets under ~2,500 rows. For larger datasets, send schema, summary statistics, and a sample. Ask Claude to generate Python code that processes the full dataset locally. Claude designs the analysis; Python executes it.</p>
+    </details>
+
+    <details>
+      <summary>How much CSV data can I send to Claude at once?</summary>
+      <p>Approximately 50,000 simple rows or 10,000-20,000 complex rows fit in the 200K context window. However, sending the schema, statistics, and 50-100 sample rows is more effective and uses only a few thousand tokens.</p>
+    </details>
+
+    <details>
+      <summary>What analysis tasks is Claude best at?</summary>
+      <p>Exploratory analysis design, pandas code generation, visualization scripts, statistical test interpretation, SQL from natural language, data cleaning pipelines, and feature engineering suggestions. Use Python for actual computation.</p>
+    </details>
+
+    <details>
+      <summary>How do I build an automated analysis pipeline?</summary>
+      <p>Four stages: data ingestion with metadata generation, analysis prompt sent to Claude, code execution locally, and results sent back to Claude for interpretation. Cache generated code and regenerate only when schema changes.</p>
+    </details>
+
+    <details>
+      <summary>Is my data safe when using Claude for analysis?</summary>
+      <p>This tool runs entirely in your browser. No data is sent anywhere. When using the Claude API, Anthropic does not train on API data by default. For sensitive data, send only schema and statistics, use synthetic data for development, or anonymize records.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/tools/token-cost-tracker.html">Token Cost Tracker</a></li>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration</a></li>
+          <li><a href="/answers/claude-memory-strategies.html">Claude Memory Strategies</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/claude-use-case-gallery.html">Claude Use Case Gallery</a></li>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var csvData = null;
+  var columns = [];
+  var rows = [];
+  var activeStage = 'clean';
+  function fmt(n){ return n.toLocaleString(); }
+
+  window.cdaLoadFile = function(event){
+    var file = event.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var text = e.target.result;
+      parseCSV(text);
+    };
+    reader.readAsText(file);
+  };
+
+  function parseCSV(text){
+    var lines = text.trim().split('\n');
+    if(lines.length<2){ alert('CSV must have a header row and at least one data row.'); return; }
+    columns = lines[0].split(',').map(function(c){ return c.trim().replace(/^"|"$/g,''); });
+    rows = [];
+    for(var i=1;i<lines.length;i++){
+      var vals = lines[i].split(',').map(function(v){ return v.trim().replace(/^"|"$/g,''); });
+      if(vals.length===columns.length) rows.push(vals);
+    }
+    csvData = { columns:columns, rows:rows };
+    document.getElementById('cda-upload').classList.add('has-data');
+    renderFileStats();
+    renderSchema();
+    renderPreview();
+    updateBudget();
+  }
+
+  function renderFileStats(){
+    var el = document.getElementById('cda-file-stats');
+    el.style.display = 'grid';
+    var tokens = Math.ceil(rows.reduce(function(s,r){ return s+r.join(',').length; },0)/4);
+    el.innerHTML = '<div class="cda-stat"><div class="val">'+fmt(rows.length)+'</div><div class="lbl">Rows</div></div>'
+      +'<div class="cda-stat"><div class="val">'+columns.length+'</div><div class="lbl">Columns</div></div>'
+      +'<div class="cda-stat"><div class="val">'+fmt(tokens)+'</div><div class="lbl">Est. Tokens (raw)</div></div>';
+  }
+
+  function detectType(colIdx){
+    var nums=0, dates=0, nulls=0;
+    var sample = rows.slice(0,100);
+    for(var i=0;i<sample.length;i++){
+      var v = sample[i][colIdx];
+      if(!v || v==='') nulls++;
+      else if(!isNaN(v) && v.trim()!=='') nums++;
+      else if(/^\d{4}[-\/]\d{2}[-\/]\d{2}/.test(v)) dates++;
+    }
+    var total = sample.length;
+    if(nulls===total) return 'empty';
+    if(nums/(total-nulls)>0.8) return 'numeric';
+    if(dates/(total-nulls)>0.8) return 'date';
+    return 'string';
+  }
+
+  function renderSchema(){
+    var schema = '';
+    for(var i=0;i<columns.length;i++){
+      var type = detectType(i);
+      var nullCount = 0;
+      for(var j=0;j<rows.length;j++) if(!rows[j][i]||rows[j][i]==='') nullCount++;
+      schema += columns[i]+' ('+type+') — nulls: '+nullCount+'/'+rows.length;
+      if(type==='numeric'){
+        var vals = rows.map(function(r){return parseFloat(r[i]);}).filter(function(v){return !isNaN(v);});
+        if(vals.length>0){
+          vals.sort(function(a,b){return a-b;});
+          var min=vals[0], max=vals[vals.length-1];
+          var sum=vals.reduce(function(s,v){return s+v;},0);
+          var mean=(sum/vals.length).toFixed(2);
+          schema += ' | min:'+min+' max:'+max+' mean:'+mean;
+        }
+      } else if(type==='string'){
+        var unique = {};
+        for(var j=0;j<rows.length;j++) if(rows[j][i]) unique[rows[j][i]]=1;
+        schema += ' | unique: '+Object.keys(unique).length;
+      }
+      schema += '\n';
+    }
+    document.getElementById('cda-schema').textContent = schema;
+  }
+
+  function renderPreview(){
+    if(!csvData){return;}
+    var html = '<table><thead><tr>';
+    for(var i=0;i<columns.length;i++) html += '<th>'+columns[i]+'</th>';
+    html += '</tr></thead><tbody>';
+    var showRows = Math.min(rows.length, 20);
+    for(var r=0;r<showRows;r++){
+      html += '<tr>';
+      for(var c=0;c<columns.length;c++) html += '<td>'+(rows[r][c]||'')+'</td>';
+      html += '</tr>';
+    }
+    if(rows.length>20) html += '<tr><td colspan="'+columns.length+'" style="text-align:center;color:var(--text-muted);">... '+(rows.length-20)+' more rows</td></tr>';
+    html += '</tbody></table>';
+    document.getElementById('cda-preview').innerHTML = html;
+  }
+
+  window.cdaSelectStage = function(stage){
+    activeStage = stage;
+    var stages = document.querySelectorAll('.cda-stage');
+    for(var i=0;i<stages.length;i++) stages[i].classList.toggle('active', stages[i].getAttribute('data-stage')===stage);
+    renderStageConfig();
+  };
+
+  function renderStageConfig(){
+    var configs = {
+      clean:'<h4 style="color:var(--accent);font-size:0.92rem;">Data Cleaning Configuration</h4><label style="font-size:0.82rem;color:var(--text-muted);">Missing Data Policy</label><select id="cda-null-policy" onchange="cdaGeneratePrompt()"><option value="drop">Drop rows with nulls</option><option value="mean">Fill numeric with mean</option><option value="median">Fill numeric with median</option><option value="ffill">Forward fill</option></select><label style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;">Outlier Method</label><select id="cda-outlier" onchange="cdaGeneratePrompt()"><option value="iqr">IQR (1.5x)</option><option value="zscore">Z-score (3 sigma)</option><option value="none">No outlier removal</option></select>',
+      explore:'<h4 style="color:var(--accent);font-size:0.92rem;">Exploratory Analysis Configuration</h4><label style="font-size:0.82rem;color:var(--text-muted);">Focus Area</label><select id="cda-focus" onchange="cdaGeneratePrompt()"><option value="all">Full EDA</option><option value="distributions">Distributions only</option><option value="correlations">Correlations only</option><option value="timeseries">Time series patterns</option></select>',
+      analyze:'<h4 style="color:var(--accent);font-size:0.92rem;">Statistical Analysis Configuration</h4><label style="font-size:0.82rem;color:var(--text-muted);">Analysis Type</label><select id="cda-analysis" onchange="cdaGeneratePrompt()"><option value="descriptive">Descriptive statistics</option><option value="regression">Regression analysis</option><option value="hypothesis">Hypothesis testing</option><option value="clustering">Clustering</option></select>',
+      visualize:'<h4 style="color:var(--accent);font-size:0.92rem;">Visualization Configuration</h4><label style="font-size:0.82rem;color:var(--text-muted);">Chart Library</label><select id="cda-lib" onchange="cdaGeneratePrompt()"><option value="matplotlib">Matplotlib + Seaborn</option><option value="plotly">Plotly (interactive)</option></select><label style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;">Style</label><select id="cda-style" onchange="cdaGeneratePrompt()"><option value="darkgrid">Dark grid</option><option value="whitegrid">White grid</option><option value="minimal">Minimal</option></select>',
+      report:'<h4 style="color:var(--accent);font-size:0.92rem;">Report Configuration</h4><label style="font-size:0.82rem;color:var(--text-muted);">Report Format</label><select id="cda-format" onchange="cdaGeneratePrompt()"><option value="markdown">Markdown</option><option value="html">HTML</option><option value="notebook">Jupyter Notebook cells</option></select><label style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;">Audience</label><select id="cda-audience" onchange="cdaGeneratePrompt()"><option value="technical">Technical (data team)</option><option value="executive">Executive summary</option><option value="stakeholder">Non-technical stakeholder</option></select>'
+    };
+    document.getElementById('cda-stage-config').innerHTML = configs[activeStage]||'';
+    cdaGeneratePrompt();
+  }
+
+  window.cdaGeneratePrompt = function(){
+    var schema = document.getElementById('cda-schema').textContent;
+    var prompt = '';
+    if(activeStage==='clean'){
+      var nullPolicy = document.getElementById('cda-null-policy')?document.getElementById('cda-null-policy').value:'drop';
+      var outlier = document.getElementById('cda-outlier')?document.getElementById('cda-outlier').value:'iqr';
+      prompt = 'You are a data engineer. Write a Python script using pandas to clean this dataset.\n\nSchema:\n'+schema+'\nCleaning rules:\n- Missing data: '+nullPolicy+'\n- Outlier detection: '+outlier+'\n- Convert date columns to datetime\n- Remove exact duplicates\n- Validate data types\n\nOutput: A single Python function clean_data(df) that returns the cleaned DataFrame. Include comments explaining each step.';
+    } else if(activeStage==='explore'){
+      var focus = document.getElementById('cda-focus')?document.getElementById('cda-focus').value:'all';
+      prompt = 'You are a data analyst. Write a Python script for exploratory data analysis of this dataset.\n\nSchema:\n'+schema+'\nFocus: '+focus+'\n\nGenerate code that:\n1. Computes summary statistics for all columns\n2. Creates distribution plots for numeric columns\n3. Creates frequency plots for categorical columns\n4. Generates a correlation heatmap\n5. Identifies the top 5 most interesting patterns\n\nUse pandas, matplotlib, and seaborn. Include plt.tight_layout() and plt.show() after each figure.';
+    } else if(activeStage==='analyze'){
+      var analysis = document.getElementById('cda-analysis')?document.getElementById('cda-analysis').value:'descriptive';
+      prompt = 'You are a statistician. Write a Python script for '+analysis+' analysis of this dataset.\n\nSchema:\n'+schema+'\n\nRequirements:\n- Use scipy.stats for statistical tests\n- Report p-values and confidence intervals\n- Include assumption checks (normality, homoscedasticity)\n- Interpret results in plain language comments\n- Output results as a structured dictionary';
+    } else if(activeStage==='visualize'){
+      var lib = document.getElementById('cda-lib')?document.getElementById('cda-lib').value:'matplotlib';
+      var style = document.getElementById('cda-style')?document.getElementById('cda-style').value:'darkgrid';
+      prompt = 'You are a data visualization expert. Create a dashboard of charts for this dataset using '+lib+'.\n\nSchema:\n'+schema+'\nStyle: '+style+'\n\nCreate a 2x3 subplot figure with:\n1. Distribution of the primary numeric column\n2. Top categories bar chart\n3. Correlation scatter of two most correlated variables\n4. Time series trend (if date column exists)\n5. Box plots comparing groups\n6. Summary statistics table\n\nUse clear titles, axis labels, and a consistent color palette.';
+    } else if(activeStage==='report'){
+      var format = document.getElementById('cda-format')?document.getElementById('cda-format').value:'markdown';
+      var audience = document.getElementById('cda-audience')?document.getElementById('cda-audience').value:'technical';
+      prompt = 'You are a data storyteller. Generate a '+format+' report for a '+audience+' audience based on this dataset.\n\nSchema:\n'+schema+'\n\nReport structure:\n1. Executive Summary (3 sentences)\n2. Key Findings (5 bullet points)\n3. Data Quality Assessment\n4. Detailed Analysis with inline chart references\n5. Recommendations\n6. Methodology Notes\n\nTone: '+audience+'. Length: 500-800 words.';
+    }
+    document.getElementById('cda-prompt').value = prompt;
+    document.getElementById('cda-token-est').textContent = fmt(Math.ceil(prompt.length/4));
+    generateCode();
+    updateBudget();
+  };
+
+  function generateCode(){
+    var code = '';
+    if(activeStage==='clean'){
+      code = 'import pandas as pd\nimport numpy as np\n\ndef clean_data(filepath):\n    """Load and clean the dataset."""\n    df = pd.read_csv(filepath)\n    print(f"Raw shape: {df.shape}")\n    \n    # Remove exact duplicates\n    df = df.drop_duplicates()\n    print(f"After dedup: {df.shape}")\n    \n    # Handle missing values\n    numeric_cols = df.select_dtypes(include=[np.number]).columns\n    for col in numeric_cols:\n        df[col] = df[col].fillna(df[col].median())\n    \n    # Convert date columns\n    for col in df.columns:\n        if df[col].dtype == "object":\n            try:\n                df[col] = pd.to_datetime(df[col])\n            except (ValueError, TypeError):\n                pass\n    \n    # Remove outliers (IQR method)\n    for col in numeric_cols:\n        Q1 = df[col].quantile(0.25)\n        Q3 = df[col].quantile(0.75)\n        IQR = Q3 - Q1\n        df = df[(df[col] >= Q1 - 1.5*IQR) & (df[col] <= Q3 + 1.5*IQR)]\n    \n    print(f"Clean shape: {df.shape}")\n    return df\n\nif __name__ == "__main__":\n    df = clean_data("data.csv")\n    df.to_csv("data_clean.csv", index=False)';
+    } else if(activeStage==='explore'){
+      code = 'import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\ndef explore_data(filepath):\n    """Exploratory data analysis."""\n    df = pd.read_csv(filepath)\n    \n    # Summary statistics\n    print("=== Summary Statistics ===")\n    print(df.describe())\n    print("\\n=== Missing Values ===")\n    print(df.isnull().sum())\n    print("\\n=== Data Types ===")\n    print(df.dtypes)\n    \n    # Numeric distributions\n    numeric_cols = df.select_dtypes(include="number").columns\n    if len(numeric_cols) > 0:\n        fig, axes = plt.subplots(1, min(len(numeric_cols), 4), figsize=(16, 4))\n        if len(numeric_cols) == 1: axes = [axes]\n        for i, col in enumerate(numeric_cols[:4]):\n            sns.histplot(df[col].dropna(), ax=axes[i], kde=True)\n            axes[i].set_title(col)\n        plt.tight_layout()\n        plt.savefig("distributions.png", dpi=150)\n        plt.show()\n    \n    # Correlation heatmap\n    if len(numeric_cols) > 1:\n        plt.figure(figsize=(10, 8))\n        sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", center=0)\n        plt.title("Correlation Matrix")\n        plt.tight_layout()\n        plt.savefig("correlations.png", dpi=150)\n        plt.show()\n\nif __name__ == "__main__":\n    explore_data("data_clean.csv")';
+    } else if(activeStage==='analyze'){
+      code = 'import pandas as pd\nimport numpy as np\nfrom scipy import stats\n\ndef analyze_data(filepath):\n    """Statistical analysis."""\n    df = pd.read_csv(filepath)\n    results = {}\n    \n    numeric_cols = df.select_dtypes(include="number").columns\n    \n    # Descriptive statistics\n    results["descriptive"] = {}\n    for col in numeric_cols:\n        data = df[col].dropna()\n        results["descriptive"][col] = {\n            "mean": data.mean(),\n            "median": data.median(),\n            "std": data.std(),\n            "skewness": data.skew(),\n            "kurtosis": data.kurtosis(),\n            "normality_p": stats.shapiro(data.sample(min(len(data), 5000)))[1]\n        }\n    \n    # Correlation analysis\n    if len(numeric_cols) > 1:\n        corr = df[numeric_cols].corr()\n        pairs = []\n        for i in range(len(numeric_cols)):\n            for j in range(i+1, len(numeric_cols)):\n                r = corr.iloc[i, j]\n                pairs.append((numeric_cols[i], numeric_cols[j], r))\n        pairs.sort(key=lambda x: abs(x[2]), reverse=True)\n        results["top_correlations"] = pairs[:5]\n    \n    # Print results\n    for col, stats_dict in results["descriptive"].items():\n        print(f"\\n{col}:")\n        for k, v in stats_dict.items():\n            print(f"  {k}: {v:.4f}")\n    \n    return results\n\nif __name__ == "__main__":\n    results = analyze_data("data_clean.csv")';
+    } else if(activeStage==='visualize'){
+      code = 'import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\ndef create_dashboard(filepath):\n    """Create a visualization dashboard."""\n    df = pd.read_csv(filepath)\n    sns.set_style("darkgrid")\n    palette = ["#06B6D4", "#a855f7", "#22c55e", "#eab308", "#ef4444"]\n    \n    fig, axes = plt.subplots(2, 3, figsize=(18, 10))\n    fig.suptitle("Data Analysis Dashboard", fontsize=16, fontweight="bold")\n    \n    numeric_cols = df.select_dtypes(include="number").columns\n    cat_cols = df.select_dtypes(include="object").columns\n    \n    # Panel 1: Primary distribution\n    if len(numeric_cols) > 0:\n        sns.histplot(df[numeric_cols[0]].dropna(), ax=axes[0,0], kde=True, color=palette[0])\n        axes[0,0].set_title(f"Distribution: {numeric_cols[0]}")\n    \n    # Panel 2: Category counts\n    if len(cat_cols) > 0:\n        top = df[cat_cols[0]].value_counts().head(10)\n        top.plot.barh(ax=axes[0,1], color=palette[1])\n        axes[0,1].set_title(f"Top Categories: {cat_cols[0]}")\n    \n    # Panel 3: Scatter\n    if len(numeric_cols) > 1:\n        axes[0,2].scatter(df[numeric_cols[0]], df[numeric_cols[1]], alpha=0.5, c=palette[0], s=20)\n        axes[0,2].set_xlabel(numeric_cols[0])\n        axes[0,2].set_ylabel(numeric_cols[1])\n        axes[0,2].set_title("Scatter Plot")\n    \n    # Panel 4: Box plots\n    if len(numeric_cols) > 0:\n        df[numeric_cols[:5]].boxplot(ax=axes[1,0])\n        axes[1,0].set_title("Box Plots")\n    \n    # Panel 5: Correlation heatmap\n    if len(numeric_cols) > 1:\n        sns.heatmap(df[numeric_cols].corr(), ax=axes[1,1], cmap="coolwarm", center=0, annot=True, fmt=".2f")\n        axes[1,1].set_title("Correlations")\n    \n    # Panel 6: Missing data\n    missing = df.isnull().sum()\n    missing[missing > 0].plot.bar(ax=axes[1,2], color=palette[4])\n    axes[1,2].set_title("Missing Values")\n    \n    plt.tight_layout()\n    plt.savefig("dashboard.png", dpi=150, bbox_inches="tight")\n    plt.show()\n\nif __name__ == "__main__":\n    create_dashboard("data_clean.csv")';
+    } else {
+      code = 'import pandas as pd\n\ndef generate_report(filepath, output="report.md"):\n    """Generate analysis report."""\n    df = pd.read_csv(filepath)\n    \n    report = []\n    report.append("# Data Analysis Report\\n")\n    report.append(f"**Dataset:** {filepath}  ")\n    report.append(f"**Rows:** {len(df):,}  ")\n    report.append(f"**Columns:** {len(df.columns)}\\n")\n    \n    report.append("## Executive Summary\\n")\n    report.append(f"This dataset contains {len(df):,} records across {len(df.columns)} variables. ")\n    numeric = df.select_dtypes(include="number")\n    if len(numeric.columns) > 0:\n        report.append(f"The primary numeric variable ({numeric.columns[0]}) has a mean of {numeric.iloc[:,0].mean():.2f} ")\n        report.append(f"and ranges from {numeric.iloc[:,0].min():.2f} to {numeric.iloc[:,0].max():.2f}.\\n")\n    \n    report.append("## Data Quality\\n")\n    missing = df.isnull().sum()\n    if missing.sum() > 0:\n        report.append(f"- **Missing values detected** in {(missing > 0).sum()} columns\\n")\n        for col in missing[missing > 0].index:\n            report.append(f"  - {col}: {missing[col]} missing ({missing[col]/len(df)*100:.1f}%)\\n")\n    else:\n        report.append("- No missing values detected\\n")\n    \n    report.append("## Key Statistics\\n")\n    report.append("| Column | Mean | Median | Std Dev |\\n")\n    report.append("|--------|------|--------|---------|\\n")\n    for col in numeric.columns[:10]:\n        report.append(f"| {col} | {numeric[col].mean():.2f} | {numeric[col].median():.2f} | {numeric[col].std():.2f} |\\n")\n    \n    with open(output, "w") as f:\n        f.writelines(report)\n    print(f"Report saved to {output}")\n\nif __name__ == "__main__":\n    generate_report("data_clean.csv")';
+    }
+    document.getElementById('cda-code').textContent = code;
+  }
+
+  function updateBudget(){
+    var promptText = document.getElementById('cda-prompt').value;
+    var promptTokens = Math.ceil(promptText.length/4);
+    var dataTokens = csvData ? Math.ceil(rows.slice(0,50).reduce(function(s,r){return s+r.join(',').length;},0)/4) + Math.ceil(document.getElementById('cda-schema').textContent.length/4) : 0;
+    var total = promptTokens + dataTokens;
+    var windowSize = 200000;
+    var pct = Math.min(100,(total/windowSize)*100);
+    var cost = (total/1000000)*3;
+
+    var el = document.getElementById('cda-budget-stats');
+    el.innerHTML = '<div class="cda-stat"><div class="val">'+fmt(dataTokens)+'</div><div class="lbl">Data Tokens</div></div>'
+      +'<div class="cda-stat"><div class="val">'+fmt(promptTokens)+'</div><div class="lbl">Prompt Tokens</div></div>'
+      +'<div class="cda-stat"><div class="val">200,000</div><div class="lbl">Window Size</div></div>'
+      +'<div class="cda-stat"><div class="val">'+pct.toFixed(1)+'%</div><div class="lbl">Window Used</div></div>'
+      +'<div class="cda-stat"><div class="val">$'+cost.toFixed(4)+'</div><div class="lbl">Est. Cost (Sonnet)</div></div>';
+
+    var note = document.getElementById('cda-sampling-note');
+    if(csvData && rows.length > 1000){
+      note.style.display = 'block';
+      note.textContent = 'Your dataset has '+fmt(rows.length)+' rows. The prompt includes schema + 50-row sample ('+fmt(dataTokens)+' tokens) instead of the full '+fmt(Math.ceil(rows.reduce(function(s,r){return s+r.join(',').length;},0)/4))+' tokens. This is the recommended approach.';
+    } else {
+      note.style.display = 'none';
+    }
+  }
+
+  window.cdaUseTemplate = function(template){
+    var templates = {
+      eda:{ stage:'explore', focus:'all' },
+      cleaning:{ stage:'clean' },
+      viz:{ stage:'visualize' },
+      regression:{ stage:'analyze' },
+      timeseries:{ stage:'explore', focus:'timeseries' },
+      sql:{ stage:'analyze' }
+    };
+    var t = templates[template];
+    if(t) cdaSelectStage(t.stage);
+  };
+
+  window.cdaCopyPrompt = function(){
+    var text = document.getElementById('cda-prompt').value;
+    navigator.clipboard.writeText(text).then(function(){alert('Prompt copied to clipboard!');});
+  };
+
+  window.cdaCopyCode = function(){
+    var text = document.getElementById('cda-code').textContent;
+    navigator.clipboard.writeText(text).then(function(){alert('Code copied to clipboard!');});
+  };
+
+  window.cdaDownloadCode = function(){
+    var code = document.getElementById('cda-code').textContent;
+    var blob = new Blob([code],{type:'text/x-python'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'analysis_'+activeStage+'.py';
+    a.click();
+  };
+
+  window.cdaExportPipeline = function(){
+    var config = {
+      version:'1.0', exportedAt:new Date().toISOString(),
+      schema: csvData ? columns : [],
+      rowCount: rows.length,
+      stages:['clean','explore','analyze','visualize','report'],
+      activeStage:activeStage,
+      prompt:document.getElementById('cda-prompt').value
+    };
+    var json = JSON.stringify(config,null,2);
+    var blob = new Blob([json],{type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'analysis-pipeline-'+Date.now()+'.json';
+    a.click();
+  };
+
+  window.cdaLoadSample = function(){
+    var sample = 'date,product,revenue,units_sold,region,rating\n2026-01-01,Widget A,1250.50,42,North,4.5\n2026-01-01,Widget B,890.00,28,South,3.8\n2026-01-02,Widget A,1100.25,38,East,4.2\n2026-01-02,Widget C,2100.00,15,West,4.9\n2026-01-03,Widget B,950.75,31,North,3.5\n2026-01-03,Widget A,1380.00,45,South,4.7\n2026-01-04,Widget C,1890.50,12,East,4.8\n2026-01-04,Widget A,1050.00,35,West,4.1\n2026-01-05,Widget B,1120.25,37,North,4.0\n2026-01-05,Widget C,2250.00,18,South,4.6\n2026-01-06,Widget A,1420.75,47,East,4.4\n2026-01-06,Widget B,780.00,25,West,3.2\n2026-01-07,Widget C,1950.50,14,North,4.7\n2026-01-07,Widget A,1280.00,43,South,4.3\n2026-01-08,Widget B,1050.25,34,East,3.9\n2026-01-08,Widget C,2400.00,20,West,5.0\n2026-01-09,Widget A,,40,North,4.6\n2026-01-09,Widget B,920.50,30,South,3.6\n2026-01-10,Widget C,2100.75,16,East,4.8\n2026-01-10,Widget A,1150.00,39,West,';
+    parseCSV(sample);
+  };
+
+  window.cdaReset = function(){
+    csvData = null; columns = []; rows = [];
+    document.getElementById('cda-upload').classList.remove('has-data');
+    document.getElementById('cda-file-stats').style.display='none';
+    document.getElementById('cda-schema').textContent='Upload a CSV file to see detected column types and statistics...';
+    document.getElementById('cda-preview').innerHTML='<div style="text-align:center;color:var(--text-muted);font-size:0.85rem;padding:2rem;">Upload a CSV to preview data here</div>';
+    document.getElementById('cda-prompt').value='';
+    document.getElementById('cda-code').textContent='Select a template or build a pipeline to generate Python analysis code...';
+    document.getElementById('cda-token-est').textContent='0';
+    updateBudget();
+  };
+
+  renderStageConfig();
+})();
+</script>
+</body>
+</html>

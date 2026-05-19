@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Memory Strategies — Context Management &amp; Token Optimization Guide | ClaudFlow</title>
+  <meta name="description" content="Select the right context management strategy for Claude. Compare sliding window, summary compression, RAG retrieval, and hybrid approaches. Token optimization calculator with cost savings estimates. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude Memory Strategies — Context Management & Token Optimization Guide">
+  <meta property="og:description" content="Select the right context management strategy for Claude. Compare sliding window, summary compression, RAG retrieval, and hybrid approaches with token optimization tips.">
+  <meta property="og:url" content="https://claudflow.com/answers/claude-memory-strategies.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude Memory Strategies — Context Management & Token Optimization Guide">
+  <meta name="twitter:description" content="Select the right context management strategy for Claude. Compare sliding window, summary compression, RAG, and hybrid approaches.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/answers/claude-memory-strategies.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/answers/claude-memory-strategies.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/answers/claude-memory-strategies.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Claude Memory Strategy Selector",
+    "url": "https://claudflow.com/answers/claude-memory-strategies.html",
+    "description": "Select the right context management strategy for Claude conversations. Compare sliding window, summary compression, RAG retrieval, and hybrid approaches. Includes token optimization calculator with cost savings estimates.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "Interactive strategy selector based on conversation type and requirements",
+      "Side-by-side comparison of sliding window, summary compression, RAG, and hybrid strategies",
+      "Token savings calculator showing per-conversation and monthly cost impact",
+      "Visual context window diagrams for each strategy",
+      "Implementation code snippets for each approach",
+      "Decision tree for choosing the optimal memory strategy",
+      "Conversation length simulator showing token growth curves",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why does Claude forget things in long conversations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude does not actually forget. It processes the entire conversation history in its context window on every turn. The issue is that the context window has a fixed token limit (200K for Claude 3.5 Sonnet and Claude 4 Opus). When the conversation exceeds this limit, older messages must be dropped to make room for new ones. Without a memory strategy, the most common approach is to simply truncate the oldest messages, which means Claude loses access to information shared early in the conversation. Memory strategies solve this by intelligently managing which information stays in the context window."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the sliding window memory strategy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The sliding window strategy keeps the N most recent messages in the context window and drops everything older. It is the simplest memory strategy to implement. You set a maximum number of conversation turns or tokens, and when the conversation exceeds that limit, the oldest messages are removed. This works well for task-focused conversations where only recent context matters, like coding sessions where the current file is more important than files discussed 50 turns ago. The downside is abrupt information loss: facts mentioned early in the conversation vanish completely once they slide out of the window."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I use RAG instead of keeping full conversation history?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use RAG (Retrieval-Augmented Generation) when your application needs to reference a large knowledge base that exceeds the context window, when users ask about specific topics that can be matched to stored documents, or when you need consistent answers across different conversations about the same facts. RAG is better than full history when the relevant information is sparse within a large corpus. Instead of stuffing the entire knowledge base into the context, RAG retrieves only the 3-5 most relevant chunks for each query. This dramatically reduces token usage while maintaining answer quality for factual lookups."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does summary compression work for long conversations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Summary compression periodically condenses older conversation turns into a brief summary. Instead of keeping 50 raw messages, you use Claude to generate a 200-token summary of messages 1-40, then keep that summary plus the 10 most recent raw messages. This preserves the key facts and decisions from earlier in the conversation while using far fewer tokens. The trade-off is lossy compression: nuanced details are lost in the summary. Implementation requires an extra API call whenever you trigger a compression cycle, but the token savings on subsequent turns usually outweigh this cost."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a hybrid memory strategy and when is it worth the complexity?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A hybrid memory strategy combines multiple approaches. A common hybrid is summary compression for old messages plus RAG for knowledge base lookups plus a sliding window for recent turns. The context window contains: a compressed summary of the full conversation history, retrieved documents relevant to the current query, and the last 5-10 raw messages. This gives Claude long-term memory (via summary), domain knowledge (via RAG), and immediate context (via sliding window). It is worth the complexity when your application has long-running conversations that reference external knowledge and where users expect the assistant to remember earlier decisions."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Answers", "item": "https://claudflow.com/answers/" },
+      { "@type": "ListItem", "position": 3, "name": "Claude Memory Strategies" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .cms-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .cms-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .cms-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .cms-card h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cms-card label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.25rem; margin-top:0.75rem; }
+    .cms-card label:first-of-type { margin-top:0; }
+    .cms-card select, .cms-card input { width:100%; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.88rem; box-sizing:border-box; }
+    .cms-card input:focus, .cms-card select:focus { outline:none; border-color:var(--accent); }
+
+    .cms-strat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin-bottom:1.5rem; }
+    .cms-strat-card { background:var(--bg-card); border:2px solid var(--border); border-radius:var(--radius); padding:1rem; cursor:pointer; transition:border-color 0.15s; text-align:center; }
+    .cms-strat-card:hover { border-color:var(--accent); }
+    .cms-strat-card.active { border-color:var(--accent); box-shadow:0 0 0 2px rgba(6,182,212,0.25); }
+    .cms-strat-card .sname { font-size:0.92rem; font-weight:600; color:var(--text); margin-bottom:0.25rem; }
+    .cms-strat-card .sdesc { font-size:0.72rem; color:var(--text-muted); }
+    .cms-strat-card .sicon { font-size:1.5rem; margin-bottom:0.4rem; }
+
+    .cms-viz { width:100%; height:60px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; display:flex; margin:0.75rem 0; }
+    .cms-seg { height:100%; display:flex; align-items:center; justify-content:center; font-size:0.68rem; font-weight:600; color:#000; transition:width 0.3s ease; overflow:hidden; white-space:nowrap; }
+
+    .cms-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .cms-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; text-align:center; }
+    .cms-stat .val { font-size:1.4rem; font-weight:700; color:var(--accent); }
+    .cms-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .cms-comparison { width:100%; border-collapse:collapse; margin:0.75rem 0; font-size:0.82rem; }
+    .cms-comparison th { text-align:left; padding:0.5rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .cms-comparison td { padding:0.5rem; border-bottom:1px solid var(--border); color:var(--text); }
+    .cms-comparison tr:hover td { background:rgba(6,182,212,0.05); }
+
+    .cms-tips { margin-top:1.5rem; }
+    .cms-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cms-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .cms-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .cms-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .cms-tip .tip-text strong { color:var(--text); }
+
+    .cms-code { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; font-family:monospace; font-size:0.78rem; color:var(--text); overflow-x:auto; white-space:pre; margin:0.75rem 0; line-height:1.5; }
+
+    @media (max-width:768px) {
+      .cms-grid { grid-template-columns:1fr; }
+      .cms-strat-grid { grid-template-columns:1fr 1fr; }
+      .cms-stats { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/answers/" style="color:var(--accent);text-decoration:none;">Answers</a> &rsaquo;
+      <span style="color:var(--text-muted);">Claude Memory Strategies</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Claude Memory Strategies</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Select the right context management strategy for your Claude application. Compare approaches, estimate token savings, and see implementation patterns.</p>
+    </section>
+  </main>
+
+  <div class="cms-wrap">
+    <div class="cms-card" style="margin-bottom:1.5rem;">
+      <h3>Choose a Memory Strategy</h3>
+      <div class="cms-strat-grid" id="cms-strats">
+        <div class="cms-strat-card active" data-strat="sliding" onclick="cmsSelect('sliding')">
+          <div class="sicon">&#9654;</div>
+          <div class="sname">Sliding Window</div>
+          <div class="sdesc">Keep N recent messages, drop oldest</div>
+        </div>
+        <div class="cms-strat-card" data-strat="summary" onclick="cmsSelect('summary')">
+          <div class="sicon">&#9998;</div>
+          <div class="sname">Summary Compression</div>
+          <div class="sdesc">Condense old turns into summaries</div>
+        </div>
+        <div class="cms-strat-card" data-strat="rag" onclick="cmsSelect('rag')">
+          <div class="sicon">&#128269;</div>
+          <div class="sname">RAG Retrieval</div>
+          <div class="sdesc">Retrieve relevant context per query</div>
+        </div>
+        <div class="cms-strat-card" data-strat="hybrid" onclick="cmsSelect('hybrid')">
+          <div class="sicon">&#9881;</div>
+          <div class="sname">Hybrid</div>
+          <div class="sdesc">Summary + RAG + sliding window</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cms-grid">
+      <div class="cms-card">
+        <h3>Conversation Parameters</h3>
+        <label>Conversation Length (turns)</label>
+        <input type="number" id="cms-turns" value="50" min="1" oninput="cmsUpdate()">
+        <label>Avg Tokens per Turn (user + assistant)</label>
+        <input type="number" id="cms-tpt" value="800" min="100" oninput="cmsUpdate()">
+        <label>System Prompt Tokens</label>
+        <input type="number" id="cms-system" value="500" min="0" oninput="cmsUpdate()">
+        <label>Context Window Size</label>
+        <select id="cms-window" onchange="cmsUpdate()">
+          <option value="200000" selected>200K (Claude 3.5 / 4 Opus)</option>
+          <option value="128000">128K (GPT-4o)</option>
+          <option value="1000000">1M (Gemini 2.5 Pro)</option>
+        </select>
+        <label>Conversations per Day</label>
+        <input type="number" id="cms-convos" value="100" min="1" oninput="cmsUpdate()">
+        <label>Model Cost ($/1M input tokens)</label>
+        <input type="number" id="cms-cost" value="3.00" min="0" step="0.01" oninput="cmsUpdate()">
+      </div>
+
+      <div class="cms-card">
+        <h3>Context Window Usage</h3>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem;">How the selected strategy fills the context window at the configured conversation length:</p>
+        <div class="cms-viz" id="cms-viz"></div>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;font-size:0.78rem;margin-bottom:0.5rem;">
+          <span style="display:flex;align-items:center;gap:0.3rem;"><span style="width:10px;height:10px;border-radius:2px;background:#a855f7;"></span> System</span>
+          <span style="display:flex;align-items:center;gap:0.3rem;"><span style="width:10px;height:10px;border-radius:2px;background:#06B6D4;"></span> Summary/RAG</span>
+          <span style="display:flex;align-items:center;gap:0.3rem;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;"></span> Recent Messages</span>
+          <span style="display:flex;align-items:center;gap:0.3rem;"><span style="width:10px;height:10px;border-radius:2px;background:var(--bg-card);border:1px solid var(--border);"></span> Free</span>
+        </div>
+        <div class="cms-stats" id="cms-stats"></div>
+        <div id="cms-recommendation" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;font-size:0.85rem;margin-top:0.75rem;"></div>
+      </div>
+    </div>
+
+    <div class="cms-card" style="margin-bottom:1.5rem;">
+      <h3>Strategy Comparison</h3>
+      <table class="cms-comparison">
+        <thead><tr><th>Strategy</th><th>Tokens Used</th><th>Monthly Cost</th><th>Info Retained</th><th>Complexity</th></tr></thead>
+        <tbody id="cms-compare-body"></tbody>
+      </table>
+    </div>
+
+    <div class="cms-card" style="margin-bottom:1.5rem;">
+      <h3>Implementation Pattern</h3>
+      <div class="cms-code" id="cms-code"></div>
+    </div>
+
+    <div class="cms-tips">
+      <h3>Token Optimization Tips</h3>
+      <div class="cms-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Compress early, compress often.</strong> Do not wait until the context window is full to start summarizing. Trigger compression when the conversation reaches 60% of the window. This leaves headroom for large user inputs and prevents the abrupt quality drop that occurs when you hit the limit and must emergency-truncate.</div>
+      </div>
+      <div class="cms-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Keep the system prompt under 500 tokens.</strong> In long conversations, the system prompt is the most expensive component because it is included in every single API call. A 2,000-token system prompt across a 50-turn conversation costs 100,000 tokens just for the system prompt. Compress it to 500 tokens and save 75,000 tokens per conversation.</div>
+      </div>
+      <div class="cms-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Use structured summaries, not prose.</strong> When compressing conversation history, use bullet points or key-value pairs instead of prose paragraphs. Structured summaries are 40-60% shorter than prose summaries while preserving more actionable information. They are also easier for the model to parse on subsequent turns.</div>
+      </div>
+      <div class="cms-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Cache system prompts with Anthropic's API.</strong> Prompt caching reduces the cost of the system prompt by 90% on subsequent requests within a conversation. For applications with 100+ daily conversations, this is typically the single largest cost saver, reducing monthly bills by thousands of dollars.</div>
+      </div>
+      <div class="cms-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Separate facts from conversation flow.</strong> Extract key facts, decisions, and user preferences into a structured memory store separate from the conversation transcript. Include only the relevant facts in each request rather than the full transcript. A user's name, preferences, and past decisions rarely need the full conversation context around them.</div>
+      </div>
+      <div class="cms-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Benchmark with real conversations.</strong> Test your memory strategy against actual user conversation logs, not synthetic examples. Real conversations have irregular turn lengths, topic changes, and reference patterns that synthetic tests miss. Measure both token cost and answer quality to find the optimal compression ratio for your use case.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Memory Strategy Selector Works</h2>
+
+    <p>The Memory Strategy Selector is a browser-based planning tool for choosing and configuring context management strategies in Claude applications. Every conversational AI application eventually hits the context window limit. A 200,000-token window sounds enormous, but a conversation averaging 800 tokens per turn fills it in just 250 turns. Many production chatbots handle conversations lasting hundreds of turns over days or weeks. Without a memory strategy, these conversations silently lose information as older messages are truncated to fit new ones. This tool helps you choose the right strategy before your users start complaining that the assistant forgot what they said five minutes ago.</p>
+
+    <p>Select a memory strategy from the four options to see how it handles your conversation parameters. Adjust the conversation length, tokens per turn, and system prompt size to match your actual application. The visual context window diagram shows exactly how the strategy allocates tokens across system prompt, compressed memory, recent messages, and free space. The comparison table lets you see all four strategies side by side with token usage, monthly cost, information retention quality, and implementation complexity.</p>
+
+    <h2>Understanding the Four Memory Strategies</h2>
+
+    <p>The sliding window strategy is the simplest and most common approach in production. It keeps the N most recent conversation turns and discards everything older. Implementation requires just a few lines of code that slice the message array to a maximum length before each API call. The advantage is zero additional API calls for memory management and perfectly preserved recent context. The disadvantage is binary information loss: everything outside the window is completely gone. The sliding window works well for task-focused conversations like coding sessions, customer support tickets, and short interactions where historical context is less important than the current task.</p>
+
+    <p>Summary compression periodically condenses older conversation turns into a compact summary. When the conversation reaches a threshold, you make an API call to Claude asking it to summarize messages 1 through N into a few hundred tokens. That summary replaces the original messages, and subsequent turns include the summary plus the most recent raw messages. This approach preserves key facts and decisions from the entire conversation while using a fraction of the tokens. The trade-off is lossy compression: subtle nuances, exact phrasings, and minor details are lost. Summary compression works best for advisory conversations, project discussions, and any interaction where remembering key decisions matters more than preserving exact wording.</p>
+
+    <p>RAG (Retrieval-Augmented Generation) retrieval is fundamentally different from the other strategies because it does not try to keep conversation history in the context window. Instead, it stores conversation content and external knowledge in a vector database. On each turn, the user's message is used to retrieve the most relevant chunks from the database, and only those chunks are injected into the context window. RAG excels at knowledge-intensive applications where the relevant information for any given query is a tiny fraction of the total knowledge base. Customer support bots that need to reference thousands of help articles, internal assistant tools that span company documentation, and research assistants over large paper collections all benefit from RAG.</p>
+
+    <p>The hybrid strategy combines all three approaches for maximum flexibility. It maintains a rolling summary of the full conversation history, uses RAG to retrieve relevant external knowledge for each query, and keeps the most recent messages in a sliding window. The context window on each turn contains: the system prompt, the conversation summary, retrieved document chunks, and the last 5 to 10 raw messages. This gives Claude long-term memory through the summary, domain knowledge through RAG, and immediate conversational context through the sliding window. The complexity cost is real, requiring infrastructure for vector storage, summarization scheduling, and context assembly, but the result is the most capable memory system possible within token limits.</p>
+
+    <h2>Token Growth Patterns and Cost Impact</h2>
+
+    <p>Without any memory strategy, token usage grows linearly with conversation length. A 50-turn conversation at 800 tokens per turn consumes 40,000 input tokens on the final turn alone, because the entire history is sent with each request. The total input tokens across all 50 turns is approximately 1 million tokens. At $3 per million tokens with Claude 3.5 Sonnet, that is $3 per conversation. At 100 conversations per day, monthly cost is approximately $9,000 just for input tokens. These numbers surprise most developers because they forget that the full history is resent on every single turn.</p>
+
+    <p>A sliding window capped at 20 turns changes the economics dramatically. After the conversation exceeds 20 turns, input token usage plateaus at approximately 16,000 tokens per turn (20 turns times 800 tokens) plus the system prompt. Total input tokens across a 50-turn conversation drops to roughly 500,000 tokens. Monthly cost at the same volume drops to approximately $4,500, a 50% reduction. The information loss from turns 1 through 30 is complete, but for many applications this is an acceptable trade-off.</p>
+
+    <p>Summary compression offers the best balance for most applications. Compressing turns 1 through 40 into a 400-token summary means the final turn's context contains 400 tokens of summary plus 8,000 tokens of recent messages (10 turns) plus the system prompt. Total input tokens across all turns is roughly 350,000. Monthly cost drops to about $3,200. The summarization calls add approximately 10% overhead, but the net saving is still around 60% compared to no strategy. More importantly, Claude retains awareness of the full conversation through the summary, which prevents the jarring "I forgot what you said earlier" experience that degrades user trust.</p>
+
+    <h2>Implementation Considerations</h2>
+
+    <p>Timing your compression triggers correctly is critical. Compressing too early wastes the API call on a short conversation that might never need it. Compressing too late risks hitting the context window limit and having to emergency-truncate. The optimal trigger point is when the conversation reaches 60 to 70 percent of the available context window. This leaves enough headroom for large user inputs and assistant responses while avoiding unnecessary compression of short conversations. For a 200K context window with a 500-token system prompt, trigger compression at approximately 120,000 tokens of conversation history.</p>
+
+    <p>The quality of your summary prompt directly determines the quality of long-term memory. A generic "summarize this conversation" instruction produces vague summaries that lose critical details. Instead, instruct the summarizer to extract specific categories: key decisions made, user preferences stated, facts established, action items agreed, and open questions remaining. This structured approach consistently produces more useful summaries that preserve the information Claude needs on subsequent turns. Testing summary quality against real conversations is essential before deploying to production.</p>
+
+    <p>For RAG implementations, chunk size and retrieval count are the two parameters that most affect quality. Chunks that are too small lose context and produce fragmented retrieval. Chunks that are too large waste tokens on irrelevant information within the chunk. A chunk size of 300 to 500 tokens works well for most conversational applications. Retrieving 3 to 5 chunks per query balances coverage against token cost. Use the <a href="/tools/context-window-optimizer.html">Context Window Optimizer</a> to plan how much of your token budget to allocate to RAG chunks versus other context components.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Memory Strategy Selector runs entirely in your browser. Conversation parameters, strategy configurations, and cost calculations are processed client-side using JavaScript. No data is sent to any server. There are no accounts, no cookies, no analytics, and no server-side processing. Your application architecture details and cost projections remain completely private on your device.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>Why does Claude forget things in long conversations?</summary>
+      <p>Claude does not actually forget. It processes the entire conversation history on every turn, but the context window has a fixed token limit. When the conversation exceeds this limit, older messages must be dropped. Without a memory strategy, the oldest messages are simply truncated. Memory strategies solve this by intelligently managing which information stays in the window.</p>
+    </details>
+
+    <details>
+      <summary>What is the sliding window memory strategy?</summary>
+      <p>The sliding window keeps the N most recent messages and drops everything older. It is the simplest to implement and works well for task-focused conversations where only recent context matters. The downside is abrupt information loss for anything outside the window.</p>
+    </details>
+
+    <details>
+      <summary>When should I use RAG instead of keeping full history?</summary>
+      <p>Use RAG when your application references a large knowledge base exceeding the context window, when users ask about specific topics matchable to stored documents, or when you need consistent answers across conversations. RAG retrieves only the most relevant chunks per query, dramatically reducing token usage.</p>
+    </details>
+
+    <details>
+      <summary>How does summary compression work?</summary>
+      <p>Summary compression periodically condenses older turns into a brief summary using an extra API call. Instead of keeping 50 raw messages, you keep a 200-token summary of messages 1-40 plus the 10 most recent raw messages. Key facts are preserved while using far fewer tokens.</p>
+    </details>
+
+    <details>
+      <summary>What is a hybrid memory strategy?</summary>
+      <p>A hybrid strategy combines summary compression for old messages, RAG for knowledge base lookups, and a sliding window for recent turns. It provides long-term memory, domain knowledge, and immediate context simultaneously. It is worth the complexity for long-running conversations that reference external knowledge.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/tools/token-cost-tracker.html">Token Cost Tracker</a></li>
+          <li><a href="/tools/system-prompt-tester.html">System Prompt A/B Tester</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration</a></li>
+          <li><a href="/guides/claude-for-data-analysis.html">Claude for Data Analysis</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+          <li><a href="/research/claude-use-case-gallery.html">Claude Use Case Gallery</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var strategy = 'sliding';
+  function fmt(n){ return n.toLocaleString(); }
+
+  window.cmsSelect = function(s){
+    strategy = s;
+    var cards = document.querySelectorAll('.cms-strat-card');
+    for(var i=0;i<cards.length;i++) cards[i].classList.toggle('active', cards[i].getAttribute('data-strat')===s);
+    cmsUpdate();
+  };
+
+  window.cmsUpdate = function(){
+    var turns = parseInt(document.getElementById('cms-turns').value)||1;
+    var tpt = parseInt(document.getElementById('cms-tpt').value)||100;
+    var system = parseInt(document.getElementById('cms-system').value)||0;
+    var windowSize = parseInt(document.getElementById('cms-window').value)||200000;
+    var convos = parseInt(document.getElementById('cms-convos').value)||1;
+    var costPer1M = parseFloat(document.getElementById('cms-cost').value)||3;
+
+    var rawTotal = turns * tpt;
+    var strategies = {
+      sliding: { windowTurns:20, summaryTokens:0, ragTokens:0, label:'Sliding Window' },
+      summary: { windowTurns:10, summaryTokens:Math.min(600,Math.ceil(turns*tpt*0.02)), ragTokens:0, label:'Summary Compression' },
+      rag:     { windowTurns:5,  summaryTokens:0, ragTokens:2000, label:'RAG Retrieval' },
+      hybrid:  { windowTurns:8,  summaryTokens:Math.min(400,Math.ceil(turns*tpt*0.015)), ragTokens:1500, label:'Hybrid' }
+    };
+
+    var s = strategies[strategy];
+    var recentTokens = Math.min(turns, s.windowTurns) * tpt;
+    var totalUsed = system + s.summaryTokens + s.ragTokens + recentTokens;
+    var free = Math.max(0, windowSize - totalUsed);
+    var pctUsed = Math.min(100, (totalUsed/windowSize)*100);
+
+    var noStrategyTokens = rawTotal + system;
+    var withStrategyTokens = totalUsed;
+    var savingsPerTurn = Math.max(0, noStrategyTokens - withStrategyTokens);
+    var totalInputTokensNoStrat = 0;
+    for(var t=1;t<=turns;t++) totalInputTokensNoStrat += system + t*tpt;
+    var totalInputTokensWithStrat = 0;
+    for(var t=1;t<=turns;t++){
+      var rt = Math.min(t, s.windowTurns)*tpt;
+      var st = t>s.windowTurns ? s.summaryTokens : 0;
+      totalInputTokensWithStrat += system + st + s.ragTokens + rt;
+    }
+    var monthlySaveTokens = (totalInputTokensNoStrat - totalInputTokensWithStrat) * convos * 30;
+    var monthlySaveDollars = (monthlySaveTokens/1000000) * costPer1M;
+
+    var viz = document.getElementById('cms-viz');
+    var pSys = Math.max(1, (system/windowSize)*100);
+    var pSum = (s.summaryTokens/windowSize)*100;
+    var pRag = (s.ragTokens/windowSize)*100;
+    var pRecent = (recentTokens/windowSize)*100;
+    var pFree = Math.max(0, 100-pSys-pSum-pRag-pRecent);
+    viz.innerHTML = '<div class="cms-seg" style="width:'+pSys+'%;background:#a855f7;">'+(pSys>4?'System':'')+'</div>'
+      +'<div class="cms-seg" style="width:'+(pSum+pRag)+'%;background:#06B6D4;">'+(pSum+pRag>4?(s.summaryTokens>0?'Summary':'RAG'):'')+'</div>'
+      +'<div class="cms-seg" style="width:'+pRecent+'%;background:#22c55e;">'+(pRecent>4?'Recent':'')+'</div>'
+      +'<div class="cms-seg" style="width:'+pFree+'%;background:var(--bg-card);color:var(--text-muted);">'+(pFree>5?fmt(free)+' free':'')+'</div>';
+
+    var stats = document.getElementById('cms-stats');
+    var savingsPct = totalInputTokensNoStrat>0 ? Math.round((1-totalInputTokensWithStrat/totalInputTokensNoStrat)*100) : 0;
+    stats.innerHTML = '<div class="cms-stat"><div class="val">'+fmt(totalUsed)+'</div><div class="lbl">Tokens / Final Turn</div></div>'
+      +'<div class="cms-stat"><div class="val">'+fmt(totalInputTokensWithStrat)+'</div><div class="lbl">Total / Conversation</div></div>'
+      +'<div class="cms-stat"><div class="val" style="color:#22c55e;">'+savingsPct+'%</div><div class="lbl">Token Savings</div></div>'
+      +'<div class="cms-stat"><div class="val" style="color:#22c55e;">$'+monthlySaveDollars.toFixed(0)+'</div><div class="lbl">Monthly Savings</div></div>';
+
+    var rec = document.getElementById('cms-recommendation');
+    var recs = {
+      sliding:'Best for: Short task-focused conversations (support tickets, coding sessions, quick Q&A). Not recommended when users reference information from early in the conversation.',
+      summary:'Best for: Advisory conversations, project discussions, multi-session interactions. The sweet spot for most production chatbots that need long-term awareness without RAG infrastructure.',
+      rag:'Best for: Knowledge-intensive applications with large document bases. Customer support over help articles, research assistants, internal documentation bots. Requires vector database infrastructure.',
+      hybrid:'Best for: Enterprise assistants that handle long conversations with external knowledge requirements. Maximum capability but highest implementation complexity. Worth it for high-value, high-volume applications.'
+    };
+    rec.innerHTML = '<strong style="color:var(--accent);">'+s.label+' Recommendation</strong><br><span style="color:var(--text-muted);">'+recs[strategy]+'</span>';
+
+    updateComparison(turns, tpt, system, windowSize, convos, costPer1M, strategies);
+    updateCode();
+  };
+
+  function updateComparison(turns,tpt,system,windowSize,convos,costPer1M,strategies){
+    var body = document.getElementById('cms-compare-body');
+    var html = '';
+    var keys = ['sliding','summary','rag','hybrid'];
+    var complexities = ['Low','Medium','Medium-High','High'];
+    var retentions = ['Recent only','Good','Query-specific','Excellent'];
+    for(var k=0;k<keys.length;k++){
+      var s = strategies[keys[k]];
+      var recentT = Math.min(turns, s.windowTurns)*tpt;
+      var used = system + s.summaryTokens + s.ragTokens + recentT;
+      var totalInput = 0;
+      for(var t=1;t<=turns;t++){
+        var rt = Math.min(t,s.windowTurns)*tpt;
+        var st = t>s.windowTurns?s.summaryTokens:0;
+        totalInput += system + st + s.ragTokens + rt;
+      }
+      var monthly = (totalInput*convos*30/1000000)*costPer1M;
+      var isActive = keys[k]===strategy;
+      html += '<tr'+(isActive?' style="background:rgba(6,182,212,0.08);"':'')+'><td'+(isActive?' style="font-weight:600;"':'')+'>'+s.label+'</td><td>'+fmt(used)+'</td><td>$'+monthly.toFixed(0)+'</td><td>'+retentions[k]+'</td><td>'+complexities[k]+'</td></tr>';
+    }
+    body.innerHTML = html;
+  }
+
+  function updateCode(){
+    var codes = {
+      sliding:'# Sliding Window Memory Strategy\ndef build_messages(history, max_turns=20, system_prompt=""):\n    messages = []\n    if system_prompt:\n        messages.append({"role": "system", "content": system_prompt})\n    \n    # Keep only the most recent N turns\n    recent = history[-max_turns:] if len(history) > max_turns else history\n    messages.extend(recent)\n    return messages\n\n# Usage\nhistory.append({"role": "user", "content": user_input})\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    messages=build_messages(history, max_turns=20,\n        system_prompt="You are a helpful assistant.")\n)\nhistory.append({"role": "assistant", "content": response.content})',
+      summary:'# Summary Compression Memory Strategy\ndef compress_if_needed(history, max_tokens=120000, system_prompt=""):\n    total = sum(len(m["content"])//4 for m in history)\n    if total < max_tokens:\n        return history  # No compression needed\n    \n    # Summarize older messages\n    old = history[:-10]  # Keep last 10 raw\n    recent = history[-10:]\n    \n    summary = client.messages.create(\n        model="claude-sonnet-4-20250514",\n        messages=[{"role":"user","content":\n            "Summarize this conversation as bullet points:\\n"\n            + "\\n".join(m["content"] for m in old)}]\n    )\n    \n    compressed = [{"role":"user","content":\n        f"[CONVERSATION SUMMARY]\\n{summary.content}"}]\n    return compressed + recent',
+      rag:'# RAG Retrieval Memory Strategy\nimport chromadb\n\nclient_db = chromadb.Client()\ncollection = client_db.get_or_create_collection("knowledge")\n\ndef build_rag_messages(query, history, system_prompt="", top_k=5):\n    # Retrieve relevant context\n    results = collection.query(query_texts=[query], n_results=top_k)\n    context_chunks = "\\n---\\n".join(results["documents"][0])\n    \n    messages = [{"role": "system", "content":\n        f"{system_prompt}\\n\\nRelevant context:\\n{context_chunks}"}]\n    \n    # Add only recent conversation turns\n    messages.extend(history[-5:])\n    messages.append({"role": "user", "content": query})\n    return messages',
+      hybrid:'# Hybrid Memory Strategy (Summary + RAG + Sliding Window)\ndef build_hybrid_context(query, history, knowledge_db,\n                         system_prompt="", summary=None):\n    messages = []\n    \n    # 1. System prompt\n    context_parts = [system_prompt]\n    \n    # 2. Conversation summary (long-term memory)\n    if summary:\n        context_parts.append(f"[CONVERSATION HISTORY]\\n{summary}")\n    \n    # 3. RAG retrieval (domain knowledge)\n    results = knowledge_db.query(query_texts=[query], n_results=3)\n    if results["documents"][0]:\n        chunks = "\\n---\\n".join(results["documents"][0])\n        context_parts.append(f"[RELEVANT DOCS]\\n{chunks}")\n    \n    messages.append({"role":"system",\n        "content":"\\n\\n".join(context_parts)})\n    \n    # 4. Sliding window (recent context)\n    messages.extend(history[-8:])\n    messages.append({"role":"user","content":query})\n    return messages'
+    };
+    document.getElementById('cms-code').textContent = codes[strategy];
+  }
+
+  cmsUpdate();
+})();
+</script>
+</body>
+</html>

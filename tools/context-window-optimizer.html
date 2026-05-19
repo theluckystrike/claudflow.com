@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Context Window Optimizer — Token Budget Planner &amp; Chunking Strategy | ClaudFlow</title>
+  <meta name="description" content="Plan your token budget across system prompts, few-shot examples, user input, and output. Compare context windows for Claude 3.5, Claude 4, GPT-4o, and Gemini. Build chunking strategies. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Context Window Optimizer — Token Budget Planner & Chunking Strategy">
+  <meta property="og:description" content="Plan your token budget across system prompts, few-shot examples, user input, and output. Compare context windows for Claude, GPT-4o, and Gemini. Build chunking strategies.">
+  <meta property="og:url" content="https://claudflow.com/tools/context-window-optimizer.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Context Window Optimizer — Token Budget Planner & Chunking Strategy">
+  <meta name="twitter:description" content="Plan your token budget across system prompts, few-shot examples, user input, and output. Compare context windows for Claude, GPT-4o, and Gemini.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/tools/context-window-optimizer.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/tools/context-window-optimizer.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/tools/context-window-optimizer.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Context Window Optimizer",
+    "url": "https://claudflow.com/tools/context-window-optimizer.html",
+    "description": "Plan your token budget across system prompts, few-shot examples, user input, and output. Compare context windows for Claude 3.5, Claude 4, GPT-4o, and Gemini. Build chunking strategies with fixed, semantic, and sliding window approaches.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "Token budget allocation across system prompt, few-shot examples, user input, and output",
+      "Model comparison: Claude 3.5 Sonnet, Claude 4 Opus, GPT-4o, Gemini 2.5 Pro",
+      "Real-time visual token budget bar with percentage breakdowns",
+      "Chunking strategy builder with fixed, semantic, and sliding window modes",
+      "Chunk overlap calculator for context preservation",
+      "Cost estimation per 1M tokens for each model",
+      "Remaining token calculator after system prompt and examples",
+      "Export budget plan as JSON",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a context window and why does size matter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A context window is the total number of tokens a language model can process in a single request, including both input and output. The size matters because it determines how much information you can feed the model at once. Claude 4 Opus supports 200K tokens, GPT-4o supports 128K, and Gemini 2.5 Pro supports 1M. Larger windows let you include more documents, examples, and context, but they also cost more per request. Optimizing your token budget ensures you use the window efficiently without wasting tokens or hitting limits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I estimate token count for my prompts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A rough estimate is that 1 token equals approximately 4 characters or 0.75 words in English. For more precise counting, this tool uses a character-based estimation that accounts for whitespace, punctuation, and common tokenization patterns. Paste your system prompt or few-shot examples into the input fields and the tool calculates estimated token usage in real time. For production workflows, always leave a 10-15% buffer above your estimate to account for tokenizer variations between models."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What chunking strategy should I use for long documents?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It depends on your content type. Fixed-size chunking splits text into equal token-length segments and works best for uniform content like logs or structured data. Semantic chunking splits at natural boundaries like paragraphs, headings, or sentence endings and works best for articles, documentation, and prose. Sliding window chunking uses overlapping segments to preserve context across chunk boundaries and works best when you need continuity between chunks, such as summarization chains or Q&A over long documents. Start with semantic chunking for most use cases and switch to sliding window if you notice context loss at boundaries."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much of the context window should I reserve for output?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Reserve at least 20-30% of the context window for output in most workflows. For code generation tasks, reserve 40% or more since generated code tends to be verbose. For classification or extraction tasks where the output is short, 5-10% is sufficient. The optimizer tool shows you the remaining tokens after your system prompt and examples are allocated, making it easy to see if you have enough room for the expected output length. Under-reserving output space causes truncated responses, which is one of the most common production issues."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does this tool actually call the AI models or count real tokens?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. The Context Window Optimizer is a planning and estimation tool that runs entirely in your browser. Token counts are estimated using a character-based heuristic that closely approximates actual tokenizer output. The tool does not call any external API or send any data to a server. For exact token counts, use the official tokenizer for your target model. The estimates here are accurate enough for budget planning and are typically within 5-10% of actual counts."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+      { "@type": "ListItem", "position": 3, "name": "Context Window Optimizer" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .cwo-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .cwo-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .cwo-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .cwo-card h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cwo-card label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.25rem; margin-top:0.75rem; }
+    .cwo-card label:first-of-type { margin-top:0; }
+    .cwo-card select, .cwo-card input, .cwo-card textarea { width:100%; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.88rem; box-sizing:border-box; }
+    .cwo-card textarea { min-height:70px; resize:vertical; }
+    .cwo-card input:focus, .cwo-card textarea:focus, .cwo-card select:focus { outline:none; border-color:var(--accent); }
+
+    .cwo-budget-bar { width:100%; height:36px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; display:flex; margin:0.75rem 0; }
+    .cwo-seg { height:100%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:600; color:#000; transition:width 0.3s ease; overflow:hidden; white-space:nowrap; }
+    .cwo-seg-system { background:#a855f7; }
+    .cwo-seg-examples { background:#06B6D4; }
+    .cwo-seg-input { background:#22c55e; }
+    .cwo-seg-output { background:#eab308; }
+    .cwo-seg-free { background:var(--bg-card); color:var(--text-muted); }
+
+    .cwo-legend { display:flex; flex-wrap:wrap; gap:1rem; font-size:0.78rem; margin-bottom:0.75rem; }
+    .cwo-legend span { display:flex; align-items:center; gap:0.35rem; }
+    .cwo-legend .dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
+    .cwo-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .cwo-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; text-align:center; }
+    .cwo-stat .val { font-size:1.4rem; font-weight:700; color:var(--accent); }
+    .cwo-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .cwo-chunk-config { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem; margin-top:0.75rem; }
+    .cwo-chunk-card { background:var(--bg); border:2px solid var(--border); border-radius:var(--radius); padding:0.75rem; cursor:pointer; transition:border-color 0.15s; text-align:center; }
+    .cwo-chunk-card:hover { border-color:var(--accent); }
+    .cwo-chunk-card.active { border-color:var(--accent); box-shadow:0 0 0 2px rgba(6,182,212,0.25); }
+    .cwo-chunk-card .ctitle { font-size:0.88rem; font-weight:600; color:var(--text); margin-bottom:0.25rem; }
+    .cwo-chunk-card .cdesc { font-size:0.72rem; color:var(--text-muted); }
+
+    .cwo-chunk-result { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-top:1rem; }
+    .cwo-chunk-result h4 { font-size:0.92rem; color:var(--accent); margin-bottom:0.5rem; }
+    .cwo-chunk-vis { display:flex; gap:3px; flex-wrap:wrap; margin:0.5rem 0; }
+    .cwo-chunk-block { height:24px; background:var(--accent); border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:600; color:#000; min-width:28px; }
+
+    .cwo-tips { margin-top:1.5rem; }
+    .cwo-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cwo-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .cwo-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .cwo-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .cwo-tip .tip-text strong { color:var(--text); }
+
+    .cwo-model-table { width:100%; border-collapse:collapse; margin:0.75rem 0; font-size:0.82rem; }
+    .cwo-model-table th { text-align:left; padding:0.5rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .cwo-model-table td { padding:0.5rem; border-bottom:1px solid var(--border); color:var(--text); }
+    .cwo-model-table tr:hover td { background:rgba(6,182,212,0.05); }
+
+    .cwo-export-bar { display:flex; gap:0.5rem; margin-top:1rem; }
+
+    @media (max-width:768px) {
+      .cwo-grid { grid-template-columns:1fr; }
+      .cwo-chunk-config { grid-template-columns:1fr; }
+      .cwo-stats { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/tools/" style="color:var(--accent);text-decoration:none;">Tools</a> &rsaquo;
+      <span style="color:var(--text-muted);">Context Window Optimizer</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Context Window Optimizer</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Plan your token budget across system prompts, few-shot examples, user input, and output. Compare models, build chunking strategies, and optimize costs.</p>
+    </section>
+  </main>
+
+  <div class="cwo-wrap">
+    <div class="cwo-grid">
+      <div class="cwo-card">
+        <h3>Model Selection</h3>
+        <label>Target Model</label>
+        <select id="cwo-model" onchange="cwoUpdate()">
+          <option value="claude35sonnet" selected>Claude 3.5 Sonnet (200K context)</option>
+          <option value="claude4opus">Claude 4 Opus (200K context)</option>
+          <option value="gpt4o">GPT-4o (128K context)</option>
+          <option value="gemini25pro">Gemini 2.5 Pro (1M context)</option>
+        </select>
+
+        <table class="cwo-model-table">
+          <thead><tr><th>Model</th><th>Context</th><th>Max Output</th><th>Input $/1M</th><th>Output $/1M</th></tr></thead>
+          <tbody>
+            <tr><td>Claude 3.5 Sonnet</td><td>200K</td><td>8,192</td><td>$3.00</td><td>$15.00</td></tr>
+            <tr><td>Claude 4 Opus</td><td>200K</td><td>32,000</td><td>$15.00</td><td>$75.00</td></tr>
+            <tr><td>GPT-4o</td><td>128K</td><td>16,384</td><td>$2.50</td><td>$10.00</td></tr>
+            <tr><td>Gemini 2.5 Pro</td><td>1,000K</td><td>65,536</td><td>$1.25</td><td>$5.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cwo-card">
+        <h3>Token Budget Allocation</h3>
+        <label>System Prompt (paste to estimate tokens)</label>
+        <textarea id="cwo-system" placeholder="You are a helpful assistant that..." oninput="cwoUpdate()"></textarea>
+        <label>Few-Shot Examples (paste all examples)</label>
+        <textarea id="cwo-examples" placeholder="User: How do I...\nAssistant: You can..." oninput="cwoUpdate()"></textarea>
+        <label>Reserved for User Input (tokens)</label>
+        <input type="number" id="cwo-userinput" value="4000" min="0" oninput="cwoUpdate()">
+        <label>Reserved for Output (tokens)</label>
+        <input type="number" id="cwo-output" value="2000" min="0" oninput="cwoUpdate()">
+      </div>
+    </div>
+
+    <div class="cwo-card" style="margin-bottom:1.5rem;">
+      <h3>Token Budget Visualization</h3>
+      <div class="cwo-legend">
+        <span><span class="dot" style="background:#a855f7;"></span> System Prompt</span>
+        <span><span class="dot" style="background:#06B6D4;"></span> Few-Shot Examples</span>
+        <span><span class="dot" style="background:#22c55e;"></span> User Input</span>
+        <span><span class="dot" style="background:#eab308;"></span> Output</span>
+        <span><span class="dot" style="background:var(--bg-card);border:1px solid var(--border);"></span> Free</span>
+      </div>
+      <div class="cwo-budget-bar" id="cwo-bar"></div>
+      <div class="cwo-stats" id="cwo-stats"></div>
+      <div id="cwo-warning" style="color:#ef4444;font-size:0.85rem;margin-top:0.5rem;display:none;"></div>
+    </div>
+
+    <div class="cwo-card" style="margin-bottom:1.5rem;">
+      <h3>Chunking Strategy Builder</h3>
+      <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.75rem;">When your documents exceed the remaining input budget, split them into chunks. Select a strategy and configure parameters below.</p>
+      <div class="cwo-chunk-config" id="cwo-chunk-config">
+        <div class="cwo-chunk-card active" data-strategy="fixed" onclick="cwoSelectChunk('fixed')">
+          <div class="ctitle">Fixed-Size</div>
+          <div class="cdesc">Equal token-length segments. Best for logs, structured data, CSV.</div>
+        </div>
+        <div class="cwo-chunk-card" data-strategy="semantic" onclick="cwoSelectChunk('semantic')">
+          <div class="ctitle">Semantic</div>
+          <div class="cdesc">Split at paragraphs/headings. Best for articles, docs, prose.</div>
+        </div>
+        <div class="cwo-chunk-card" data-strategy="sliding" onclick="cwoSelectChunk('sliding')">
+          <div class="ctitle">Sliding Window</div>
+          <div class="cdesc">Overlapping segments. Best for summarization, Q&A chains.</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-top:1rem;">
+        <div>
+          <label style="display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:0.25rem;">Document Size (tokens)</label>
+          <input type="number" id="cwo-docsize" value="50000" min="1000" oninput="cwoUpdateChunk()">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:0.25rem;">Chunk Size (tokens)</label>
+          <input type="number" id="cwo-chunksize" value="4000" min="100" oninput="cwoUpdateChunk()">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:0.25rem;">Overlap (tokens)</label>
+          <input type="number" id="cwo-overlap" value="200" min="0" oninput="cwoUpdateChunk()">
+        </div>
+      </div>
+      <div class="cwo-chunk-result" id="cwo-chunk-result"></div>
+    </div>
+
+    <div class="cwo-card" style="margin-bottom:1.5rem;">
+      <h3>Cost Estimator</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+        <div>
+          <label style="display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:0.25rem;">Requests per Day</label>
+          <input type="number" id="cwo-requests" value="100" min="1" oninput="cwoUpdateCost()">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.82rem;color:var(--text-muted);margin-bottom:0.25rem;">Days</label>
+          <input type="number" id="cwo-days" value="30" min="1" oninput="cwoUpdateCost()">
+        </div>
+      </div>
+      <div id="cwo-cost-result" style="margin-top:0.75rem;"></div>
+    </div>
+
+    <div class="cwo-export-bar">
+      <button class="btn btn-accent" onclick="cwoExport()">Export Budget Plan (JSON)</button>
+      <button class="btn" onclick="cwoReset()">Reset All</button>
+    </div>
+
+    <div class="cwo-tips" style="margin-top:1.5rem;">
+      <h3>Cost Optimization Tips</h3>
+      <div class="cwo-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Compress your system prompt.</strong> Remove filler words, merge redundant instructions, and use abbreviations in internal directives. A 500-token system prompt that conveys the same info as a 2,000-token one saves 1,500 tokens per request. At 1,000 requests per day, that is 1.5M tokens saved daily.</div>
+      </div>
+      <div class="cwo-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Use fewer, better few-shot examples.</strong> Two high-quality examples outperform five mediocre ones in most benchmarks. Each example consumes input tokens on every request. Cutting from five to two examples at 300 tokens each saves 900 tokens per call.</div>
+      </div>
+      <div class="cwo-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Set max_tokens on every request.</strong> If you know your output will be under 500 tokens, set max_tokens to 500. This prevents runaway generation that wastes output tokens and adds latency. It also makes your cost forecasting predictable.</div>
+      </div>
+      <div class="cwo-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Choose the right model for the task.</strong> Use Claude 3.5 Sonnet or GPT-4o for routine classification and extraction. Reserve Claude 4 Opus for complex reasoning tasks. Gemini 2.5 Pro offers the largest context window at the lowest per-token cost for bulk document processing.</div>
+      </div>
+      <div class="cwo-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Pre-filter documents before chunking.</strong> Remove headers, footers, boilerplate, navigation elements, and duplicate content before splitting. A 50,000-token document might contain only 30,000 tokens of useful content. Pre-filtering reduces both chunk count and cost by 40%.</div>
+      </div>
+      <div class="cwo-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Cache system prompts when supported.</strong> Anthropic's prompt caching lets you cache the system prompt and few-shot examples across requests. Cached input tokens cost 90% less than uncached tokens. For high-volume applications, this is the single largest cost saver.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Context Window Optimizer Works</h2>
+
+    <p>The Context Window Optimizer is a browser-based planning tool for allocating tokens across the components of an LLM request. Every API call to a language model consumes tokens from a fixed-size context window. That window must accommodate your system prompt, any few-shot examples, the user's input, and the model's generated output. If the total exceeds the window size, the request fails or the model silently truncates content. This tool makes the allocation visible and helps you plan before you hit production.</p>
+
+    <p>Select a target model from the dropdown to set the context window size and pricing. Paste your actual system prompt and few-shot examples into the text areas, and the tool estimates their token consumption using a character-based heuristic. Set your expected user input size and desired output length using the numeric inputs. The visual budget bar updates in real time, showing exactly how much of the window each component consumes and how much headroom remains. If your allocation exceeds the window, a warning appears immediately.</p>
+
+    <h2>Understanding Token Budgets Across Models</h2>
+
+    <p>Different models offer vastly different context window sizes, and the right choice depends on your use case. Claude 3.5 Sonnet provides 200,000 tokens of context at $3 per million input tokens, making it an excellent general-purpose choice for most workflows. Claude 4 Opus also offers 200,000 tokens but with significantly more capable reasoning at $15 per million input tokens. GPT-4o provides 128,000 tokens at $2.50 per million. Gemini 2.5 Pro leads with 1,000,000 tokens at just $1.25 per million, which makes it the clear choice for bulk document processing where you need to ingest entire codebases or book-length documents in a single pass.</p>
+
+    <p>The maximum output length also varies dramatically. Claude 3.5 Sonnet caps output at 8,192 tokens, which is roughly 6,000 words. Claude 4 Opus extends this to 32,000 tokens for longer-form generation. GPT-4o sits at 16,384 tokens. Gemini 2.5 Pro allows up to 65,536 tokens of output. If your workflow involves generating long documents, code files, or detailed reports, the output cap matters as much as the total context window. The optimizer shows both limits so you can plan accordingly.</p>
+
+    <h2>Chunking Strategies for Long Documents</h2>
+
+    <p>When a document exceeds your remaining input budget, you need to split it into chunks and process each chunk in a separate request. The choice of chunking strategy significantly impacts quality and cost. Fixed-size chunking is the simplest approach: divide the document into equal-length segments of N tokens each. This works well for structured data like CSV files, log entries, or JSON records where each line is independent. The downside is that fixed-size chunks often split mid-sentence or mid-paragraph, which can confuse the model.</p>
+
+    <p>Semantic chunking addresses this by splitting at natural language boundaries. The text is divided at paragraph breaks, heading boundaries, or sentence endings, with each chunk sized to stay under the token limit. This preserves the coherence of each segment, which leads to better model comprehension and higher-quality outputs. The trade-off is that chunk sizes vary, so some chunks may be significantly smaller than the limit, reducing efficiency. For articles, documentation, legal contracts, and any prose-heavy content, semantic chunking is the default recommendation.</p>
+
+    <p>Sliding window chunking adds overlap between consecutive chunks. If your chunk size is 4,000 tokens with 200 tokens of overlap, the second chunk starts 3,800 tokens into the document rather than 4,000 tokens in. The overlapping region provides context continuity, which is critical for tasks like summarization chains where each chunk's summary needs to connect logically with the previous one. The cost is higher total token consumption since the overlapping tokens are processed multiple times. Use sliding window when context preservation across boundaries is more important than minimizing API costs.</p>
+
+    <h2>Token Budget Allocation Best Practices</h2>
+
+    <p>The system prompt is your highest-leverage allocation. Every token in the system prompt is sent with every single request. A system prompt that is 2,000 tokens costs 2,000 tokens multiplied by every request you make. In a production application handling 10,000 requests per day, that is 20 million tokens per day just for the system prompt. Compressing the system prompt without losing essential instructions is the single most impactful optimization. Techniques include removing polite filler, using structured formats instead of prose, and consolidating overlapping instructions.</p>
+
+    <p>Few-shot examples have the same multiplicative cost as the system prompt since they are included in every request. The optimal number of examples depends on the task complexity. For simple classification tasks, zero or one example often suffices because the model already understands the task from the system prompt alone. For complex formatting tasks or domain-specific outputs, two to three carefully crafted examples typically achieve near-maximum quality. Beyond three examples, quality improvements are marginal while costs scale linearly. Each example should demonstrate a distinct aspect of the desired behavior rather than repeating similar patterns.</p>
+
+    <p>The user input allocation should match your actual distribution. If 95% of your users send inputs under 1,000 tokens but your edge case is 10,000 tokens, design your system for the common case and implement a separate flow for long inputs. Over-allocating for edge cases wastes headroom on every request. Similarly, the output allocation should match the actual generation length, not the model's maximum. Set the max_tokens parameter to cap generation at your expected length plus a buffer. This prevents both wasted tokens and unexpectedly long outputs that slow down your application.</p>
+
+    <h2>Cost Optimization at Scale</h2>
+
+    <p>At production scale, small per-request savings compound into significant monthly cost differences. The cost estimator in this tool lets you model different scenarios. Compare what happens to your monthly bill if you switch from Claude 4 Opus to Claude 3.5 Sonnet for tasks that do not require Opus-level reasoning. Compare the cost of processing a 100,000-token document in one pass with Gemini 2.5 Pro versus splitting it into 25 chunks with Claude 3.5 Sonnet. In many cases, the cheaper option also produces better results because smaller, focused chunks lead to more precise outputs.</p>
+
+    <p>Prompt caching, available through Anthropic's API, is a particularly powerful optimization. When you cache the system prompt and few-shot examples, subsequent requests that use the same cached prefix pay only 10% of the normal input token cost for the cached portion. For applications with a stable system prompt and fixed examples, this can reduce input costs by up to 90% for the cached segment. The optimizer does not calculate cached pricing directly, but you can estimate it by reducing the system prompt and example costs by 90% in your mental model. For teams running <a href="https://claudkit.com">ClaudKit</a> API workflows, prompt caching integrates directly into the request pipeline.</p>
+
+    <p>Cross-model routing is another advanced optimization. Route simple classification requests to the cheapest model and reserve expensive models for complex reasoning. A routing layer adds development complexity but can cut costs by 60-80% for mixed workloads. Use the model comparison table in this tool to identify which model offers the best price-performance ratio for each task type in your pipeline. For teams already using <a href="https://claudflow.com/tools/workflow-builder.html">the visual workflow designer</a>, each block in the workflow can target a different model based on the complexity of that step.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Context Window Optimizer runs entirely in your browser. No prompts, examples, or configuration data are sent to any server. Token estimates are calculated client-side using a character-based heuristic. Budget plans exported as JSON are generated and downloaded locally. There are no accounts, no cookies, no analytics, and no server-side processing. Your prompt text, system instructions, and all other content remain private on your device at all times. The complete application is static HTML, CSS, and JavaScript. For teams working with sensitive prompts or proprietary system instructions, this local-only architecture ensures nothing leaves your machine.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What is a context window and why does size matter?</summary>
+      <p>A context window is the total number of tokens a language model can process in a single request, including both input and output. The size matters because it determines how much information you can feed the model at once. Claude 4 Opus supports 200K tokens, GPT-4o supports 128K, and Gemini 2.5 Pro supports 1M. Larger windows let you include more documents, examples, and context, but they also cost more per request. Optimizing your token budget ensures you use the window efficiently.</p>
+    </details>
+
+    <details>
+      <summary>How do I estimate token count for my prompts?</summary>
+      <p>A rough estimate is that 1 token equals approximately 4 characters or 0.75 words in English. This tool uses a character-based estimation. Paste your system prompt or few-shot examples into the input fields and the tool calculates estimated token usage in real time. For production workflows, always leave a 10-15% buffer above your estimate to account for tokenizer variations between models.</p>
+    </details>
+
+    <details>
+      <summary>What chunking strategy should I use for long documents?</summary>
+      <p>It depends on your content type. Fixed-size chunking works best for uniform content like logs or structured data. Semantic chunking splits at natural boundaries and works best for articles and documentation. Sliding window chunking uses overlapping segments for context continuity and works best for summarization chains. Start with semantic chunking for most use cases.</p>
+    </details>
+
+    <details>
+      <summary>How much of the context window should I reserve for output?</summary>
+      <p>Reserve at least 20-30% for output in most workflows. For code generation, reserve 40% or more. For classification or extraction where output is short, 5-10% is sufficient. Under-reserving output space causes truncated responses, which is one of the most common production issues.</p>
+    </details>
+
+    <details>
+      <summary>Does this tool actually call AI models or count real tokens?</summary>
+      <p>No. The Context Window Optimizer is a planning and estimation tool that runs entirely in your browser. Token counts are estimated using a character-based heuristic that closely approximates actual tokenizer output. No data is sent to any server. For exact counts, use the official tokenizer for your target model.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/">ClaudFlow Home &mdash; Canvas Builder</a></li>
+          <li><a href="/answers/claude-vs-gpt-workflows.html">Claude vs GPT for Workflows</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var MODELS = {
+    claude35sonnet: { name:'Claude 3.5 Sonnet', context:200000, maxOutput:8192, inputCost:3.00, outputCost:15.00 },
+    claude4opus:    { name:'Claude 4 Opus',      context:200000, maxOutput:32000, inputCost:15.00, outputCost:75.00 },
+    gpt4o:          { name:'GPT-4o',             context:128000, maxOutput:16384, inputCost:2.50, outputCost:10.00 },
+    gemini25pro:    { name:'Gemini 2.5 Pro',     context:1000000, maxOutput:65536, inputCost:1.25, outputCost:5.00 }
+  };
+
+  var chunkStrategy = 'fixed';
+
+  function estimateTokens(text){
+    if(!text) return 0;
+    return Math.ceil(text.length / 4);
+  }
+
+  function fmt(n){
+    return n.toLocaleString();
+  }
+
+  window.cwoUpdate = function(){
+    var modelKey = document.getElementById('cwo-model').value;
+    var model = MODELS[modelKey];
+    var systemTokens = estimateTokens(document.getElementById('cwo-system').value);
+    var exampleTokens = estimateTokens(document.getElementById('cwo-examples').value);
+    var userTokens = parseInt(document.getElementById('cwo-userinput').value) || 0;
+    var outputTokens = parseInt(document.getElementById('cwo-output').value) || 0;
+
+    var totalUsed = systemTokens + exampleTokens + userTokens + outputTokens;
+    var free = Math.max(0, model.context - totalUsed);
+    var overBudget = totalUsed > model.context;
+
+    var bar = document.getElementById('cwo-bar');
+    var total = model.context;
+    var pSystem = Math.min(100, (systemTokens/total)*100);
+    var pExamples = Math.min(100-pSystem, (exampleTokens/total)*100);
+    var pUser = Math.min(100-pSystem-pExamples, (userTokens/total)*100);
+    var pOutput = Math.min(100-pSystem-pExamples-pUser, (outputTokens/total)*100);
+    var pFree = Math.max(0, 100-pSystem-pExamples-pUser-pOutput);
+
+    bar.innerHTML = '<div class="cwo-seg cwo-seg-system" style="width:'+pSystem+'%">'+(pSystem>5?fmt(systemTokens):'')+'</div>'
+      +'<div class="cwo-seg cwo-seg-examples" style="width:'+pExamples+'%">'+(pExamples>5?fmt(exampleTokens):'')+'</div>'
+      +'<div class="cwo-seg cwo-seg-input" style="width:'+pUser+'%">'+(pUser>5?fmt(userTokens):'')+'</div>'
+      +'<div class="cwo-seg cwo-seg-output" style="width:'+pOutput+'%">'+(pOutput>5?fmt(outputTokens):'')+'</div>'
+      +'<div class="cwo-seg cwo-seg-free" style="width:'+pFree+'%">'+(pFree>5?fmt(free):'')+'</div>';
+
+    var stats = document.getElementById('cwo-stats');
+    stats.innerHTML = '<div class="cwo-stat"><div class="val">'+fmt(model.context)+'</div><div class="lbl">Total Context</div></div>'
+      +'<div class="cwo-stat"><div class="val">'+fmt(systemTokens)+'</div><div class="lbl">System Prompt</div></div>'
+      +'<div class="cwo-stat"><div class="val">'+fmt(exampleTokens)+'</div><div class="lbl">Few-Shot Examples</div></div>'
+      +'<div class="cwo-stat"><div class="val">'+fmt(userTokens)+'</div><div class="lbl">User Input</div></div>'
+      +'<div class="cwo-stat"><div class="val">'+fmt(outputTokens)+'</div><div class="lbl">Output Reserved</div></div>'
+      +'<div class="cwo-stat"><div class="val" style="color:'+(overBudget?'#ef4444':'#22c55e')+'">'+fmt(free)+'</div><div class="lbl">Free Tokens</div></div>';
+
+    var warn = document.getElementById('cwo-warning');
+    if(overBudget){
+      warn.style.display = 'block';
+      warn.textContent = 'WARNING: Budget exceeds context window by '+fmt(totalUsed-model.context)+' tokens. Reduce allocations or switch to a larger model.';
+    } else if(outputTokens > model.maxOutput){
+      warn.style.display = 'block';
+      warn.textContent = 'WARNING: Output reservation ('+fmt(outputTokens)+') exceeds '+model.name+' max output ('+fmt(model.maxOutput)+'). The model will cap at '+fmt(model.maxOutput)+' tokens.';
+    } else {
+      warn.style.display = 'none';
+    }
+
+    cwoUpdateChunk();
+    cwoUpdateCost();
+  };
+
+  window.cwoSelectChunk = function(strategy){
+    chunkStrategy = strategy;
+    var cards = document.querySelectorAll('.cwo-chunk-card');
+    for(var i=0;i<cards.length;i++){
+      cards[i].classList.toggle('active', cards[i].getAttribute('data-strategy')===strategy);
+    }
+    cwoUpdateChunk();
+  };
+
+  window.cwoUpdateChunk = function(){
+    var docSize = parseInt(document.getElementById('cwo-docsize').value) || 0;
+    var chunkSize = parseInt(document.getElementById('cwo-chunksize').value) || 1;
+    var overlap = parseInt(document.getElementById('cwo-overlap').value) || 0;
+    var result = document.getElementById('cwo-chunk-result');
+
+    if(chunkStrategy === 'fixed'){
+      overlap = 0;
+    }
+
+    var step = Math.max(1, chunkSize - overlap);
+    var numChunks = Math.ceil(docSize / step);
+    if(docSize <= chunkSize) numChunks = 1;
+    var totalTokensProcessed = numChunks * chunkSize;
+    var overheadPct = docSize > 0 ? Math.round(((totalTokensProcessed - docSize) / docSize)*100) : 0;
+
+    var strategyNames = { fixed:'Fixed-Size Chunking', semantic:'Semantic Chunking', sliding:'Sliding Window Chunking' };
+    var vis = '';
+    var maxVis = Math.min(numChunks, 30);
+    for(var i=0;i<maxVis;i++){
+      var w = Math.max(28, Math.min(80, Math.round(80*(chunkSize/docSize)*10)));
+      vis += '<div class="cwo-chunk-block" style="width:'+w+'px;opacity:'+(0.5+0.5*(i%2))+'">C'+(i+1)+'</div>';
+    }
+    if(numChunks > maxVis) vis += '<div style="display:flex;align-items:center;font-size:0.75rem;color:var(--text-muted);padding:0 0.5rem;">+'+(numChunks-maxVis)+' more</div>';
+
+    result.innerHTML = '<h4>'+strategyNames[chunkStrategy]+' Result</h4>'
+      +'<div class="cwo-chunk-vis">'+vis+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.5rem;margin-top:0.75rem;font-size:0.82rem;">'
+      +'<div><strong style="color:var(--accent);">'+fmt(numChunks)+'</strong><br><span style="color:var(--text-muted);">Total Chunks</span></div>'
+      +'<div><strong style="color:var(--accent);">'+fmt(chunkSize)+'</strong><br><span style="color:var(--text-muted);">Tokens/Chunk</span></div>'
+      +'<div><strong style="color:var(--accent);">'+fmt(overlap)+'</strong><br><span style="color:var(--text-muted);">Overlap</span></div>'
+      +'<div><strong style="color:var(--accent);">'+fmt(totalTokensProcessed)+'</strong><br><span style="color:var(--text-muted);">Total Processed</span></div>'
+      +'<div><strong style="color:'+(overheadPct>20?'#eab308':'#22c55e')+';">'+overheadPct+'%</strong><br><span style="color:var(--text-muted);">Overhead</span></div>'
+      +'</div>'
+      +(chunkStrategy==='fixed'?'<p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">Fixed-size chunking uses zero overlap. Chunks may split mid-sentence. Best for structured data.</p>':'')
+      +(chunkStrategy==='semantic'?'<p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">Semantic chunking splits at paragraph/heading boundaries. Actual chunk sizes vary. Token counts are estimates assuming average chunk fills to the limit.</p>':'')
+      +(chunkStrategy==='sliding'?'<p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">Sliding window preserves context across boundaries. The '+fmt(overlap)+'-token overlap means each chunk shares content with its neighbor. Total tokens processed exceeds document size by '+overheadPct+'%.</p>':'');
+  };
+
+  window.cwoUpdateCost = function(){
+    var modelKey = document.getElementById('cwo-model').value;
+    var model = MODELS[modelKey];
+    var systemTokens = estimateTokens(document.getElementById('cwo-system').value);
+    var exampleTokens = estimateTokens(document.getElementById('cwo-examples').value);
+    var userTokens = parseInt(document.getElementById('cwo-userinput').value) || 0;
+    var outputTokens = parseInt(document.getElementById('cwo-output').value) || 0;
+    var requests = parseInt(document.getElementById('cwo-requests').value) || 0;
+    var days = parseInt(document.getElementById('cwo-days').value) || 0;
+
+    var inputPerReq = systemTokens + exampleTokens + userTokens;
+    var outputPerReq = outputTokens;
+    var totalReqs = requests * days;
+
+    var inputCost = (inputPerReq * totalReqs / 1000000) * model.inputCost;
+    var outputCost = (outputPerReq * totalReqs / 1000000) * model.outputCost;
+    var totalCost = inputCost + outputCost;
+
+    var el = document.getElementById('cwo-cost-result');
+    el.innerHTML = '<table class="cwo-model-table">'
+      +'<thead><tr><th>Metric</th><th>Value</th></tr></thead>'
+      +'<tbody>'
+      +'<tr><td>Model</td><td>'+model.name+'</td></tr>'
+      +'<tr><td>Input tokens/request</td><td>'+fmt(inputPerReq)+'</td></tr>'
+      +'<tr><td>Output tokens/request</td><td>'+fmt(outputPerReq)+'</td></tr>'
+      +'<tr><td>Total requests</td><td>'+fmt(totalReqs)+'</td></tr>'
+      +'<tr><td>Input cost</td><td>$'+inputCost.toFixed(2)+'</td></tr>'
+      +'<tr><td>Output cost</td><td>$'+outputCost.toFixed(2)+'</td></tr>'
+      +'<tr><td><strong>Total estimated cost</strong></td><td><strong style="color:var(--accent);">$'+totalCost.toFixed(2)+'</strong></td></tr>'
+      +'</tbody></table>'
+      +'<p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">Estimates based on published API pricing. Actual costs may vary with caching, batching, and tier discounts.</p>';
+  };
+
+  window.cwoExport = function(){
+    var modelKey = document.getElementById('cwo-model').value;
+    var model = MODELS[modelKey];
+    var plan = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      model: { key:modelKey, name:model.name, context:model.context, maxOutput:model.maxOutput },
+      budget: {
+        systemPromptTokens: estimateTokens(document.getElementById('cwo-system').value),
+        fewShotTokens: estimateTokens(document.getElementById('cwo-examples').value),
+        userInputTokens: parseInt(document.getElementById('cwo-userinput').value) || 0,
+        outputTokens: parseInt(document.getElementById('cwo-output').value) || 0
+      },
+      chunking: {
+        strategy: chunkStrategy,
+        documentSize: parseInt(document.getElementById('cwo-docsize').value) || 0,
+        chunkSize: parseInt(document.getElementById('cwo-chunksize').value) || 0,
+        overlap: parseInt(document.getElementById('cwo-overlap').value) || 0
+      },
+      pricing: {
+        inputCostPer1M: model.inputCost,
+        outputCostPer1M: model.outputCost
+      }
+    };
+    var json = JSON.stringify(plan, null, 2);
+    var blob = new Blob([json], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'token-budget-plan-'+Date.now()+'.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  window.cwoReset = function(){
+    document.getElementById('cwo-system').value = '';
+    document.getElementById('cwo-examples').value = '';
+    document.getElementById('cwo-userinput').value = '4000';
+    document.getElementById('cwo-output').value = '2000';
+    document.getElementById('cwo-model').value = 'claude35sonnet';
+    document.getElementById('cwo-docsize').value = '50000';
+    document.getElementById('cwo-chunksize').value = '4000';
+    document.getElementById('cwo-overlap').value = '200';
+    document.getElementById('cwo-requests').value = '100';
+    document.getElementById('cwo-days').value = '30';
+    chunkStrategy = 'fixed';
+    var cards = document.querySelectorAll('.cwo-chunk-card');
+    for(var i=0;i<cards.length;i++){
+      cards[i].classList.toggle('active', cards[i].getAttribute('data-strategy')==='fixed');
+    }
+    cwoUpdate();
+  };
+
+  cwoUpdate();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Agent Pattern Library — 12 Agentic AI Design Patterns with Templates | ClaudFlow</title>
+  <meta name="description" content="Searchable catalog of 12 agentic AI design patterns: ReAct, Plan-Execute, Reflection, Tool-Use, Multi-Agent, Chain-of-Thought, Tree-of-Thought, and more. Each with flow diagrams, pseudocode, pros/cons, and use cases. Free reference.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Agent Pattern Library — 12 Agentic AI Design Patterns with Templates">
+  <meta property="og:description" content="Searchable catalog of 12 agentic AI design patterns: ReAct, Plan-Execute, Reflection, Tool-Use, Multi-Agent, and more. Each with flow diagrams, pseudocode, and use cases.">
+  <meta property="og:url" content="https://claudflow.com/research/agent-pattern-library.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agent Pattern Library — 12 Agentic AI Design Patterns with Templates">
+  <meta name="twitter:description" content="Searchable catalog of 12 agentic AI design patterns with flow diagrams, pseudocode, pros/cons, and use cases.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/research/agent-pattern-library.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/research/agent-pattern-library.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/research/agent-pattern-library.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Agent Pattern Library — 12 Agentic AI Design Patterns with Templates",
+    "url": "https://claudflow.com/research/agent-pattern-library.html",
+    "description": "Comprehensive catalog of 12 agentic AI design patterns including ReAct, Plan-Execute, Reflection, Tool-Use, Multi-Agent, Chain-of-Thought, Tree-of-Thought, Self-Ask, MRKL, Debate, Verify-then-Edit, and Orchestrator-Worker. Each pattern includes flow diagrams, pseudocode, pros/cons, and real-world use cases.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "mainEntityOfPage": "https://claudflow.com/research/agent-pattern-library.html"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is an agentic AI pattern and how does it differ from a simple prompt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "An agentic AI pattern is a structured design for multi-step LLM interactions where the model reasons, plans, acts, and iterates rather than generating a single response. Unlike a simple prompt-response pair, agentic patterns involve loops, tool calls, self-evaluation, and dynamic decision-making. For example, the ReAct pattern alternates between reasoning and action steps, letting the agent decide what tool to call next based on previous observations. These patterns are the building blocks for autonomous AI systems that can handle complex, open-ended tasks."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which agent pattern should I use for my project?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The best pattern depends on your task requirements. For tasks requiring external data or API calls, use ReAct or Tool-Use. For complex multi-step planning, use Plan-Execute. For improving output quality iteratively, use Reflection or Verify-then-Edit. For exploring multiple solution paths, use Tree-of-Thought. For tasks requiring multiple specialized capabilities, use Multi-Agent or Orchestrator-Worker. The pattern comparison tool on this page lets you compare patterns side by side to find the best fit."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I combine multiple agent patterns in one system?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, pattern composition is common in production systems. A typical architecture uses Orchestrator-Worker at the top level, with individual workers implementing different patterns. For example, a research worker might use ReAct for web searching, a writing worker might use Reflection for iterative drafting, and a coding worker might use Verify-then-Edit for self-correcting code generation. The key is to match each sub-task to the pattern best suited for it rather than forcing one pattern across the entire system."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I handle failures and infinite loops in agent patterns?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Every agentic pattern needs explicit termination conditions to prevent infinite loops. Common safeguards include maximum iteration limits (e.g., max 10 ReAct cycles), token budget caps that halt execution when cumulative usage exceeds a threshold, timeout limits for wall-clock time, and quality gates that accept output once it meets minimum criteria. For Reflection patterns, limit self-critique rounds to 3-5 iterations. For Multi-Agent patterns, implement a supervisor that can force termination if agents enter circular disagreement."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the cost implications of agentic patterns versus single-shot prompts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Agentic patterns consume significantly more tokens than single-shot prompts because they involve multiple LLM calls per task. A ReAct loop averaging 5 iterations costs roughly 5x a single prompt. Reflection with 3 rounds costs 3x plus the overhead of critique prompts. Multi-Agent patterns with 4 agents can cost 4-10x depending on inter-agent communication. The trade-off is that agentic patterns produce dramatically better results for complex tasks. Optimize costs by using cheaper models for simple steps and reserving expensive models for critical reasoning steps."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Research", "item": "https://claudflow.com/research/" },
+      { "@type": "ListItem", "position": 3, "name": "Agent Pattern Library" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .apl-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .apl-controls { display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; margin-bottom:1.5rem; }
+    .apl-search { flex:1; min-width:220px; padding:0.6rem 1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:0.92rem; font-family:var(--font-body); }
+    .apl-search:focus { outline:none; border-color:var(--accent); }
+    .apl-filters { display:flex; flex-wrap:wrap; gap:0.4rem; }
+    .apl-tag { padding:0.3rem 0.7rem; background:var(--bg-card); border:1px solid var(--border); border-radius:99px; font-size:0.78rem; cursor:pointer; color:var(--text-muted); transition:all 0.15s; }
+    .apl-tag:hover { border-color:var(--accent); color:var(--text); }
+    .apl-tag.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:600; }
+
+    .apl-count { font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem; }
+
+    .apl-grid { display:grid; grid-template-columns:1fr; gap:1.25rem; }
+    .apl-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:border-color 0.15s; }
+    .apl-card:hover { border-color:var(--accent); }
+    .apl-card-header { padding:1rem 1.25rem; cursor:pointer; display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; }
+    .apl-card-header h3 { font-size:1.05rem; color:var(--text); margin:0 0 0.25rem; }
+    .apl-card-header .apl-desc { font-size:0.85rem; color:var(--text-muted); margin:0; line-height:1.5; }
+    .apl-card-header .apl-tags { display:flex; gap:0.35rem; margin-top:0.4rem; flex-wrap:wrap; }
+    .apl-card-header .apl-tags span { font-size:0.68rem; padding:0.15rem 0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:99px; color:var(--text-muted); }
+    .apl-card-toggle { flex-shrink:0; width:28px; height:28px; background:var(--bg); border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:var(--text-muted); transition:transform 0.2s; }
+    .apl-card.open .apl-card-toggle { transform:rotate(180deg); }
+
+    .apl-card-body { display:none; padding:0 1.25rem 1.25rem; border-top:1px solid var(--border); }
+    .apl-card.open .apl-card-body { display:block; }
+
+    .apl-section { margin-top:1rem; }
+    .apl-section h4 { font-size:0.88rem; color:var(--accent); margin-bottom:0.5rem; }
+
+    .apl-flow { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; font-family:var(--font-display); font-size:0.78rem; line-height:1.7; color:var(--text-muted); overflow-x:auto; white-space:pre; }
+
+    .apl-code { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; font-family:var(--font-display); font-size:0.78rem; line-height:1.6; color:var(--text); overflow-x:auto; white-space:pre; }
+
+    .apl-proscons { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .apl-pros, .apl-cons { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; }
+    .apl-pros h5 { color:#22c55e; font-size:0.82rem; margin-bottom:0.4rem; }
+    .apl-cons h5 { color:#ef4444; font-size:0.82rem; margin-bottom:0.4rem; }
+    .apl-pros ul, .apl-cons ul { margin:0; padding-left:1.2rem; font-size:0.82rem; color:var(--text-muted); line-height:1.6; }
+
+    .apl-usecases { display:flex; flex-wrap:wrap; gap:0.4rem; }
+    .apl-usecases span { padding:0.25rem 0.6rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); font-size:0.78rem; color:var(--text-muted); }
+
+    .apl-compare { margin-top:1.5rem; }
+    .apl-compare-bar { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:1rem; }
+    .apl-compare-bar select { padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:0.88rem; font-family:var(--font-body); }
+    .apl-compare-bar select:focus { outline:none; border-color:var(--accent); }
+    .apl-compare-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .apl-compare-table th { text-align:left; padding:0.5rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .apl-compare-table td { padding:0.5rem; border-bottom:1px solid var(--border); color:var(--text); vertical-align:top; }
+
+    @media (max-width:640px) {
+      .apl-proscons { grid-template-columns:1fr; }
+      .apl-controls { flex-direction:column; }
+      .apl-search { width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/research/" style="color:var(--accent);text-decoration:none;">Research</a> &rsaquo;
+      <span style="color:var(--text-muted);">Agent Pattern Library</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Agent Pattern Library</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Searchable catalog of 12 agentic AI design patterns with flow diagrams, pseudocode, pros/cons, and real-world use cases. Click any pattern to expand.</p>
+    </section>
+  </main>
+
+  <div class="apl-wrap">
+    <div class="apl-controls">
+      <input type="text" class="apl-search" id="apl-search" placeholder="Search patterns by name, description, or use case..." oninput="aplFilter()">
+      <div class="apl-filters" id="apl-filters"></div>
+    </div>
+    <div class="apl-count" id="apl-count"></div>
+    <div class="apl-grid" id="apl-grid"></div>
+
+    <div class="apl-compare" style="margin-top:2rem;">
+      <h2 style="font-size:1.2rem;margin-bottom:1rem;">Pattern Comparison Tool</h2>
+      <div class="apl-compare-bar">
+        <label style="font-size:0.85rem;color:var(--text-muted);">Compare:</label>
+        <select id="apl-cmp-a" onchange="aplCompare()"></select>
+        <span style="color:var(--text-muted);">vs</span>
+        <select id="apl-cmp-b" onchange="aplCompare()"></select>
+      </div>
+      <div id="apl-cmp-result"></div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>Understanding Agentic AI Design Patterns</h2>
+
+    <p>Agentic AI patterns represent a fundamental shift from single-shot prompt-response interactions to multi-step, autonomous workflows where the language model reasons, plans, acts, observes, and iterates. Instead of asking a model to answer a question in one pass, an agentic system breaks the task into steps, decides which tools to use, evaluates intermediate results, and adjusts its approach dynamically. These patterns emerged from research in autonomous agents and have become the standard architecture for production AI systems that handle complex, open-ended tasks.</p>
+
+    <p>This library catalogs twelve distinct agentic patterns, each addressing a different class of problem. Some patterns like ReAct and Tool-Use focus on grounding the model's reasoning in real-world data through tool calls. Others like Reflection and Verify-then-Edit focus on self-improvement through iterative critique. Architectural patterns like Multi-Agent and Orchestrator-Worker address how to decompose complex systems into specialized components. The goal is not to prescribe a single best pattern but to give you a vocabulary for designing AI systems and a reference for implementation details.</p>
+
+    <h2>Pattern Selection Criteria</h2>
+
+    <p>Choosing the right pattern starts with understanding your task's requirements along five dimensions. First, does the task require external data or tool access? If yes, ReAct, Tool-Use, or MRKL are your primary options. Second, does the task benefit from iterative refinement? If the first output is rarely good enough, Reflection or Verify-then-Edit add self-correction loops. Third, does the task involve multiple independent sub-problems? Multi-Agent and Orchestrator-Worker decompose the work across specialized components. Fourth, does the task require exploring multiple solution paths? Tree-of-Thought and Self-Ask enable branching exploration. Fifth, what are your latency and cost constraints? Each additional loop or agent multiplies both.</p>
+
+    <p>In practice, most production systems combine multiple patterns. A common architecture uses Orchestrator-Worker at the top level, with individual workers implementing pattern-specific behaviors. The orchestrator decomposes the user's request into sub-tasks, assigns each to the appropriate worker, and aggregates results. A research worker might implement ReAct to search and synthesize information. A writing worker might implement Reflection to iteratively improve drafts. A coding worker might implement Verify-then-Edit to generate and test code. This compositional approach matches each sub-task to its optimal pattern.</p>
+
+    <h2>Implementation Considerations</h2>
+
+    <p>Every agentic pattern needs explicit termination conditions. Without them, loops can run indefinitely, consuming tokens and generating hallucinated content. The standard safeguards include maximum iteration limits, token budget caps, wall-clock timeouts, and quality gates. For ReAct, limit the reasoning-action cycle to 5-10 iterations. For Reflection, limit critique rounds to 3-5. For Multi-Agent debates, implement a supervisor that forces consensus after a fixed number of rounds. These limits should be configurable per deployment since different tasks have different convergence profiles.</p>
+
+    <p>Error handling in agentic systems requires careful design because failures can cascade across steps. If a tool call fails in a ReAct loop, the agent needs to decide whether to retry, use an alternative tool, or report the failure. If a worker in a Multi-Agent system produces invalid output, the orchestrator needs fallback logic. Implement structured error responses that the agent can reason about rather than letting raw error messages propagate through the system. For teams building on the Claude API, <a href="https://claudkit.com">ClaudKit</a> provides error handling utilities designed specifically for agentic workflows.</p>
+
+    <p>Cost management is the other critical implementation concern. Agentic patterns are inherently more expensive than single-shot prompts because they involve multiple LLM calls per task. A ReAct loop averaging 5 iterations costs roughly 5 times a single prompt. Multi-Agent systems with 4 agents can cost 4 to 10 times depending on inter-agent communication overhead. The most effective cost optimization is to use different models for different steps. Use a smaller, cheaper model for simple classification and routing decisions. Reserve expensive models like Claude 4 Opus for the critical reasoning steps that determine output quality. The <a href="/tools/context-window-optimizer.html">Context Window Optimizer</a> can help you plan token budgets for each step in your agentic pipeline.</p>
+
+    <h2>Pattern Evolution and Research Frontiers</h2>
+
+    <p>The field of agentic AI is evolving rapidly. New patterns emerge as researchers discover more effective ways to structure multi-step reasoning. Recent developments include memory-augmented agents that maintain persistent context across sessions, hierarchical planning agents that decompose goals into increasingly granular sub-goals, and learning agents that update their strategies based on feedback from previous task executions. The twelve patterns in this library represent the current production-ready standard, but the catalog will expand as new patterns prove their value in real-world deployments.</p>
+
+    <p>One important research direction is pattern composition. Rather than treating patterns as standalone architectures, researchers are developing formal methods for combining patterns into hybrid systems. For example, a Plan-Execute pattern where the execution phase uses ReAct for each step, with Reflection applied to the overall plan after each execution round. These composed patterns can handle tasks that no single pattern addresses well, such as multi-day research projects that require planning, tool use, iterative refinement, and coordination across multiple specialized agents. For a deeper dive into how these patterns map to production workflow architectures, see our <a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a> research.</p>
+
+    <h2>Practical Application Guidelines</h2>
+
+    <p>Start simple and add complexity only when needed. If a single well-crafted prompt produces acceptable results, do not add an agentic loop. If the results are inconsistent, add Reflection. If the task requires external data, add ReAct. If the task is too complex for one agent, decompose with Orchestrator-Worker. Each layer of agentic behavior adds latency, cost, and debugging complexity. The goal is to use the minimum pattern that achieves your quality requirements.</p>
+
+    <p>Test each pattern independently before combining them. Build a ReAct agent and validate that it correctly uses tools across a range of inputs. Build a Reflection agent and verify that the critique loop actually improves outputs rather than degrading them through over-editing. Only after individual patterns work reliably should you compose them into a larger system. This incremental approach makes debugging dramatically easier because you can isolate which pattern is causing failures. For visual workflow planning of your agent architecture, the <a href="/tools/workflow-builder.html">Visual Workflow Designer</a> lets you map out the data flow between agents and steps before writing any code.</p>
+
+    <h2>Privacy and Open Access</h2>
+
+    <p>This pattern library runs entirely in your browser with no server-side processing. The search, filtering, comparison, and expansion features are all implemented in client-side JavaScript. No data about your searches, pattern selections, or comparisons is collected or transmitted. The library is designed as an open reference for the AI engineering community. All pattern descriptions, pseudocode, and flow diagrams are original content based on published research and production experience.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What is an agentic AI pattern and how does it differ from a simple prompt?</summary>
+      <p>An agentic AI pattern is a structured design for multi-step LLM interactions where the model reasons, plans, acts, and iterates rather than generating a single response. Unlike a simple prompt-response pair, agentic patterns involve loops, tool calls, self-evaluation, and dynamic decision-making. These patterns are the building blocks for autonomous AI systems.</p>
+    </details>
+
+    <details>
+      <summary>Which agent pattern should I use for my project?</summary>
+      <p>The best pattern depends on your task. For external data or API calls, use ReAct or Tool-Use. For complex multi-step planning, use Plan-Execute. For improving output quality, use Reflection. For exploring multiple solutions, use Tree-of-Thought. For multiple specialized capabilities, use Multi-Agent or Orchestrator-Worker. Use the comparison tool above to compare patterns side by side.</p>
+    </details>
+
+    <details>
+      <summary>Can I combine multiple agent patterns in one system?</summary>
+      <p>Yes, pattern composition is common. A typical architecture uses Orchestrator-Worker at the top level, with individual workers implementing different patterns. For example, a research worker using ReAct, a writing worker using Reflection, and a coding worker using Verify-then-Edit. Match each sub-task to its optimal pattern.</p>
+    </details>
+
+    <details>
+      <summary>How do I handle failures and infinite loops in agent patterns?</summary>
+      <p>Every agentic pattern needs explicit termination conditions. Common safeguards include maximum iteration limits, token budget caps, timeouts, and quality gates. For ReAct, limit to 5-10 cycles. For Reflection, limit to 3-5 rounds. For Multi-Agent, implement a supervisor that can force termination if agents enter circular disagreement.</p>
+    </details>
+
+    <details>
+      <summary>What are the cost implications of agentic patterns versus single-shot prompts?</summary>
+      <p>Agentic patterns consume significantly more tokens. A ReAct loop averaging 5 iterations costs roughly 5x a single prompt. Multi-Agent with 4 agents can cost 4-10x. The trade-off is dramatically better results for complex tasks. Optimize by using cheaper models for simple steps and reserving expensive models for critical reasoning.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/">ClaudFlow Home &mdash; Canvas Builder</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/workflow-automation-patterns.html">Workflow Automation Patterns</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var PATTERNS = [
+    {
+      id:'react', name:'ReAct', category:'reasoning',
+      tags:['reasoning','tool-use','iterative'],
+      desc:'Interleaves reasoning traces with action steps. The agent thinks about what to do, takes an action (tool call), observes the result, and repeats until the task is complete.',
+      flow:'User Query\n  -> Thought: reason about current state\n  -> Action: call tool (search, calculate, API)\n  -> Observation: process tool result\n  -> Thought: reason about observation\n  -> ... (loop until answer found)\n  -> Final Answer',
+      code:'function react(query, tools, maxSteps=10) {\n  let context = query;\n  for (let i = 0; i < maxSteps; i++) {\n    let thought = llm("Think step by step: " + context);\n    if (thought.includes("Final Answer:")) return thought;\n    let action = parseAction(thought);\n    let observation = tools[action.name](action.args);\n    context += "\\nThought: " + thought;\n    context += "\\nObservation: " + observation;\n  }\n  return "Max steps reached";\n}',
+      pros:['Grounds reasoning in real data via tool calls','Self-corrects based on observations','Transparent reasoning chain for debugging','Works well with diverse tool sets'],
+      cons:['Higher latency due to multiple LLM calls per loop','Token cost scales with iteration count','Can get stuck in repetitive loops without good termination logic','Requires well-defined tool interfaces'],
+      useCases:['Research and fact-checking','Customer support with knowledge base lookup','Data analysis with API calls','Multi-step calculations'],
+      complexity:'Medium', iterations:'3-10', costMultiplier:'3-10x'
+    },
+    {
+      id:'plan-execute', name:'Plan-Execute', category:'planning',
+      tags:['planning','decomposition','sequential'],
+      desc:'Separates planning from execution. First generates a complete step-by-step plan, then executes each step independently. Optionally re-plans after each step based on results.',
+      flow:'User Query\n  -> Planner: generate ordered step list\n  -> Step 1: execute + collect result\n  -> Step 2: execute + collect result\n  -> ... (optionally re-plan after each step)\n  -> Synthesizer: combine all results\n  -> Final Output',
+      code:'function planExecute(query, tools) {\n  let plan = llm("Create a step-by-step plan for: " + query);\n  let steps = parsePlan(plan);\n  let results = [];\n  for (let step of steps) {\n    let result = executeStep(step, tools, results);\n    results.push({ step, result });\n    // Optional: re-plan based on results\n    // steps = llm("Revise plan given: " + results);\n  }\n  return llm("Synthesize results: " + JSON.stringify(results));\n}',
+      pros:['Handles complex multi-step tasks systematically','Plan is reviewable before execution begins','Each step can be executed with the optimal tool or model','Re-planning adapts to unexpected intermediate results'],
+      cons:['Initial plan may be suboptimal for novel tasks','Re-planning adds significant token overhead','Fails if the planner cannot decompose the task correctly','Sequential execution limits parallelism'],
+      useCases:['Project management automation','Multi-document analysis','Complex code generation tasks','Travel or event planning'],
+      complexity:'Medium-High', iterations:'Plan + N steps', costMultiplier:'3-8x'
+    },
+    {
+      id:'reflection', name:'Reflection', category:'self-improvement',
+      tags:['self-improvement','iterative','quality'],
+      desc:'Generates an initial output, then critiques it against quality criteria, and revises based on the critique. Repeats until the output meets the criteria or a max iteration limit is reached.',
+      flow:'User Query\n  -> Generator: produce initial output\n  -> Critic: evaluate against criteria\n  -> Pass? -> Final Output\n  -> Fail? -> Generator: revise based on critique\n  -> Critic: re-evaluate\n  -> ... (loop until pass or max iterations)',
+      code:'function reflection(query, criteria, maxRounds=3) {\n  let output = llm("Generate: " + query);\n  for (let i = 0; i < maxRounds; i++) {\n    let critique = llm("Critique this against " + criteria + ": " + output);\n    if (critique.includes("PASS")) return output;\n    output = llm("Revise based on critique: " + critique + "\\nOriginal: " + output);\n  }\n  return output; // Return best effort after max rounds\n}',
+      pros:['Consistently improves output quality','Catches errors the initial generation misses','Criteria-driven evaluation is systematic and repeatable','Works for any text generation task'],
+      cons:['Each round doubles token consumption for that step','Over-reflection can degrade quality through excessive editing','Requires well-defined evaluation criteria','Critic may be biased in the same ways as generator'],
+      useCases:['Technical writing and documentation','Code review and improvement','Email and communication drafting','Legal or compliance document generation'],
+      complexity:'Low-Medium', iterations:'2-5', costMultiplier:'2-5x'
+    },
+    {
+      id:'tool-use', name:'Tool-Use', category:'augmentation',
+      tags:['tool-use','augmentation','grounding'],
+      desc:'The model decides which tools to call based on the user query, invokes them through a structured interface, and incorporates results into its response. Simpler than ReAct with no explicit reasoning trace.',
+      flow:'User Query\n  -> LLM: analyze query, decide tool(s)\n  -> Tool Call(s): execute selected tools\n  -> Results: collect tool outputs\n  -> LLM: synthesize results into response\n  -> Final Output',
+      code:'function toolUse(query, tools) {\n  let decision = llm({\n    messages: [{ role: "user", content: query }],\n    tools: tools.map(t => t.schema)\n  });\n  let results = [];\n  for (let call of decision.toolCalls) {\n    results.push(tools[call.name].execute(call.args));\n  }\n  return llm("Given results " + JSON.stringify(results) + ", answer: " + query);\n}',
+      pros:['Native support in Claude, GPT-4, and Gemini APIs','Single-round tool calling is fast and cost-efficient','Structured tool schemas reduce errors','Parallel tool calls supported by most APIs'],
+      cons:['No iterative reasoning about tool results','Cannot recover from wrong tool selection without re-prompting','Limited to tools defined in the schema','Does not plan multi-step tool sequences natively'],
+      useCases:['API integrations','Database queries','Calculator and unit conversions','File system operations'],
+      complexity:'Low', iterations:'1-2', costMultiplier:'1.5-2x'
+    },
+    {
+      id:'multi-agent', name:'Multi-Agent', category:'architecture',
+      tags:['architecture','collaboration','specialized'],
+      desc:'Multiple specialized agents collaborate on a task. Each agent has distinct expertise, instructions, and optionally different models. Agents communicate through a shared context or message passing.',
+      flow:'User Query\n  -> Router: assign to relevant agents\n  -> Agent A (Expert Domain 1): process\n  -> Agent B (Expert Domain 2): process\n  -> Agent C (Expert Domain 3): process\n  -> Aggregator: merge agent outputs\n  -> Final Output',
+      code:'function multiAgent(query, agents) {\n  let assignments = llm("Route this query to relevant agents: " + query);\n  let results = {};\n  for (let agentId of assignments) {\n    let agent = agents[agentId];\n    results[agentId] = agent.process(query);\n  }\n  return llm("Merge expert opinions: " + JSON.stringify(results));\n}',
+      pros:['Each agent can be optimized for its specialty','Parallel execution reduces wall-clock time','Modular design makes the system extensible','Different agents can use different models for cost optimization'],
+      cons:['Inter-agent communication adds token overhead','Coordinating agents increases system complexity','Conflicting agent outputs require resolution logic','Debugging distributed failures is harder'],
+      useCases:['Content production pipelines','Code review with specialized checkers','Customer support with routing','Investment analysis from multiple perspectives'],
+      complexity:'High', iterations:'Varies', costMultiplier:'3-10x'
+    },
+    {
+      id:'chain-of-thought', name:'Chain-of-Thought', category:'reasoning',
+      tags:['reasoning','prompting','single-shot'],
+      desc:'Instructs the model to show its reasoning step by step before giving a final answer. This prompting technique improves accuracy on math, logic, and multi-step reasoning tasks without requiring tool calls or loops.',
+      flow:'User Query + "Think step by step"\n  -> Step 1: identify known information\n  -> Step 2: apply relevant reasoning\n  -> Step 3: derive intermediate conclusion\n  -> ... (continue reasoning chain)\n  -> Final Answer',
+      code:'function chainOfThought(query) {\n  return llm(\n    "Think through this step by step, showing your reasoning " +\n    "at each stage before giving your final answer:\\n\\n" + query\n  );\n}',
+      pros:['No additional LLM calls needed beyond the single prompt','Dramatically improves math and logic accuracy','Reasoning is visible and auditable','Zero implementation complexity'],
+      cons:['Uses more output tokens for the reasoning chain','Not effective for simple factual recall','Model may generate plausible but incorrect reasoning','Cannot access external data or tools'],
+      useCases:['Mathematical problem solving','Logical reasoning and deduction','Code debugging explanations','Decision analysis with trade-offs'],
+      complexity:'Very Low', iterations:'1', costMultiplier:'1.2-1.5x'
+    },
+    {
+      id:'tree-of-thought', name:'Tree-of-Thought', category:'reasoning',
+      tags:['reasoning','exploration','branching'],
+      desc:'Explores multiple reasoning paths simultaneously, evaluates each path, and selects the most promising one. Like Chain-of-Thought but with branching and backtracking to find the best solution.',
+      flow:'User Query\n  -> Generate N initial thoughts\n  -> Evaluate each thought (score/rank)\n  -> Expand top K thoughts into next steps\n  -> Evaluate expanded thoughts\n  -> ... (breadth-first or depth-first search)\n  -> Select best complete solution path',
+      code:'function treeOfThought(query, breadth=3, depth=3) {\n  let thoughts = [];\n  for (let i = 0; i < breadth; i++) {\n    thoughts.push(llm("Propose approach " + (i+1) + " for: " + query));\n  }\n  for (let d = 0; d < depth; d++) {\n    let scored = thoughts.map(t => ({\n      thought: t,\n      score: llm("Rate 1-10: " + t)\n    }));\n    scored.sort((a,b) => b.score - a.score);\n    thoughts = scored.slice(0, breadth).map(s =>\n      llm("Continue this approach: " + s.thought)\n    );\n  }\n  return thoughts[0]; // Best scored path\n}',
+      pros:['Explores diverse solution approaches','Finds solutions that linear reasoning misses','Evaluation step filters out bad paths early','Effective for creative and strategic tasks'],
+      cons:['Very high token cost due to parallel path exploration','Evaluation model may not reliably score solution quality','Complexity grows exponentially with breadth and depth','Significantly higher latency than single-path approaches'],
+      useCases:['Creative writing with multiple angles','Strategic planning with trade-off analysis','Complex puzzle solving','Architecture design decisions'],
+      complexity:'High', iterations:'Breadth x Depth', costMultiplier:'5-20x'
+    },
+    {
+      id:'self-ask', name:'Self-Ask', category:'reasoning',
+      tags:['reasoning','decomposition','question-driven'],
+      desc:'The model decomposes a complex question into simpler sub-questions, answers each one (optionally using search), and combines the answers to address the original question.',
+      flow:'Complex Question\n  -> "Do I need to ask a follow-up?"\n  -> Sub-question 1 -> Answer 1 (via search or reasoning)\n  -> Sub-question 2 -> Answer 2\n  -> ... (continue until no more sub-questions)\n  -> Synthesize sub-answers into final answer',
+      code:'function selfAsk(query, searchFn) {\n  let context = "Question: " + query + "\\n";\n  let maxSubs = 5;\n  for (let i = 0; i < maxSubs; i++) {\n    let response = llm(context + "Are follow-up questions needed?");\n    if (response.includes("No,")) {\n      return llm(context + "Final answer:");\n    }\n    let subQ = parseSubQuestion(response);\n    let subA = searchFn ? searchFn(subQ) : llm(subQ);\n    context += "Sub-Q: " + subQ + "\\nSub-A: " + subA + "\\n";\n  }\n  return llm(context + "Final answer:");\n}',
+      pros:['Handles compositional questions that require multiple facts','Sub-questions are independently verifiable','Natural integration with search tools','Transparent decomposition process'],
+      cons:['May generate unnecessary sub-questions','Sub-question answers can introduce errors that propagate','Requires the model to know when to stop decomposing','Higher latency proportional to decomposition depth'],
+      useCases:['Multi-hop question answering','Research queries requiring multiple sources','Fact-checking claims with multiple components','Historical analysis with layered context'],
+      complexity:'Medium', iterations:'2-6', costMultiplier:'2-6x'
+    },
+    {
+      id:'mrkl', name:'MRKL (Modular Reasoning)', category:'architecture',
+      tags:['architecture','modular','routing'],
+      desc:'Routes sub-tasks to specialized expert modules (LLMs, APIs, databases, calculators). A central router decides which module handles each part of the query. Named after Modular Reasoning, Knowledge, and Language.',
+      flow:'User Query\n  -> Router: classify query components\n  -> Component A -> Math Module (calculator)\n  -> Component B -> Knowledge Module (search)\n  -> Component C -> Language Module (LLM)\n  -> Combiner: merge module outputs\n  -> Final Response',
+      code:'function mrkl(query, modules) {\n  let routing = llm(\n    "Break this into sub-tasks and assign each to a module: " +\n    Object.keys(modules).join(", ") + "\\nQuery: " + query\n  );\n  let tasks = parseRouting(routing);\n  let results = tasks.map(t => modules[t.module].execute(t.input));\n  return llm("Combine these results: " + JSON.stringify(results));\n}',
+      pros:['Each module is best-in-class for its domain','Deterministic modules (calculators, databases) eliminate hallucination','System is extensible by adding new modules','Routing can be very fast with a small classifier model'],
+      cons:['Router accuracy is the single point of failure','Adding modules increases routing complexity','Modules may have incompatible output formats','Requires upfront architecture decisions about module boundaries'],
+      useCases:['Enterprise chatbots with database access','Financial analysis combining market data and reasoning','Healthcare assistants with structured knowledge bases','Educational tutoring with specialized subject modules'],
+      complexity:'High', iterations:'1-3', costMultiplier:'2-5x'
+    },
+    {
+      id:'debate', name:'Debate', category:'self-improvement',
+      tags:['self-improvement','adversarial','verification'],
+      desc:'Two or more agents argue opposing positions on a question. A judge agent evaluates the arguments and selects the most supported conclusion. Reduces bias by forcing consideration of counterarguments.',
+      flow:'Question\n  -> Agent A: argue position 1\n  -> Agent B: argue position 2\n  -> Agent A: counter Agent B\n  -> Agent B: counter Agent A\n  -> ... (N rounds)\n  -> Judge: evaluate arguments, decide winner\n  -> Final Answer with justification',
+      code:'function debate(question, rounds=3) {\n  let history = [];\n  for (let r = 0; r < rounds; r++) {\n    let argA = llm("Argue FOR, given history: " + JSON.stringify(history) + "\\n" + question);\n    history.push({ agent: "A", round: r, argument: argA });\n    let argB = llm("Argue AGAINST, given history: " + JSON.stringify(history) + "\\n" + question);\n    history.push({ agent: "B", round: r, argument: argB });\n  }\n  return llm("Judge these arguments and give a verdict: " + JSON.stringify(history));\n}',
+      pros:['Reduces confirmation bias through adversarial structure','Forces exploration of counterarguments','Judge sees both sides before deciding','Effective for controversial or ambiguous topics'],
+      cons:['High token cost: 2 agents x N rounds + judge','Agents may not generate genuinely novel counterarguments','Judge may have its own biases','Overkill for questions with clear factual answers'],
+      useCases:['Policy analysis and recommendation','Ethical decision-making','Investment thesis evaluation','Technical architecture trade-off analysis'],
+      complexity:'Medium-High', iterations:'2N+1 calls', costMultiplier:'4-8x'
+    },
+    {
+      id:'verify-edit', name:'Verify-then-Edit', category:'self-improvement',
+      tags:['self-improvement','verification','correction'],
+      desc:'Generates an output, runs it through a verification step (tests, validators, fact-checks), identifies specific errors, and edits only the erroneous parts. More targeted than full Reflection.',
+      flow:'User Query\n  -> Generator: produce initial output\n  -> Verifier: check output (run tests, validate facts)\n  -> Errors found? -> Editor: fix specific errors\n  -> Verifier: re-check edited output\n  -> ... (loop until verification passes)\n  -> Final Output (verified)',
+      code:'function verifyThenEdit(query, verifier, maxAttempts=3) {\n  let output = llm("Generate: " + query);\n  for (let i = 0; i < maxAttempts; i++) {\n    let errors = verifier(output);\n    if (errors.length === 0) return { output, verified: true };\n    output = llm(\n      "Fix these specific errors in the output:\\n" +\n      "Errors: " + JSON.stringify(errors) + "\\n" +\n      "Output: " + output\n    );\n  }\n  return { output, verified: false };\n}',
+      pros:['Targeted edits preserve correct parts of the output','Verification can use deterministic checks (tests, linters, validators)','More efficient than regenerating the entire output','Clear pass/fail criteria make termination reliable'],
+      cons:['Requires a reliable verification mechanism','Cannot fix errors the verifier does not detect','Edits may introduce new errors in adjacent sections','Verification step adds latency to every generation'],
+      useCases:['Code generation with test suites','Data extraction with schema validation','Mathematical derivations with proof checking','Structured output with format validators'],
+      complexity:'Medium', iterations:'2-4', costMultiplier:'2-4x'
+    },
+    {
+      id:'orchestrator-worker', name:'Orchestrator-Worker', category:'architecture',
+      tags:['architecture','decomposition','coordination'],
+      desc:'A central orchestrator decomposes the task into sub-tasks, assigns each to specialized worker agents, monitors progress, handles failures, and aggregates results. The standard pattern for complex agent systems.',
+      flow:'User Query\n  -> Orchestrator: decompose into sub-tasks\n  -> Worker A: execute sub-task 1 -> result\n  -> Worker B: execute sub-task 2 -> result\n  -> Worker C: execute sub-task 3 -> result\n  -> Orchestrator: validate, aggregate results\n  -> Orchestrator: re-assign if needed\n  -> Final Output',
+      code:'function orchestratorWorker(query, workers) {\n  let plan = llm("Decompose into sub-tasks: " + query);\n  let tasks = parseTasks(plan);\n  let results = {};\n  for (let task of tasks) {\n    let worker = selectWorker(task, workers);\n    results[task.id] = worker.execute(task);\n    if (!validate(results[task.id])) {\n      results[task.id] = worker.execute(task); // Retry\n    }\n  }\n  return llm("Aggregate results for: " + query + "\\n" + JSON.stringify(results));\n}',
+      pros:['Scalable to arbitrarily complex tasks','Workers can be independently developed and tested','Orchestrator handles coordination and error recovery','Natural fit for microservice-style architectures'],
+      cons:['Orchestrator is a single point of failure','Worker communication overhead scales with number of workers','Requires careful task decomposition to avoid overlaps or gaps','Most complex pattern to implement and debug'],
+      useCases:['Content production pipelines','Software development automation','Business process automation','Research synthesis from multiple domains'],
+      complexity:'Very High', iterations:'1 + N workers', costMultiplier:'5-15x'
+    }
+  ];
+
+  var ALL_TAGS = [];
+  PATTERNS.forEach(function(p){
+    p.tags.forEach(function(t){ if(ALL_TAGS.indexOf(t)===-1) ALL_TAGS.push(t); });
+  });
+  ALL_TAGS.sort();
+
+  var activeTag = null;
+
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderFilters(){
+    var el = document.getElementById('apl-filters');
+    var html = '<div class="apl-tag'+(activeTag===null?' active':'')+'" onclick="aplTagClick(null)">All</div>';
+    ALL_TAGS.forEach(function(t){
+      html += '<div class="apl-tag'+(activeTag===t?' active':'')+'" onclick="aplTagClick(\''+t+'\')">'+t+'</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderPatterns(filtered){
+    var grid = document.getElementById('apl-grid');
+    var count = document.getElementById('apl-count');
+    count.textContent = 'Showing '+filtered.length+' of '+PATTERNS.length+' patterns';
+
+    var html = '';
+    filtered.forEach(function(p){
+      html += '<div class="apl-card" id="card-'+p.id+'">'
+        +'<div class="apl-card-header" onclick="aplToggle(\''+p.id+'\')">'
+        +'<div>'
+        +'<h3>'+esc(p.name)+'</h3>'
+        +'<p class="apl-desc">'+esc(p.desc)+'</p>'
+        +'<div class="apl-tags">'
+        +p.tags.map(function(t){return '<span>'+t+'</span>';}).join('')
+        +'<span style="border-color:var(--accent);color:var(--accent);">'+p.complexity+'</span>'
+        +'</div>'
+        +'</div>'
+        +'<div class="apl-card-toggle">&#9660;</div>'
+        +'</div>'
+        +'<div class="apl-card-body">'
+        +'<div class="apl-section"><h4>Flow Diagram</h4><div class="apl-flow">'+esc(p.flow)+'</div></div>'
+        +'<div class="apl-section"><h4>Pseudocode</h4><div class="apl-code">'+esc(p.code)+'</div></div>'
+        +'<div class="apl-section"><h4>Pros &amp; Cons</h4><div class="apl-proscons">'
+        +'<div class="apl-pros"><h5>Pros</h5><ul>'+p.pros.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>'
+        +'<div class="apl-cons"><h5>Cons</h5><ul>'+p.cons.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>'
+        +'</div></div>'
+        +'<div class="apl-section"><h4>Use Cases</h4><div class="apl-usecases">'+p.useCases.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</div></div>'
+        +'<div class="apl-section" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">'
+        +'<div style="text-align:center;"><div style="font-size:0.78rem;color:var(--text-muted);">Complexity</div><div style="font-weight:600;color:var(--accent);">'+p.complexity+'</div></div>'
+        +'<div style="text-align:center;"><div style="font-size:0.78rem;color:var(--text-muted);">Iterations</div><div style="font-weight:600;color:var(--accent);">'+p.iterations+'</div></div>'
+        +'<div style="text-align:center;"><div style="font-size:0.78rem;color:var(--text-muted);">Cost Multiplier</div><div style="font-weight:600;color:var(--accent);">'+p.costMultiplier+'</div></div>'
+        +'</div>'
+        +'</div></div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function renderCompareSelects(){
+    var optHtml = PATTERNS.map(function(p){ return '<option value="'+p.id+'">'+p.name+'</option>'; }).join('');
+    document.getElementById('apl-cmp-a').innerHTML = optHtml;
+    document.getElementById('apl-cmp-b').innerHTML = optHtml;
+    document.getElementById('apl-cmp-b').selectedIndex = 1;
+  }
+
+  window.aplToggle = function(id){
+    var card = document.getElementById('card-'+id);
+    if(card) card.classList.toggle('open');
+  };
+
+  window.aplTagClick = function(tag){
+    activeTag = tag;
+    renderFilters();
+    aplFilter();
+  };
+
+  window.aplFilter = function(){
+    var q = document.getElementById('apl-search').value.toLowerCase();
+    var filtered = PATTERNS.filter(function(p){
+      if(activeTag && p.tags.indexOf(activeTag)===-1) return false;
+      if(!q) return true;
+      return p.name.toLowerCase().indexOf(q)!==-1
+        || p.desc.toLowerCase().indexOf(q)!==-1
+        || p.useCases.join(' ').toLowerCase().indexOf(q)!==-1
+        || p.tags.join(' ').toLowerCase().indexOf(q)!==-1;
+    });
+    renderPatterns(filtered);
+  };
+
+  window.aplCompare = function(){
+    var aId = document.getElementById('apl-cmp-a').value;
+    var bId = document.getElementById('apl-cmp-b').value;
+    var a = PATTERNS.find(function(p){return p.id===aId;});
+    var b = PATTERNS.find(function(p){return p.id===bId;});
+    if(!a||!b) return;
+
+    var el = document.getElementById('apl-cmp-result');
+    el.innerHTML = '<table class="apl-compare-table">'
+      +'<thead><tr><th>Attribute</th><th>'+esc(a.name)+'</th><th>'+esc(b.name)+'</th></tr></thead>'
+      +'<tbody>'
+      +'<tr><td><strong>Category</strong></td><td>'+a.category+'</td><td>'+b.category+'</td></tr>'
+      +'<tr><td><strong>Complexity</strong></td><td>'+a.complexity+'</td><td>'+b.complexity+'</td></tr>'
+      +'<tr><td><strong>Iterations</strong></td><td>'+a.iterations+'</td><td>'+b.iterations+'</td></tr>'
+      +'<tr><td><strong>Cost Multiplier</strong></td><td>'+a.costMultiplier+'</td><td>'+b.costMultiplier+'</td></tr>'
+      +'<tr><td><strong>Key Pros</strong></td><td>'+a.pros.slice(0,2).map(esc).join('<br>')+'</td><td>'+b.pros.slice(0,2).map(esc).join('<br>')+'</td></tr>'
+      +'<tr><td><strong>Key Cons</strong></td><td>'+a.cons.slice(0,2).map(esc).join('<br>')+'</td><td>'+b.cons.slice(0,2).map(esc).join('<br>')+'</td></tr>'
+      +'<tr><td><strong>Best For</strong></td><td>'+a.useCases.slice(0,2).map(esc).join('<br>')+'</td><td>'+b.useCases.slice(0,2).map(esc).join('<br>')+'</td></tr>'
+      +'</tbody></table>';
+  };
+
+  renderFilters();
+  renderPatterns(PATTERNS);
+  renderCompareSelects();
+  aplCompare();
+})();
+</script>
+</body>
+</html>

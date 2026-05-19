@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Use Case Gallery — Searchable Implementation Library &amp; Architecture Diagrams | ClaudFlow</title>
+  <meta name="description" content="Browse 30+ Claude implementation patterns with architecture diagrams. Search by industry, use case type, and complexity. Explore customer support bots, code reviewers, data pipelines, and more. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude Use Case Gallery — Searchable Implementation Library & Architecture Diagrams">
+  <meta property="og:description" content="Browse 30+ Claude implementation patterns with architecture diagrams. Search by industry, use case type, and complexity level.">
+  <meta property="og:url" content="https://claudflow.com/research/claude-use-case-gallery.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude Use Case Gallery — Searchable Implementation Library & Architecture Diagrams">
+  <meta name="twitter:description" content="Browse 30+ Claude implementation patterns with architecture diagrams. Search by industry, use case, and complexity.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/research/claude-use-case-gallery.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/research/claude-use-case-gallery.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/research/claude-use-case-gallery.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Claude Use Case Gallery",
+    "url": "https://claudflow.com/research/claude-use-case-gallery.html",
+    "description": "Browse 30+ Claude implementation patterns with architecture diagrams. Search by industry, use case type, and complexity. Includes customer support bots, code reviewers, data pipelines, content generators, and research assistants.",
+    "applicationCategory": "Reference",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "30+ Claude implementation patterns with detailed descriptions",
+      "Text-based architecture diagrams showing component relationships",
+      "Filterable by industry: SaaS, Fintech, Healthcare, Education, E-commerce, DevTools",
+      "Filterable by type: Chatbot, Pipeline, Agent, Automation, Analysis",
+      "Complexity ratings: Beginner, Intermediate, Advanced",
+      "Recommended model and estimated cost per use case",
+      "Implementation checklist for each pattern",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are the most common Claude use cases in production?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The most common production use cases for Claude are: customer support chatbots that handle Tier 1 queries automatically, code review assistants that analyze pull requests for bugs and style issues, document summarization pipelines that condense long reports into actionable briefs, content generation systems that produce marketing copy and product descriptions, and data extraction pipelines that convert unstructured documents into structured data. Customer support chatbots are the most widely deployed because they offer clear ROI: deflecting even 30% of support tickets saves significant labor costs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which Claude model should I use for my use case?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For simple tasks like classification, extraction, and FAQ answering, use Claude 3.5 Haiku for the lowest cost. For most production chatbots, content generation, and code review, use Claude 3.5 Sonnet for the best balance of quality and cost. For complex multi-step reasoning, legal analysis, scientific research, and tasks requiring the highest accuracy, use Claude 4 Opus. The gallery shows the recommended model for each use case. When in doubt, start with Sonnet and upgrade to Opus only if quality is insufficient."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much does it cost to run a Claude-powered chatbot?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A typical customer support chatbot using Claude 3.5 Sonnet costs $50-200 per month at 1,000 conversations per day with an average of 5 turns per conversation. Using Claude 3.5 Haiku drops this to $5-20 per month. The exact cost depends on system prompt length, conversation history management strategy, and average message length. Enable prompt caching to reduce costs by up to 90% on the system prompt portion. The gallery includes cost estimates for each use case pattern."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What architecture patterns work best for Claude applications?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The three most proven architecture patterns are: Direct API integration (simplest, one API call per user interaction), RAG pipeline (retrieve relevant documents then generate with context), and Multi-agent orchestration (multiple specialized Claude agents collaborating). Direct integration works for chatbots and simple tools. RAG is essential for knowledge-intensive applications. Multi-agent orchestration handles complex workflows like code review, content creation pipelines, and research synthesis. Start with the simplest pattern that meets your requirements."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can Claude handle domain-specific tasks without fine-tuning?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, in most cases. Claude's broad training enables it to handle specialized domains through well-crafted system prompts and RAG without fine-tuning. For legal document analysis, medical information extraction, financial report generation, and technical documentation, a domain-specific system prompt combined with relevant reference documents in the context window typically achieves production-quality results. Fine-tuning is rarely needed. The key is providing domain context through the prompt and retrieved documents rather than trying to train domain knowledge into the model."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Research", "item": "https://claudflow.com/research/" },
+      { "@type": "ListItem", "position": 3, "name": "Claude Use Case Gallery" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .ucg-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .ucg-filters { display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .ucg-filters select, .ucg-filters input { padding:0.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:0.88rem; }
+    .ucg-filters input { flex:1; min-width:200px; }
+    .ucg-filters select { min-width:140px; }
+    .ucg-filters input:focus, .ucg-filters select:focus { outline:none; border-color:var(--accent); }
+
+    .ucg-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.25rem; margin-bottom:1.5rem; }
+    .ucg-case { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; cursor:pointer; transition:border-color 0.15s; }
+    .ucg-case:hover { border-color:var(--accent); }
+    .ucg-case .case-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem; }
+    .ucg-case .case-title { font-size:1rem; font-weight:600; color:var(--text); }
+    .ucg-case .case-badge { font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:10px; font-weight:600; }
+    .ucg-case .case-badge.beginner { background:rgba(34,197,94,0.15); color:#22c55e; }
+    .ucg-case .case-badge.intermediate { background:rgba(6,182,212,0.15); color:#06B6D4; }
+    .ucg-case .case-badge.advanced { background:rgba(168,85,247,0.15); color:#a855f7; }
+    .ucg-case .case-desc { font-size:0.82rem; color:var(--text-muted); margin-bottom:0.75rem; line-height:1.5; }
+    .ucg-case .case-tags { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .ucg-case .case-tag { font-size:0.68rem; padding:0.12rem 0.4rem; background:var(--bg); border:1px solid var(--border); border-radius:4px; color:var(--text-muted); }
+    .ucg-case .case-meta { display:flex; justify-content:space-between; font-size:0.72rem; color:var(--text-muted); margin-top:0.75rem; padding-top:0.5rem; border-top:1px solid var(--border); }
+
+    .ucg-detail { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; display:none; }
+    .ucg-detail.active { display:block; }
+    .ucg-detail h3 { font-size:1.1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .ucg-detail .arch-diagram { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; font-family:monospace; font-size:0.78rem; white-space:pre; overflow-x:auto; color:var(--text); line-height:1.6; margin:0.75rem 0; }
+    .ucg-detail .checklist { list-style:none; padding:0; margin:0.75rem 0; }
+    .ucg-detail .checklist li { padding:0.35rem 0; font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem; }
+    .ucg-detail .checklist li::before { content:''; width:16px; height:16px; border:2px solid var(--border); border-radius:3px; flex-shrink:0; }
+
+    .ucg-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .ucg-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.6rem; text-align:center; }
+    .ucg-stat .val { font-size:1.2rem; font-weight:700; color:var(--accent); }
+    .ucg-stat .lbl { font-size:0.68rem; color:var(--text-muted); }
+
+    .ucg-count { font-size:0.88rem; color:var(--text-muted); margin-bottom:1rem; }
+
+    .ucg-tips { margin-top:1.5rem; }
+    .ucg-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .ucg-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .ucg-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .ucg-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .ucg-tip .tip-text strong { color:var(--text); }
+
+    @media (max-width:768px) {
+      .ucg-grid { grid-template-columns:1fr; }
+      .ucg-filters { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/research/" style="color:var(--accent);text-decoration:none;">Research</a> &rsaquo;
+      <span style="color:var(--text-muted);">Claude Use Case Gallery</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Claude Use Case Gallery</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Browse implementation patterns with architecture diagrams. Filter by industry, use case type, and complexity. Find the right starting point for your Claude project.</p>
+    </section>
+  </main>
+
+  <div class="ucg-wrap">
+    <div class="ucg-filters">
+      <input type="text" id="ucg-search" placeholder="Search use cases..." oninput="ucgFilter()">
+      <select id="ucg-industry" onchange="ucgFilter()">
+        <option value="">All Industries</option>
+        <option value="saas">SaaS</option>
+        <option value="fintech">Fintech</option>
+        <option value="healthcare">Healthcare</option>
+        <option value="education">Education</option>
+        <option value="ecommerce">E-commerce</option>
+        <option value="devtools">DevTools</option>
+      </select>
+      <select id="ucg-type" onchange="ucgFilter()">
+        <option value="">All Types</option>
+        <option value="chatbot">Chatbot</option>
+        <option value="pipeline">Pipeline</option>
+        <option value="agent">Agent</option>
+        <option value="automation">Automation</option>
+        <option value="analysis">Analysis</option>
+      </select>
+      <select id="ucg-complexity" onchange="ucgFilter()">
+        <option value="">All Levels</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+      </select>
+    </div>
+
+    <div class="ucg-count" id="ucg-count">Showing 30 use cases</div>
+
+    <div class="ucg-detail" id="ucg-detail"></div>
+
+    <div class="ucg-grid" id="ucg-grid"></div>
+
+    <div class="ucg-tips" style="margin-top:1.5rem;">
+      <h3>Implementation Tips</h3>
+      <div class="ucg-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Start with the simplest architecture.</strong> Most use cases can start as a direct API integration with a well-crafted system prompt. Add RAG or multi-agent orchestration only when the simple approach proves insufficient. Over-engineering the initial version wastes development time and increases debugging complexity.</div>
+      </div>
+      <div class="ucg-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Prototype with Sonnet, optimize with Haiku.</strong> Build your first version using Claude 3.5 Sonnet for the best quality during development. Once the prompts are polished, test whether Claude 3.5 Haiku produces acceptable quality for your use case. Many classification and extraction tasks perform identically on Haiku at 12x lower cost.</div>
+      </div>
+      <div class="ucg-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Instrument from day one.</strong> Log every API call with input/output token counts, latency, and the user query that triggered it. This data is essential for cost optimization, quality monitoring, and debugging. Use the <a href="/tools/token-cost-tracker.html" style="color:var(--accent);">Token Cost Tracker</a> to monitor spending against budget.</div>
+      </div>
+      <div class="ucg-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Build evaluation suites before scaling.</strong> Create a test set of 20+ representative queries with expected outputs. Run this suite whenever you change the system prompt, switch models, or modify the architecture. Without automated evaluation, prompt changes are a coin flip. The <a href="/tools/system-prompt-tester.html" style="color:var(--accent);">System Prompt A/B Tester</a> helps structure this process.</div>
+      </div>
+      <div class="ucg-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Plan for failure modes.</strong> Every Claude integration should handle API timeouts, rate limits, malformed responses, and model refusals gracefully. Implement retry logic with exponential backoff, fallback responses for when the API is unavailable, and output validation to catch hallucinations before they reach the user.</div>
+      </div>
+      <div class="ucg-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Choose the right memory strategy early.</strong> If your application has multi-turn conversations, decide upfront whether to use sliding window, summary compression, or RAG. Changing memory strategies after launch requires rewriting the conversation management layer. The <a href="/answers/claude-memory-strategies.html" style="color:var(--accent);">Memory Strategies guide</a> helps you choose.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Use Case Gallery Works</h2>
+
+    <p>The Claude Use Case Gallery is a browsable library of implementation patterns for building applications with Claude. Each use case includes a description of the problem it solves, the recommended architecture, the suggested model, an estimated cost range, and an implementation checklist. The gallery is designed for developers and product managers who know they want to use Claude but are not sure which pattern fits their needs. Instead of starting from scratch, find a similar use case in the gallery and adapt its architecture to your specific requirements.</p>
+
+    <p>Filter by industry to see use cases relevant to your domain. Filter by type to focus on chatbots, pipelines, agents, automation, or analysis patterns. Filter by complexity to match your team's experience level. Click any use case card to see its full architecture diagram and implementation details. The architecture diagrams show the key components and how data flows between them, from user input through Claude API calls to the final output. These diagrams are intentionally simple, showing the conceptual architecture rather than deployment specifics, so you can implement them with any technology stack.</p>
+
+    <h2>Common Architecture Patterns</h2>
+
+    <p>The direct API integration pattern is the simplest and most common architecture. The user's input is sent to Claude along with a system prompt, and the response is returned directly. This pattern works for chatbots, content generators, code assistants, and any use case where the model has enough knowledge in its training data to answer without external context. The architecture is: User Interface to Backend Server to Claude API and back. Implementation takes hours, not weeks. The main design decisions are the system prompt, the model choice, and conversation history management.</p>
+
+    <p>The RAG (Retrieval-Augmented Generation) pipeline pattern adds an external knowledge base to the architecture. Before calling Claude, the system searches a vector database for documents relevant to the user's query. The retrieved documents are injected into the prompt as context. This pattern is essential for customer support bots that reference help articles, internal assistants that query company documentation, and any application where the model needs information not in its training data. The architecture adds a vector database and retrieval layer between the user input and the Claude API call.</p>
+
+    <p>The multi-agent orchestration pattern uses multiple Claude instances with different roles. A supervisor agent coordinates the workflow, delegating subtasks to specialized worker agents. Each agent has its own system prompt and potentially a different model. This pattern handles complex workflows like code review (separate agents for security, style, performance), content creation (research, draft, edit, format), and research synthesis (data collection, analysis, report generation). The architecture is more complex but produces significantly better results for tasks that benefit from specialized attention to different aspects.</p>
+
+    <p>The automation pipeline pattern chains Claude calls together in a sequence without direct user interaction. A trigger (webhook, scheduled job, or file upload) initiates the pipeline. Each stage processes data, potentially transforming it, and passes the result to the next stage. This pattern works for document processing (ingest, extract, classify, store), content moderation (analyze, flag, route, action), and data enrichment (receive, research, augment, validate). The key architectural consideration is error handling between stages: if stage 3 of 5 fails, do you retry, skip, or abort the pipeline.</p>
+
+    <h2>Industry-Specific Patterns</h2>
+
+    <p>SaaS applications most commonly use Claude for in-app assistants that help users navigate complex features, for automated customer support that handles Tier 1 queries, and for content generation that produces onboarding emails, product descriptions, and help articles. The typical architecture is a direct API integration with RAG over the product's help documentation. Cost is usually $50 to $500 per month depending on user volume. The critical success factor is the system prompt, which must teach Claude about the specific product's features and terminology without being so long that it consumes excessive tokens.</p>
+
+    <p>Fintech applications leverage Claude for regulatory document analysis, transaction monitoring narrative generation, customer communication drafting, and risk assessment summaries. These applications typically require higher accuracy than other industries because errors have financial and legal consequences. Use Claude 4 Opus for compliance-sensitive tasks and implement multi-layer validation to catch hallucinations. RAG over regulatory databases is common. Cost is higher due to Opus pricing but justified by the value of accurate regulatory analysis that would otherwise require expensive human analysts.</p>
+
+    <p>Healthcare applications use Claude for clinical note summarization, patient communication drafting, medical literature synthesis, and administrative workflow automation. HIPAA compliance is a primary architectural constraint. All Claude API calls must go through BAA-covered infrastructure. Use Anthropic's enterprise tier with a signed BAA for healthcare deployments. The system prompt must include explicit instructions about not providing medical diagnoses or treatment recommendations. RAG over medical literature databases provides the clinical context the model needs for accurate summarization.</p>
+
+    <p>Education applications deploy Claude as tutoring assistants, essay feedback generators, quiz creators, and curriculum development tools. The system prompt for educational use cases must balance being helpful with not doing the student's work. Socratic prompting instructions that guide students toward answers through questions rather than providing direct answers produce the best educational outcomes. Cost is typically low because student interactions are short and can often use Claude 3.5 Haiku. The main challenge is maintaining pedagogical quality across diverse subjects and student skill levels.</p>
+
+    <h2>Cost Estimation by Use Case</h2>
+
+    <p>Customer support chatbots handling 1,000 conversations per day with 5 turns each, using Claude 3.5 Haiku, cost approximately $5 to $20 per month. Switching to Claude 3.5 Sonnet for better quality raises cost to $50 to $200 per month. Adding RAG over a knowledge base increases cost by 20 to 30 percent due to longer prompts. The ROI is clear: deflecting even 30% of support tickets at an average handling cost of $5 to $15 per ticket saves $45,000 to $135,000 per month for a 1,000 ticket per day operation.</p>
+
+    <p>Code review assistants analyzing 50 pull requests per day with an average of 500 lines of code per PR, using Claude 3.5 Sonnet, cost approximately $30 to $100 per month. Multi-agent review (security, style, performance agents) costs 3 to 5 times more but catches significantly more issues. The architecture is typically a webhook triggered by PR events that sends the diff to Claude with a code review system prompt and posts comments back to the PR. Integration with GitHub Actions or GitLab CI makes the process fully automated.</p>
+
+    <p>Document processing pipelines that extract structured data from unstructured documents, such as invoices, contracts, or reports, cost approximately $0.01 to $0.05 per document depending on document length and extraction complexity. At 10,000 documents per day, monthly cost ranges from $3,000 to $15,000. Using Claude 3.5 Haiku for extraction can reduce costs to $300 to $1,500 per month for the same volume. The architecture typically involves OCR preprocessing, chunking for long documents, Claude extraction, and validation against expected schemas.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Claude Use Case Gallery runs entirely in your browser. Filtering, searching, and viewing architecture details are processed client-side using JavaScript. No data is sent to any server. There are no accounts, no cookies, no analytics, and no server-side processing. The gallery is a reference tool that helps you plan your Claude implementation before writing code.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What are the most common Claude use cases in production?</summary>
+      <p>Customer support chatbots, code review assistants, document summarization pipelines, content generation systems, and data extraction pipelines. Support chatbots are the most widely deployed due to clear ROI from ticket deflection.</p>
+    </details>
+
+    <details>
+      <summary>Which Claude model should I use for my use case?</summary>
+      <p>Use Haiku for simple tasks (classification, extraction, FAQ). Use Sonnet for most production chatbots, content generation, and code review. Use Opus for complex reasoning, legal analysis, and scientific research. Start with Sonnet and upgrade only if quality is insufficient.</p>
+    </details>
+
+    <details>
+      <summary>How much does it cost to run a Claude-powered chatbot?</summary>
+      <p>A chatbot using Sonnet costs $50-200/month at 1,000 conversations/day. Using Haiku drops this to $5-20/month. Enable prompt caching for up to 90% savings on system prompt costs.</p>
+    </details>
+
+    <details>
+      <summary>What architecture patterns work best for Claude?</summary>
+      <p>Direct API integration (simplest), RAG pipeline (for knowledge-intensive tasks), and multi-agent orchestration (for complex workflows). Start with the simplest pattern that meets your requirements.</p>
+    </details>
+
+    <details>
+      <summary>Can Claude handle domain-specific tasks without fine-tuning?</summary>
+      <p>Yes, in most cases. Well-crafted system prompts combined with RAG provide domain context without fine-tuning. This works for legal, medical, financial, and technical domains. Provide context through prompts and retrieved documents rather than training domain knowledge into the model.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/tools/token-cost-tracker.html">Token Cost Tracker</a></li>
+          <li><a href="/tools/system-prompt-tester.html">System Prompt A/B Tester</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration</a></li>
+          <li><a href="/guides/claude-for-data-analysis.html">Claude for Data Analysis</a></li>
+          <li><a href="/answers/claude-memory-strategies.html">Claude Memory Strategies</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var USE_CASES = [
+    {title:'Customer Support Chatbot',desc:'Automated Tier 1 support that answers FAQs, resolves common issues, and escalates complex cases to human agents. Integrates with help center articles via RAG.',industry:'saas',type:'chatbot',complexity:'beginner',model:'Claude 3.5 Haiku',cost:'$5-200/mo',arch:'User -> Chat UI -> Backend -> [RAG: Vector DB] -> Claude API -> Response -> Chat UI'},
+    {title:'Code Review Assistant',desc:'Analyzes pull requests for bugs, security vulnerabilities, style issues, and performance problems. Posts inline comments directly on the PR.',industry:'devtools',type:'agent',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$30-100/mo',arch:'PR Event -> Webhook -> Diff Parser -> Claude API -> Comment Formatter -> GitHub API'},
+    {title:'Document Summarizer',desc:'Condenses long reports, articles, and legal documents into actionable summaries with key points and action items. Handles documents up to 200K tokens.',industry:'saas',type:'pipeline',complexity:'beginner',model:'Claude 3.5 Sonnet',cost:'$0.01-0.05/doc',arch:'Document Upload -> Chunker -> Claude API (per chunk) -> Summary Merger -> Final Summary'},
+    {title:'Invoice Data Extractor',desc:'Extracts structured data (vendor, amount, date, line items) from PDF invoices. Handles diverse formats with 95%+ accuracy. Outputs JSON for ERP integration.',industry:'fintech',type:'pipeline',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$0.02/invoice',arch:'PDF Upload -> OCR -> Text Cleanup -> Claude API (extract) -> Schema Validator -> JSON Output'},
+    {title:'Product Description Generator',desc:'Creates SEO-optimized product descriptions from product specs, images, and brand guidelines. Supports multiple tones and lengths for different platforms.',industry:'ecommerce',type:'automation',complexity:'beginner',model:'Claude 3.5 Sonnet',cost:'$0.005/desc',arch:'Product Data -> Template Selector -> Claude API -> Quality Check -> CMS Integration'},
+    {title:'Medical Note Summarizer',desc:'Summarizes clinical notes, discharge summaries, and lab reports for physician review. HIPAA-compliant architecture with BAA-covered infrastructure.',industry:'healthcare',type:'pipeline',complexity:'advanced',model:'Claude 4 Opus',cost:'$0.10/note',arch:'EHR Export -> PHI Filter -> Claude API (BAA) -> Summary -> Physician Review Queue'},
+    {title:'Tutoring Assistant',desc:'Socratic tutoring bot that guides students through problems with questions rather than answers. Adapts to student level. Covers math, science, and writing.',industry:'education',type:'chatbot',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$20-80/mo',arch:'Student Input -> Context Builder -> Claude API (Socratic prompt) -> Hint Generator -> Response'},
+    {title:'Contract Clause Analyzer',desc:'Identifies risky clauses, missing provisions, and non-standard terms in legal contracts. Compares against template libraries. Flags items for attorney review.',industry:'fintech',type:'analysis',complexity:'advanced',model:'Claude 4 Opus',cost:'$0.50/contract',arch:'Contract PDF -> OCR -> Clause Splitter -> Claude API (per clause) -> Risk Scorer -> Report'},
+    {title:'Content Moderation Pipeline',desc:'Screens user-generated content for policy violations, hate speech, and harmful content. Routes flagged items to human moderators with severity scores.',industry:'saas',type:'pipeline',complexity:'intermediate',model:'Claude 3.5 Haiku',cost:'$2-10/mo',arch:'User Content -> Pre-filter -> Claude API (classify) -> Severity Score -> Route to Queue/Approve'},
+    {title:'Email Draft Generator',desc:'Generates professional email drafts based on bullet points and context. Matches company tone and templates. Supports reply suggestions for incoming emails.',industry:'saas',type:'automation',complexity:'beginner',model:'Claude 3.5 Haiku',cost:'$0.001/email',arch:'Bullet Points + Context -> Template Selector -> Claude API -> Draft -> User Edit -> Send'},
+    {title:'Financial Report Analyzer',desc:'Reads quarterly earnings reports and extracts KPIs, trends, and risk factors. Generates executive summaries comparing against previous quarters and competitors.',industry:'fintech',type:'analysis',complexity:'advanced',model:'Claude 4 Opus',cost:'$1-5/report',arch:'PDF Report -> Parser -> Chunker -> Claude API (extract KPIs) -> Trend Analyzer -> Summary'},
+    {title:'Quiz and Assessment Creator',desc:'Generates quizzes from learning material with multiple choice, short answer, and essay questions. Auto-grades objective questions. Provides feedback on essays.',industry:'education',type:'automation',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$0.02/quiz',arch:'Learning Material -> Topic Extractor -> Claude API (generate Qs) -> Quiz Formatter -> Grading Pipeline'},
+    {title:'API Documentation Generator',desc:'Generates API documentation from OpenAPI specs, code comments, and example requests. Produces human-readable guides with code samples in multiple languages.',industry:'devtools',type:'automation',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$0.05/endpoint',arch:'OpenAPI Spec -> Endpoint Parser -> Claude API (per endpoint) -> Markdown Generator -> Doc Site'},
+    {title:'Product Recommendation Engine',desc:'Generates personalized product recommendations with explanations. Uses customer purchase history, browsing behavior, and product catalog as context via RAG.',industry:'ecommerce',type:'agent',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$50-200/mo',arch:'User Profile + History -> RAG: Product Catalog -> Claude API -> Ranked Recommendations -> Display'},
+    {title:'Compliance Document Reviewer',desc:'Reviews documents against regulatory requirements (SOC2, GDPR, HIPAA). Identifies gaps, suggests remediation, and generates compliance reports.',industry:'fintech',type:'analysis',complexity:'advanced',model:'Claude 4 Opus',cost:'$2-10/doc',arch:'Document + Regulations (RAG) -> Claude API -> Gap Analysis -> Remediation Suggestions -> Report'},
+    {title:'Bug Report Classifier',desc:'Automatically classifies incoming bug reports by severity, component, and type. Assigns to the right team and suggests related known issues from the database.',industry:'devtools',type:'automation',complexity:'beginner',model:'Claude 3.5 Haiku',cost:'$1-5/mo',arch:'Bug Report -> Claude API (classify) -> Team Router -> [RAG: Known Issues] -> Duplicate Check'},
+    {title:'Patient Communication Drafter',desc:'Drafts patient-facing communications including appointment reminders, test result notifications, and care plan summaries in plain language. Multilingual support.',industry:'healthcare',type:'automation',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$0.005/msg',arch:'Clinical Data -> PHI Filter -> Claude API (plain language) -> Tone Check -> Patient Portal'},
+    {title:'Sales Call Summarizer',desc:'Processes sales call transcripts to extract action items, objections raised, next steps, and sentiment analysis. Updates CRM records automatically.',industry:'saas',type:'pipeline',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$0.05/call',arch:'Call Recording -> Transcription -> Claude API (extract) -> CRM Updater -> Team Dashboard'},
+    {title:'Research Paper Synthesizer',desc:'Multi-agent system that searches papers, extracts findings, identifies contradictions, and produces literature review summaries with citation tracking.',industry:'education',type:'agent',complexity:'advanced',model:'Claude 4 Opus',cost:'$1-5/review',arch:'Search Query -> Paper Retriever -> [Agent: Extractor] -> [Agent: Synthesizer] -> [Agent: Writer] -> Report'},
+    {title:'Inventory Description Updater',desc:'Bulk updates product descriptions across marketplaces. Adapts tone for Amazon, eBay, Shopify, and social media. Maintains brand voice consistency.',industry:'ecommerce',type:'automation',complexity:'beginner',model:'Claude 3.5 Haiku',cost:'$0.002/desc',arch:'Product DB -> Platform Template -> Claude API -> Quality Check -> Multi-Platform Publisher'},
+    {title:'CI/CD Pipeline Debugger',desc:'Analyzes failed CI/CD logs to identify root causes, suggest fixes, and link to relevant documentation. Reduces mean time to resolution for build failures.',industry:'devtools',type:'agent',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$10-30/mo',arch:'CI Failure Event -> Log Collector -> Claude API (analyze) -> [RAG: Fix DB] -> Fix Suggestion -> Slack/PR'},
+    {title:'Clinical Trial Matcher',desc:'Matches patients to eligible clinical trials based on medical history, diagnosis, and trial criteria. Generates eligibility assessments for physician review.',industry:'healthcare',type:'analysis',complexity:'advanced',model:'Claude 4 Opus',cost:'$0.50/match',arch:'Patient Profile -> Trial DB (RAG) -> Claude API (match criteria) -> Eligibility Score -> Physician Review'},
+    {title:'Loan Application Processor',desc:'Pre-screens loan applications by extracting financial data, verifying document completeness, and generating risk assessment summaries for underwriters.',industry:'fintech',type:'pipeline',complexity:'advanced',model:'Claude 3.5 Sonnet',cost:'$0.20/app',arch:'Application Docs -> OCR -> Claude API (extract) -> Rules Engine -> Risk Score -> Underwriter Queue'},
+    {title:'Personalized Learning Path',desc:'Creates customized curriculum sequences based on student assessments, learning goals, and progress. Adjusts difficulty dynamically as student advances.',industry:'education',type:'agent',complexity:'advanced',model:'Claude 3.5 Sonnet',cost:'$0.10/path',arch:'Student Assessment -> Goal Mapper -> Claude API (plan) -> Content Selector -> Progress Tracker -> Adapt'},
+    {title:'Return Reason Analyzer',desc:'Classifies product return reasons from free-text customer feedback. Identifies trending issues, defective batches, and sizing problems. Feeds product improvement.',industry:'ecommerce',type:'analysis',complexity:'beginner',model:'Claude 3.5 Haiku',cost:'$1-5/mo',arch:'Return Feedback -> Claude API (classify + extract) -> Trend Aggregator -> Product Team Dashboard'},
+    {title:'PR Release Notes Generator',desc:'Generates user-facing release notes from git commit logs, PR descriptions, and Jira tickets. Groups by feature area and explains changes in plain language.',industry:'devtools',type:'automation',complexity:'beginner',model:'Claude 3.5 Sonnet',cost:'$0.01/release',arch:'Git Log + PRs + Jira -> Aggregator -> Claude API (summarize) -> Markdown Formatter -> Changelog'},
+    {title:'Symptom Triage Assistant',desc:'Initial symptom assessment chatbot that collects patient symptoms, suggests urgency level, and recommends next steps. Does not diagnose, only triages.',industry:'healthcare',type:'chatbot',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$30-100/mo',arch:'Patient Input -> Symptom Collector -> Claude API (triage prompt) -> Urgency Level -> Next Steps'},
+    {title:'Investment Memo Generator',desc:'Produces structured investment memos from company data, market research, and financial models. Follows standard VC memo format with risks and opportunities.',industry:'fintech',type:'pipeline',complexity:'advanced',model:'Claude 4 Opus',cost:'$2-8/memo',arch:'Company Data + Market Data (RAG) -> Claude API (section by section) -> Formatter -> Review Queue'},
+    {title:'Multi-Language FAQ Bot',desc:'Customer support bot that detects language and responds in the customer\'s language. Pulls answers from a multilingual knowledge base. Supports 20+ languages.',industry:'saas',type:'chatbot',complexity:'intermediate',model:'Claude 3.5 Sonnet',cost:'$30-150/mo',arch:'User Message -> Language Detect -> RAG: Multilingual KB -> Claude API (respond in detected lang) -> Response'},
+    {title:'Checkout Abandonment Recovery',desc:'Generates personalized recovery emails based on cart contents, browsing history, and user segment. A/B tests subject lines and messaging for optimal conversion.',industry:'ecommerce',type:'automation',complexity:'intermediate',model:'Claude 3.5 Haiku',cost:'$5-20/mo',arch:'Abandoned Cart Event -> User Profile -> Claude API (personalize) -> A/B Variant -> Email Service'}
+  ];
+
+  var selectedCase = null;
+
+  function renderGrid(cases){
+    var grid = document.getElementById('ucg-grid');
+    var html = '';
+    for(var i=0;i<cases.length;i++){
+      var c = cases[i];
+      html += '<div class="ucg-case" onclick="ucgShowDetail('+i+')">'
+        +'<div class="case-head"><span class="case-title">'+c.title+'</span><span class="case-badge '+c.complexity+'">'+c.complexity+'</span></div>'
+        +'<div class="case-desc">'+c.desc+'</div>'
+        +'<div class="case-tags"><span class="case-tag">'+c.industry+'</span><span class="case-tag">'+c.type+'</span></div>'
+        +'<div class="case-meta"><span>'+c.model+'</span><span>'+c.cost+'</span></div>'
+        +'</div>';
+    }
+    grid.innerHTML = html;
+    document.getElementById('ucg-count').textContent = 'Showing '+cases.length+' use case'+(cases.length!==1?'s':'');
+  }
+
+  window.ucgFilter = function(){
+    var search = document.getElementById('ucg-search').value.toLowerCase();
+    var industry = document.getElementById('ucg-industry').value;
+    var type = document.getElementById('ucg-type').value;
+    var complexity = document.getElementById('ucg-complexity').value;
+    var filtered = USE_CASES.filter(function(c){
+      if(search && c.title.toLowerCase().indexOf(search)===-1 && c.desc.toLowerCase().indexOf(search)===-1) return false;
+      if(industry && c.industry!==industry) return false;
+      if(type && c.type!==type) return false;
+      if(complexity && c.complexity!==complexity) return false;
+      return true;
+    });
+    renderGrid(filtered);
+    document.getElementById('ucg-detail').classList.remove('active');
+  };
+
+  window.ucgShowDetail = function(idx){
+    var filtered = getFilteredCases();
+    var c = filtered[idx];
+    if(!c) return;
+    var detail = document.getElementById('ucg-detail');
+    var checklist = [
+      'Define system prompt with role, constraints, and output format',
+      'Choose model based on complexity and cost requirements',
+      'Implement conversation history management strategy',
+      'Add error handling for API timeouts and rate limits',
+      'Build evaluation test suite with 20+ representative queries',
+      'Set up token usage logging and cost monitoring',
+      'Implement output validation and hallucination detection',
+      'Configure prompt caching for cost optimization',
+      'Load test with expected production volume',
+      'Deploy with monitoring dashboards and alerting'
+    ];
+    var checkHtml = '';
+    for(var i=0;i<checklist.length;i++) checkHtml += '<li>'+checklist[i]+'</li>';
+
+    detail.innerHTML = '<h3>'+c.title+'</h3>'
+      +'<p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">'+c.desc+'</p>'
+      +'<div class="ucg-stats">'
+      +'<div class="ucg-stat"><div class="val">'+c.model+'</div><div class="lbl">Recommended Model</div></div>'
+      +'<div class="ucg-stat"><div class="val">'+c.cost+'</div><div class="lbl">Est. Cost</div></div>'
+      +'<div class="ucg-stat"><div class="val" style="text-transform:capitalize;">'+c.complexity+'</div><div class="lbl">Complexity</div></div>'
+      +'<div class="ucg-stat"><div class="val" style="text-transform:capitalize;">'+c.type+'</div><div class="lbl">Pattern Type</div></div>'
+      +'</div>'
+      +'<h4 style="font-size:0.92rem;color:var(--accent);margin:1rem 0 0.5rem;">Architecture Flow</h4>'
+      +'<div class="arch-diagram">'+c.arch.replace(/ -> /g,' ──> ')+'</div>'
+      +'<h4 style="font-size:0.92rem;color:var(--accent);margin:1rem 0 0.5rem;">Implementation Checklist</h4>'
+      +'<ul class="checklist">'+checkHtml+'</ul>';
+    detail.classList.add('active');
+    detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
+
+  function getFilteredCases(){
+    var search = document.getElementById('ucg-search').value.toLowerCase();
+    var industry = document.getElementById('ucg-industry').value;
+    var type = document.getElementById('ucg-type').value;
+    var complexity = document.getElementById('ucg-complexity').value;
+    return USE_CASES.filter(function(c){
+      if(search && c.title.toLowerCase().indexOf(search)===-1 && c.desc.toLowerCase().indexOf(search)===-1) return false;
+      if(industry && c.industry!==industry) return false;
+      if(type && c.type!==type) return false;
+      if(complexity && c.complexity!==complexity) return false;
+      return true;
+    });
+  }
+
+  renderGrid(USE_CASES);
+})();
+</script>
+</body>
+</html>

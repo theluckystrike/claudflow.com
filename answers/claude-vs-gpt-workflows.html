@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude vs GPT for Workflows — Side-by-Side Comparison &amp; Cost Calculator | ClaudFlow</title>
+  <meta name="description" content="Compare Claude and GPT for AI workflows side by side. Select workflow type, compare capabilities, pricing, context windows, and latency. Built-in recommendation engine and cost calculator. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude vs GPT for Workflows — Side-by-Side Comparison & Cost Calculator">
+  <meta property="og:description" content="Compare Claude and GPT for AI workflows. Select workflow type, compare capabilities, pricing, context windows, and latency. Recommendation engine and cost calculator included.">
+  <meta property="og:url" content="https://claudflow.com/answers/claude-vs-gpt-workflows.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude vs GPT for Workflows — Side-by-Side Comparison & Cost Calculator">
+  <meta name="twitter:description" content="Compare Claude and GPT for AI workflows. Select workflow type, compare capabilities, pricing, and latency. Free comparison tool.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/answers/claude-vs-gpt-workflows.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/answers/claude-vs-gpt-workflows.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/answers/claude-vs-gpt-workflows.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Claude vs GPT for Workflows — Side-by-Side Comparison & Cost Calculator",
+    "url": "https://claudflow.com/answers/claude-vs-gpt-workflows.html",
+    "description": "Comprehensive side-by-side comparison of Claude and GPT models for AI workflows. Compare capabilities, pricing, context windows, and latency across data analysis, content generation, code review, customer support, and more. Includes recommendation engine based on your requirements and a cost calculator.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "mainEntityOfPage": "https://claudflow.com/answers/claude-vs-gpt-workflows.html"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is Claude or GPT better for code generation workflows?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "For code generation, Claude 4 Opus leads on complex multi-file implementations and architectural reasoning, while GPT-4o is competitive on single-function generation and has faster output for rapid iteration. Claude 3.5 Sonnet offers the best balance of code quality and cost for most production workflows. Both support tool use and structured output for code-adjacent tasks like running tests and parsing errors. Choose based on whether your priority is output quality (Claude 4 Opus), speed (GPT-4o), or cost-efficiency (Claude 3.5 Sonnet)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which model has the larger context window for processing long documents?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Among Claude and GPT models, Claude 3.5 Sonnet and Claude 4 Opus both offer 200K token context windows, while GPT-4o offers 128K tokens. If you need an even larger window, Gemini 2.5 Pro offers 1M tokens. For most document processing workflows, 128K-200K tokens is sufficient to process a full-length book or several hundred pages of documentation in a single pass. The 200K window in Claude models gives approximately 50% more capacity than GPT-4o for long-document workflows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do the costs compare between Claude and GPT for high-volume workflows?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "At high volume, Claude 3.5 Sonnet costs $3 per million input tokens and $15 per million output tokens. GPT-4o costs $2.50 per million input and $10 per million output, making it slightly cheaper per token. However, Claude's prompt caching can reduce repeated input costs by up to 90%, which often makes Claude cheaper for high-volume workflows with stable system prompts. Claude 4 Opus at $15/$75 per million is significantly more expensive and should be reserved for tasks where its superior reasoning justifies the cost. The cost calculator on this page lets you model your specific volume and see exact comparisons."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use both Claude and GPT in the same workflow?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, multi-model workflows are a common production pattern. Route different steps to different models based on their strengths. Use GPT-4o for fast classification and routing steps where speed matters. Use Claude 3.5 Sonnet for the core generation steps where instruction following and output quality matter. Reserve Claude 4 Opus for complex reasoning steps like planning or evaluation. This routing approach can reduce costs by 40-60% compared to using a single premium model for every step, while maintaining or improving overall quality."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which model is better for customer support workflow automation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude models tend to outperform on customer support workflows due to stronger instruction following, more natural conversation tone, and better handling of nuanced or sensitive situations. Claude 3.5 Sonnet is the recommended choice for most support automation because it balances quality and cost effectively. GPT-4o is a viable alternative, especially if your stack already integrates with OpenAI. Both support tool use for looking up customer data and knowledge base articles. The key differentiator is Claude's tendency to produce more empathetic, carefully worded responses, which directly impacts customer satisfaction scores."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Answers", "item": "https://claudflow.com/answers/" },
+      { "@type": "ListItem", "position": 3, "name": "Claude vs GPT for Workflows" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .cvg-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+
+    .cvg-workflow-select { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:0.6rem; margin-bottom:1.5rem; }
+    .cvg-wf-btn { padding:0.6rem 0.75rem; background:var(--bg-card); border:2px solid var(--border); border-radius:var(--radius); cursor:pointer; text-align:center; transition:all 0.15s; }
+    .cvg-wf-btn:hover { border-color:var(--accent); }
+    .cvg-wf-btn.active { border-color:var(--accent); background:rgba(6,182,212,0.08); box-shadow:0 0 0 2px rgba(6,182,212,0.2); }
+    .cvg-wf-btn .wf-name { font-size:0.88rem; font-weight:600; color:var(--text); }
+    .cvg-wf-btn .wf-desc { font-size:0.7rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .cvg-comparison { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .cvg-col { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .cvg-col h3 { font-size:1.05rem; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+    .cvg-col h3 .col-badge { padding:0.2rem 0.6rem; border-radius:99px; font-size:0.7rem; font-weight:700; }
+    .cvg-claude-badge { background:rgba(6,182,212,0.15); color:var(--accent); }
+    .cvg-gpt-badge { background:rgba(168,85,247,0.15); color:#a855f7; }
+
+    .cvg-meter { margin:0.5rem 0; }
+    .cvg-meter-label { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-muted); margin-bottom:0.25rem; }
+    .cvg-meter-bar { height:8px; background:var(--bg); border-radius:4px; overflow:hidden; }
+    .cvg-meter-fill { height:100%; border-radius:4px; transition:width 0.4s ease; }
+    .cvg-meter-fill.claude { background:var(--accent); }
+    .cvg-meter-fill.gpt { background:#a855f7; }
+
+    .cvg-detail-row { display:flex; justify-content:space-between; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.82rem; }
+    .cvg-detail-row:last-child { border-bottom:none; }
+    .cvg-detail-row .dr-label { color:var(--text-muted); }
+    .cvg-detail-row .dr-value { color:var(--text); font-weight:500; }
+
+    .cvg-recommendation { background:var(--bg-card); border:2px solid var(--accent); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.5rem; }
+    .cvg-recommendation h3 { font-size:1rem; color:var(--accent); margin-bottom:0.5rem; }
+    .cvg-rec-result { font-size:0.92rem; line-height:1.6; color:var(--text); }
+    .cvg-rec-winner { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; }
+
+    .cvg-reqs { margin-bottom:1.5rem; }
+    .cvg-reqs h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cvg-reqs-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem; }
+    .cvg-req { display:flex; align-items:center; gap:0.5rem; }
+    .cvg-req label { font-size:0.82rem; color:var(--text-muted); }
+    .cvg-req select { padding:0.4rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:0.82rem; font-family:var(--font-body); }
+    .cvg-req select:focus { outline:none; border-color:var(--accent); }
+
+    .cvg-cost-calc { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.5rem; }
+    .cvg-cost-calc h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .cvg-cost-inputs { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:0.75rem; margin-bottom:1rem; }
+    .cvg-cost-inputs label { display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:0.25rem; }
+    .cvg-cost-inputs input { width:100%; padding:0.45rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:0.85rem; font-family:var(--font-body); box-sizing:border-box; }
+    .cvg-cost-inputs input:focus { outline:none; border-color:var(--accent); }
+
+    .cvg-cost-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .cvg-cost-table th { text-align:left; padding:0.5rem; border-bottom:2px solid var(--border); color:var(--accent); font-weight:600; }
+    .cvg-cost-table td { padding:0.5rem; border-bottom:1px solid var(--border); color:var(--text); }
+    .cvg-cost-table tr:hover td { background:rgba(6,182,212,0.03); }
+    .cvg-cost-table .cheapest { color:#22c55e; font-weight:700; }
+
+    .cvg-summary-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .cvg-summary-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; text-align:center; }
+    .cvg-summary-card .sc-val { font-size:1.5rem; font-weight:700; color:var(--accent); }
+    .cvg-summary-card .sc-label { font-size:0.75rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    @media (max-width:768px) {
+      .cvg-comparison { grid-template-columns:1fr; }
+      .cvg-workflow-select { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/answers/" style="color:var(--accent);text-decoration:none;">Answers</a> &rsaquo;
+      <span style="color:var(--text-muted);">Claude vs GPT for Workflows</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Claude vs GPT for Workflows</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Select a workflow type to compare Claude and GPT capabilities, pricing, context windows, and latency. Get model recommendations based on your requirements.</p>
+    </section>
+  </main>
+
+  <div class="cvg-wrap">
+    <h2 style="font-size:1.1rem;margin-bottom:0.75rem;">Select Workflow Type</h2>
+    <div class="cvg-workflow-select" id="cvg-wf-select"></div>
+
+    <div class="cvg-comparison" id="cvg-comparison"></div>
+
+    <div class="cvg-reqs">
+      <h3>Your Requirements</h3>
+      <div class="cvg-reqs-grid">
+        <div class="cvg-req">
+          <label>Budget Priority:</label>
+          <select id="cvg-req-budget" onchange="cvgRecommend()">
+            <option value="low">Minimize Cost</option>
+            <option value="balanced" selected>Balanced</option>
+            <option value="high">Maximize Quality</option>
+          </select>
+        </div>
+        <div class="cvg-req">
+          <label>Latency Need:</label>
+          <select id="cvg-req-latency" onchange="cvgRecommend()">
+            <option value="realtime">Real-time (&lt;2s)</option>
+            <option value="fast" selected>Fast (&lt;10s)</option>
+            <option value="batch">Batch (async OK)</option>
+          </select>
+        </div>
+        <div class="cvg-req">
+          <label>Volume:</label>
+          <select id="cvg-req-volume" onchange="cvgRecommend()">
+            <option value="low">Low (&lt;100/day)</option>
+            <option value="medium" selected>Medium (100-10K/day)</option>
+            <option value="high">High (10K+/day)</option>
+          </select>
+        </div>
+        <div class="cvg-req">
+          <label>Doc Length:</label>
+          <select id="cvg-req-doclength" onchange="cvgRecommend()">
+            <option value="short" selected>Short (&lt;4K tokens)</option>
+            <option value="medium">Medium (4K-50K)</option>
+            <option value="long">Long (50K+)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="cvg-recommendation" id="cvg-recommendation"></div>
+
+    <div class="cvg-cost-calc">
+      <h3>Cost Calculator</h3>
+      <div class="cvg-cost-inputs">
+        <div>
+          <label>Avg Input Tokens/Request</label>
+          <input type="number" id="cvg-cost-input" value="2000" min="1" oninput="cvgCalcCost()">
+        </div>
+        <div>
+          <label>Avg Output Tokens/Request</label>
+          <input type="number" id="cvg-cost-output" value="1000" min="1" oninput="cvgCalcCost()">
+        </div>
+        <div>
+          <label>Requests per Day</label>
+          <input type="number" id="cvg-cost-reqs" value="500" min="1" oninput="cvgCalcCost()">
+        </div>
+        <div>
+          <label>Days</label>
+          <input type="number" id="cvg-cost-days" value="30" min="1" oninput="cvgCalcCost()">
+        </div>
+      </div>
+      <div id="cvg-cost-result"></div>
+    </div>
+
+    <div class="cvg-summary-grid" id="cvg-summary"></div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>Choosing Between Claude and GPT for AI Workflows</h2>
+
+    <p>The choice between Claude and GPT for production AI workflows is not a simple one-size-fits-all decision. Both model families have evolved significantly, and each has distinct strengths that map to different workflow requirements. This comparison tool helps you make an informed decision by matching your specific workflow type, volume, budget, and latency constraints to the model that best fits your needs. Rather than relying on general benchmarks, the tool evaluates models against the dimensions that actually matter for production deployments.</p>
+
+    <p>The comparison covers five key dimensions for each workflow type. Reasoning quality measures how well the model handles complex, multi-step logic for that specific task. Instruction following measures how reliably the model adheres to formatting constraints, output schemas, and behavioral guidelines. Speed measures time-to-first-token and total generation time under production load. Context handling measures how effectively the model uses long context windows without degrading quality. Cost efficiency measures the price-to-quality ratio for the expected token volumes in that workflow.</p>
+
+    <h2>Workflow-Specific Model Strengths</h2>
+
+    <p>For data analysis workflows, Claude models excel at structured reasoning over tabular data and maintaining consistency across long analytical chains. Claude 4 Opus produces particularly strong statistical interpretations and can hold complex multi-variable relationships in context throughout a long analysis. GPT-4o is competitive for simpler analytical tasks and offers faster output generation, which matters when running many parallel analysis queries. For teams processing large datasets, the token cost difference between models can be significant, making Claude 3.5 Sonnet the sweet spot for routine analytical work.</p>
+
+    <p>Content generation workflows reveal different trade-offs. Claude models tend to produce more nuanced, natural-sounding prose with better adherence to tone and style guidelines. This makes Claude the preferred choice for brand-sensitive content where voice consistency matters. GPT-4o generates content faster, which is advantageous for high-volume content pipelines where speed outweighs style precision. For SEO-optimized content workflows, both models perform comparably when given detailed structural prompts, but Claude more reliably follows complex formatting instructions like specific heading hierarchies and internal linking patterns.</p>
+
+    <p>Code review workflows benefit from Claude's strength in identifying subtle logical errors and security vulnerabilities across large codebases. Claude 4 Opus in particular demonstrates strong architectural reasoning, able to identify issues that span multiple files and modules. GPT-4o is effective for focused, single-file reviews and offers faster turnaround for rapid iteration cycles. For production code review pipelines that run on every pull request, Claude 3.5 Sonnet provides the optimal balance of review quality and per-review cost.</p>
+
+    <h2>Context Window and Long Document Processing</h2>
+
+    <p>The context window is one of the most consequential differences between model families. Claude 3.5 Sonnet and Claude 4 Opus both offer 200,000 tokens of context, approximately 150,000 words or a 300-page book. GPT-4o offers 128,000 tokens, roughly two-thirds of Claude's capacity. For workflows that process long legal contracts, technical documentation, or entire codebases, this difference determines whether you can process the document in a single pass or need to chunk it into multiple requests.</p>
+
+    <p>Context window size alone does not tell the full story. Quality of attention across the window matters equally. Both Claude and GPT models show some degree of attention degradation in the middle of very long contexts, a phenomenon sometimes called "lost in the middle." Claude models have shown strong performance on needle-in-a-haystack tests across the full 200K window, meaning they can retrieve and reason about information placed anywhere in the context. For workflows that require the model to synthesize information from disparate parts of a long document, testing with your actual document types is essential. The <a href="/tools/context-window-optimizer.html">Context Window Optimizer</a> can help you plan your token budget and chunking strategy for either model family.</p>
+
+    <h2>Pricing and Cost Optimization Strategies</h2>
+
+    <p>At the API level, GPT-4o is slightly cheaper per token than Claude 3.5 Sonnet for raw input and output pricing. GPT-4o costs $2.50 per million input tokens and $10 per million output tokens. Claude 3.5 Sonnet costs $3 per million input and $15 per million output. However, Anthropic's prompt caching feature significantly changes the cost equation for high-volume workflows. When you cache your system prompt and few-shot examples, subsequent requests pay only 10% of the normal input token cost for the cached portion. For a workflow with a 2,000-token system prompt running 10,000 requests per day, prompt caching saves approximately 18 million tokens worth of input cost daily.</p>
+
+    <p>The most cost-effective production strategy is multi-model routing. Use a lightweight classifier to categorize incoming requests by complexity, then route simple requests to the cheapest model and complex requests to the most capable model. A customer support pipeline might route 70% of queries to Claude 3.5 Sonnet for routine answers, 25% to GPT-4o for fast classification tasks, and 5% to Claude 4 Opus for complex escalations requiring deep reasoning. This routing approach typically reduces monthly costs by 40-60% compared to using a single model for all requests.</p>
+
+    <p>For teams already running <a href="/tools/workflow-builder.html">visual workflow designs</a>, each block in the workflow can target a different model. The routing decision is made at the block level based on the complexity classification of that specific step. A content generation workflow might use GPT-4o for the outline step, Claude 3.5 Sonnet for the drafting step, and Claude 4 Opus for the final editorial review step. Each step uses the model that offers the best price-performance ratio for its specific task.</p>
+
+    <h2>Latency and Throughput Considerations</h2>
+
+    <p>For real-time applications like chatbots and interactive tools, time-to-first-token and total generation time are critical metrics. GPT-4o generally offers faster time-to-first-token, making it feel more responsive in conversational interfaces. Claude 3.5 Sonnet is competitive on throughput, processing similar token volumes in comparable total time. Claude 4 Opus is notably slower due to its deeper reasoning process, making it less suitable for real-time conversational use but ideal for batch processing where quality outweighs speed.</p>
+
+    <p>Throughput under load depends on both the model's raw speed and the API provider's infrastructure. Both Anthropic and OpenAI offer tiered rate limits based on usage volume. At high volume, you may hit rate limits before you hit cost constraints. For batch processing workflows that can tolerate asynchronous execution, both providers offer batch APIs that process requests at reduced cost in exchange for accepting delayed delivery. Anthropic's batch API pricing is 50% off standard rates, and OpenAI's batch API offers similar discounts. For workflows that are not latency-sensitive, batch processing is the single largest cost optimization available.</p>
+
+    <h2>Instruction Following and Structured Output</h2>
+
+    <p>Production workflows depend heavily on the model's ability to follow complex formatting instructions reliably. If your workflow expects JSON output with a specific schema, the model must produce valid JSON that conforms to that schema on every request, not just most requests. Claude models have historically shown stronger instruction following, particularly for complex output formats with nested structures, specific field types, and conditional formatting rules. Both providers now offer structured output modes that constrain generation to match a JSON schema, which largely eliminates format compliance issues for JSON-based workflows.</p>
+
+    <p>For free-form text output with structural requirements such as using specific headings, maintaining a particular tone, following a template, or including specific sections, Claude tends to follow instructions more literally. GPT-4o sometimes takes creative liberties with structural instructions, which can be desirable in creative writing but problematic in production pipelines that expect deterministic formatting. Test with your actual prompt and structural requirements to verify compliance rates. A 99% compliance rate sounds good but means 1 in 100 requests produces malformed output that requires error handling or retry logic.</p>
+
+    <h2>Building Model-Agnostic Workflows</h2>
+
+    <p>The most resilient approach is to design your workflows to be model-agnostic from the start. Abstract the model call behind a provider interface so you can swap Claude for GPT or vice versa without changing your workflow logic. Store prompts as templates separate from the model configuration. Test every workflow against both model families to understand where each performs best. This flexibility lets you respond to pricing changes, capability improvements, and availability issues by switching models without redesigning your pipeline.</p>
+
+    <p>The <a href="/research/agent-pattern-library.html">Agent Pattern Library</a> documents design patterns that work across both Claude and GPT. Patterns like ReAct, Reflection, and Plan-Execute are model-agnostic by design. The implementation details differ slightly between providers, mainly in how tool calls and structured output are formatted, but the architectural patterns transfer cleanly. For teams using <a href="https://claudkit.com">ClaudKit</a> for API management, the provider abstraction layer handles the format differences automatically.</p>
+
+    <h2>Privacy and Neutrality</h2>
+
+    <p>This comparison tool runs entirely in your browser. No workflow selections, requirement configurations, or cost calculations are sent to any server. The ratings and recommendations are based on publicly available benchmark data and documented model specifications. While this tool is hosted on ClaudFlow, a site focused on Claude workflows, the comparison data represents our honest assessment of both model families' strengths and weaknesses. We update the data regularly as models are updated and new benchmarks are published. All calculations and rendering are performed client-side in static JavaScript with no external dependencies.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>Is Claude or GPT better for code generation workflows?</summary>
+      <p>Claude 4 Opus leads on complex multi-file implementations, while GPT-4o is competitive on single-function generation with faster output. Claude 3.5 Sonnet offers the best balance of code quality and cost. Choose based on whether you prioritize output quality, speed, or cost-efficiency.</p>
+    </details>
+
+    <details>
+      <summary>Which model has the larger context window for processing long documents?</summary>
+      <p>Claude 3.5 Sonnet and Claude 4 Opus both offer 200K token context windows, while GPT-4o offers 128K tokens. Claude provides approximately 50% more capacity for long-document workflows. Gemini 2.5 Pro offers 1M tokens if you need even more.</p>
+    </details>
+
+    <details>
+      <summary>How do the costs compare between Claude and GPT for high-volume workflows?</summary>
+      <p>GPT-4o is slightly cheaper per raw token ($2.50/$10 vs $3/$15 per million). However, Claude's prompt caching can reduce repeated input costs by up to 90%, often making Claude cheaper for high-volume workflows with stable system prompts. Use the cost calculator above for your specific scenario.</p>
+    </details>
+
+    <details>
+      <summary>Can I use both Claude and GPT in the same workflow?</summary>
+      <p>Yes. Multi-model routing is a common production pattern. Route different steps to different models based on their strengths. This approach can reduce costs by 40-60% while maintaining or improving quality compared to using a single model for everything.</p>
+    </details>
+
+    <details>
+      <summary>Which model is better for customer support workflow automation?</summary>
+      <p>Claude models tend to outperform on customer support due to stronger instruction following and more natural conversation tone. Claude 3.5 Sonnet is recommended for most support automation. GPT-4o is a viable alternative, especially if your stack already integrates with OpenAI.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/answers/claude-error-troubleshooting.html">Claude Error Troubleshooting</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+          <li><a href="/research/workflow-automation-patterns.html">Workflow Automation Patterns</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var MODELS = [
+    { id:'claude35sonnet', name:'Claude 3.5 Sonnet', family:'claude', context:200000, maxOutput:8192, inputCost:3.00, outputCost:15.00, speed:'Fast' },
+    { id:'claude4opus', name:'Claude 4 Opus', family:'claude', context:200000, maxOutput:32000, inputCost:15.00, outputCost:75.00, speed:'Moderate' },
+    { id:'gpt4o', name:'GPT-4o', family:'gpt', context:128000, maxOutput:16384, inputCost:2.50, outputCost:10.00, speed:'Fast' },
+    { id:'gpt4omini', name:'GPT-4o Mini', family:'gpt', context:128000, maxOutput:16384, inputCost:0.15, outputCost:0.60, speed:'Very Fast' }
+  ];
+
+  var WORKFLOWS = [
+    {
+      id:'data-analysis', name:'Data Analysis', desc:'Tables, stats, insights',
+      claude: { reasoning:92, instructions:90, speed:78, context:95, costEff:82 },
+      gpt: { reasoning:85, instructions:82, speed:85, context:80, costEff:88 },
+      claudeNotes:'Excels at multi-step statistical reasoning and maintaining consistency across long analytical chains. Strong at structured output for reports.',
+      gptNotes:'Faster for simple queries. Competitive on basic analysis. Better throughput for batch statistical processing.',
+      winner:'claude', winReason:'Superior structured reasoning over complex datasets and better long-context retention for multi-table analysis.'
+    },
+    {
+      id:'content-gen', name:'Content Generation', desc:'Blog, copy, marketing',
+      claude: { reasoning:88, instructions:94, speed:80, context:92, costEff:80 },
+      gpt: { reasoning:84, instructions:80, speed:88, context:78, costEff:85 },
+      claudeNotes:'More natural prose. Better adherence to tone/style guidelines. Stronger at following complex structural templates for SEO content.',
+      gptNotes:'Faster generation speed. Good for high-volume content pipelines. Slightly more creative in brainstorming scenarios.',
+      winner:'claude', winReason:'Stronger instruction following for brand voice consistency and structural formatting requirements in production content pipelines.'
+    },
+    {
+      id:'code-review', name:'Code Review', desc:'Bugs, security, performance',
+      claude: { reasoning:94, instructions:92, speed:75, context:95, costEff:78 },
+      gpt: { reasoning:88, instructions:85, speed:88, context:82, costEff:84 },
+      claudeNotes:'Identifies subtle architectural issues across large codebases. Strong at security vulnerability analysis. Excellent multi-file reasoning.',
+      gptNotes:'Faster per-review turnaround. Good for focused single-file reviews. Competitive on common bug patterns.',
+      winner:'claude', winReason:'Deeper architectural reasoning and superior ability to identify cross-file issues in large codebase reviews.'
+    },
+    {
+      id:'customer-support', name:'Customer Support', desc:'Tickets, routing, responses',
+      claude: { reasoning:86, instructions:95, speed:82, context:88, costEff:85 },
+      gpt: { reasoning:82, instructions:82, speed:90, context:80, costEff:90 },
+      claudeNotes:'More empathetic, carefully worded responses. Better at handling sensitive situations. Stronger guardrails for brand safety.',
+      gptNotes:'Faster response times for real-time chat. Slightly cheaper at high volume. Good for straightforward FAQ responses.',
+      winner:'claude', winReason:'Superior instruction following for brand voice, better handling of sensitive situations, and more empathetic response tone.'
+    },
+    {
+      id:'document-processing', name:'Document Processing', desc:'Extract, classify, summarize',
+      claude: { reasoning:90, instructions:92, speed:78, context:96, costEff:80 },
+      gpt: { reasoning:85, instructions:84, speed:86, context:78, costEff:86 },
+      claudeNotes:'200K context handles full documents without chunking. Strong at schema-driven extraction. Reliable structured output for downstream systems.',
+      gptNotes:'128K context sufficient for most documents. Faster processing per document. GPT-4o Mini very cost-effective for simple extraction.',
+      winner:'claude', winReason:'Larger context window processes more documents in a single pass. Better at maintaining extraction accuracy across long documents.'
+    },
+    {
+      id:'code-generation', name:'Code Generation', desc:'Functions, modules, apps',
+      claude: { reasoning:94, instructions:90, speed:76, context:94, costEff:76 },
+      gpt: { reasoning:90, instructions:86, speed:88, context:82, costEff:82 },
+      claudeNotes:'Claude 4 Opus leads on complex multi-file generation. Strong architectural reasoning. Better at following coding style constraints.',
+      gptNotes:'Faster iteration speed. Good for rapid prototyping. Competitive on single-function generation tasks.',
+      winner:'claude', winReason:'Claude 4 Opus produces superior results on complex, multi-file code generation requiring architectural coherence.'
+    },
+    {
+      id:'translation', name:'Translation', desc:'Multi-language, localization',
+      claude: { reasoning:86, instructions:90, speed:82, context:90, costEff:80 },
+      gpt: { reasoning:88, instructions:84, speed:86, context:80, costEff:84 },
+      claudeNotes:'Better at preserving nuance and cultural context. Stronger instruction following for terminology glossaries. Consistent formatting.',
+      gptNotes:'Broader language coverage. Slightly faster processing. Good for high-volume translation pipelines.',
+      winner:'tie', winReason:'Both models perform comparably. Claude leads on nuance preservation; GPT leads on language breadth and speed.'
+    },
+    {
+      id:'research', name:'Research & Synthesis', desc:'Multi-source analysis',
+      claude: { reasoning:94, instructions:88, speed:74, context:96, costEff:76 },
+      gpt: { reasoning:88, instructions:82, speed:84, context:78, costEff:82 },
+      claudeNotes:'Exceptional at synthesizing information from multiple long documents. Strong multi-step reasoning chains. Better at identifying contradictions across sources.',
+      gptNotes:'Faster for quick research queries. Good at surface-level synthesis. Better throughput for broad topic scanning.',
+      winner:'claude', winReason:'Superior long-context synthesis and deeper reasoning chains make Claude the clear choice for multi-source research tasks.'
+    }
+  ];
+
+  var activeWf = WORKFLOWS[0].id;
+
+  function fmt(n){ return n.toLocaleString(); }
+
+  function renderWorkflowSelect(){
+    var el = document.getElementById('cvg-wf-select');
+    el.innerHTML = WORKFLOWS.map(function(w){
+      return '<div class="cvg-wf-btn'+(w.id===activeWf?' active':'')+'" onclick="cvgSelectWf(\''+w.id+'\')">'
+        +'<div class="wf-name">'+w.name+'</div>'
+        +'<div class="wf-desc">'+w.desc+'</div></div>';
+    }).join('');
+  }
+
+  function renderComparison(){
+    var wf = WORKFLOWS.find(function(w){ return w.id===activeWf; });
+    if(!wf) return;
+
+    var dims = [
+      {key:'reasoning', label:'Reasoning Quality'},
+      {key:'instructions', label:'Instruction Following'},
+      {key:'speed', label:'Speed'},
+      {key:'context', label:'Context Handling'},
+      {key:'costEff', label:'Cost Efficiency'}
+    ];
+
+    var claudeHtml = '<h3><span class="col-badge cvg-claude-badge">CLAUDE</span> Claude Models</h3>';
+    dims.forEach(function(d){
+      claudeHtml += '<div class="cvg-meter">'
+        +'<div class="cvg-meter-label"><span>'+d.label+'</span><span>'+wf.claude[d.key]+'/100</span></div>'
+        +'<div class="cvg-meter-bar"><div class="cvg-meter-fill claude" style="width:'+wf.claude[d.key]+'%"></div></div></div>';
+    });
+    claudeHtml += '<div style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);line-height:1.6;">'+wf.claudeNotes+'</div>';
+    claudeHtml += '<div style="margin-top:0.75rem;">';
+    claudeHtml += '<div class="cvg-detail-row"><span class="dr-label">Best Model</span><span class="dr-value">Claude 3.5 Sonnet</span></div>';
+    claudeHtml += '<div class="cvg-detail-row"><span class="dr-label">Premium Model</span><span class="dr-value">Claude 4 Opus</span></div>';
+    claudeHtml += '<div class="cvg-detail-row"><span class="dr-label">Context Window</span><span class="dr-value">200K tokens</span></div>';
+    claudeHtml += '<div class="cvg-detail-row"><span class="dr-label">Input Cost</span><span class="dr-value">$3.00/1M tokens</span></div>';
+    claudeHtml += '<div class="cvg-detail-row"><span class="dr-label">Output Cost</span><span class="dr-value">$15.00/1M tokens</span></div>';
+    claudeHtml += '</div>';
+
+    var gptHtml = '<h3><span class="col-badge cvg-gpt-badge">GPT</span> GPT Models</h3>';
+    dims.forEach(function(d){
+      gptHtml += '<div class="cvg-meter">'
+        +'<div class="cvg-meter-label"><span>'+d.label+'</span><span>'+wf.gpt[d.key]+'/100</span></div>'
+        +'<div class="cvg-meter-bar"><div class="cvg-meter-fill gpt" style="width:'+wf.gpt[d.key]+'%"></div></div></div>';
+    });
+    gptHtml += '<div style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);line-height:1.6;">'+wf.gptNotes+'</div>';
+    gptHtml += '<div style="margin-top:0.75rem;">';
+    gptHtml += '<div class="cvg-detail-row"><span class="dr-label">Best Model</span><span class="dr-value">GPT-4o</span></div>';
+    gptHtml += '<div class="cvg-detail-row"><span class="dr-label">Budget Model</span><span class="dr-value">GPT-4o Mini</span></div>';
+    gptHtml += '<div class="cvg-detail-row"><span class="dr-label">Context Window</span><span class="dr-value">128K tokens</span></div>';
+    gptHtml += '<div class="cvg-detail-row"><span class="dr-label">Input Cost</span><span class="dr-value">$2.50/1M tokens</span></div>';
+    gptHtml += '<div class="cvg-detail-row"><span class="dr-label">Output Cost</span><span class="dr-value">$10.00/1M tokens</span></div>';
+    gptHtml += '</div>';
+
+    document.getElementById('cvg-comparison').innerHTML = '<div class="cvg-col">'+claudeHtml+'</div><div class="cvg-col">'+gptHtml+'</div>';
+  }
+
+  window.cvgSelectWf = function(id){
+    activeWf = id;
+    renderWorkflowSelect();
+    renderComparison();
+    cvgRecommend();
+  };
+
+  window.cvgRecommend = function(){
+    var wf = WORKFLOWS.find(function(w){ return w.id===activeWf; });
+    if(!wf) return;
+
+    var budget = document.getElementById('cvg-req-budget').value;
+    var latency = document.getElementById('cvg-req-latency').value;
+    var volume = document.getElementById('cvg-req-volume').value;
+    var docLen = document.getElementById('cvg-req-doclength').value;
+
+    var claudeScore = 0; var gptScore = 0;
+
+    claudeScore += wf.claude.reasoning; gptScore += wf.gpt.reasoning;
+    claudeScore += wf.claude.instructions; gptScore += wf.gpt.instructions;
+    claudeScore += wf.claude.context; gptScore += wf.gpt.context;
+
+    if(budget==='low'){ claudeScore += wf.claude.costEff*1.5; gptScore += wf.gpt.costEff*1.5; }
+    else if(budget==='high'){ claudeScore += wf.claude.reasoning*0.5; gptScore += wf.gpt.reasoning*0.5; }
+    else { claudeScore += wf.claude.costEff; gptScore += wf.gpt.costEff; }
+
+    if(latency==='realtime'){ claudeScore += wf.claude.speed*1.5; gptScore += wf.gpt.speed*1.5; }
+    else if(latency==='batch'){ claudeScore += wf.claude.reasoning*0.3; gptScore += wf.gpt.reasoning*0.3; }
+    else { claudeScore += wf.claude.speed; gptScore += wf.gpt.speed; }
+
+    if(volume==='high'){ claudeScore += wf.claude.costEff*0.5; gptScore += wf.gpt.costEff*0.5; }
+    if(docLen==='long'){ claudeScore += wf.claude.context*0.5; gptScore += wf.gpt.context*0.5; }
+
+    var winner, recModel, recReason;
+    var diff = Math.abs(claudeScore-gptScore);
+    if(diff < 15){
+      winner = 'tie';
+      recModel = 'Both are viable';
+      recReason = 'The scores are very close for your requirements. Test both with your actual prompts and data. For cost optimization, consider Claude 3.5 Sonnet as primary with GPT-4o Mini for simple sub-tasks.';
+    } else if(claudeScore > gptScore){
+      winner = 'claude';
+      if(budget==='low') recModel = 'Claude 3.5 Sonnet';
+      else if(budget==='high') recModel = 'Claude 4 Opus';
+      else recModel = 'Claude 3.5 Sonnet';
+      recReason = wf.winReason || 'Claude scores higher across your requirement dimensions.';
+      if(budget==='low') recReason += ' Claude 3.5 Sonnet provides the best quality-to-cost ratio. Enable prompt caching to further reduce input costs by up to 90%.';
+      if(latency==='realtime') recReason += ' For real-time use, Claude 3.5 Sonnet is recommended over Claude 4 Opus due to faster response times.';
+    } else {
+      winner = 'gpt';
+      if(budget==='low') recModel = 'GPT-4o Mini';
+      else recModel = 'GPT-4o';
+      recReason = wf.gptNotes;
+      if(budget==='low') recReason += ' GPT-4o Mini at $0.15/$0.60 per million tokens is the most cost-effective option for this workflow type.';
+    }
+
+    var colors = { claude:'var(--accent)', gpt:'#a855f7', tie:'#eab308' };
+    var labels = { claude:'Claude Recommended', gpt:'GPT Recommended', tie:'Both Viable' };
+
+    document.getElementById('cvg-recommendation').innerHTML = '<h3>Recommendation</h3>'
+      +'<div class="cvg-rec-winner" style="color:'+colors[winner]+';">'+labels[winner]+(recModel!==' '?' &mdash; '+recModel:'')+'</div>'
+      +'<div class="cvg-rec-result">'+recReason+'</div>'
+      +'<div style="margin-top:0.75rem;font-size:0.78rem;color:var(--text-muted);">Score: Claude '+Math.round(claudeScore)+' vs GPT '+Math.round(gptScore)+' (based on '+wf.name+' workflow with your requirements)</div>';
+  };
+
+  window.cvgCalcCost = function(){
+    var inputTok = parseInt(document.getElementById('cvg-cost-input').value) || 0;
+    var outputTok = parseInt(document.getElementById('cvg-cost-output').value) || 0;
+    var reqs = parseInt(document.getElementById('cvg-cost-reqs').value) || 0;
+    var days = parseInt(document.getElementById('cvg-cost-days').value) || 0;
+    var totalReqs = reqs * days;
+
+    var rows = MODELS.map(function(m){
+      var inCost = (inputTok * totalReqs / 1000000) * m.inputCost;
+      var outCost = (outputTok * totalReqs / 1000000) * m.outputCost;
+      return { name:m.name, family:m.family, inCost:inCost, outCost:outCost, total:inCost+outCost };
+    });
+
+    var minCost = Math.min.apply(null, rows.map(function(r){ return r.total; }));
+
+    var html = '<table class="cvg-cost-table">'
+      +'<thead><tr><th>Model</th><th>Input Cost</th><th>Output Cost</th><th>Total ('+fmt(totalReqs)+' reqs)</th><th>Per Request</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      var isCheapest = r.total===minCost && r.total > 0;
+      html += '<tr><td>'+r.name+'</td><td>$'+r.inCost.toFixed(2)+'</td><td>$'+r.outCost.toFixed(2)+'</td>'
+        +'<td class="'+(isCheapest?'cheapest':'')+'">$'+r.total.toFixed(2)+(isCheapest?' (cheapest)':'')+'</td>'
+        +'<td>$'+(totalReqs>0?(r.total/totalReqs).toFixed(4):'0.0000')+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">Based on published API pricing. Claude prompt caching can reduce input costs by up to 90% for repeated system prompts. Batch API pricing is 50% off for both providers.</p>';
+
+    document.getElementById('cvg-cost-result').innerHTML = html;
+
+    var wf = WORKFLOWS.find(function(w){ return w.id===activeWf; });
+    document.getElementById('cvg-summary').innerHTML = '<div class="cvg-summary-card"><div class="sc-val">'+fmt(totalReqs)+'</div><div class="sc-label">Total Requests</div></div>'
+      +'<div class="cvg-summary-card"><div class="sc-val">'+fmt(inputTok+outputTok)+'</div><div class="sc-label">Tokens per Request</div></div>'
+      +'<div class="cvg-summary-card"><div class="sc-val">$'+minCost.toFixed(2)+'</div><div class="sc-label">Cheapest Option</div></div>'
+      +'<div class="cvg-summary-card"><div class="sc-val">'+wf.name+'</div><div class="sc-label">Workflow Type</div></div>';
+  };
+
+  renderWorkflowSelect();
+  renderComparison();
+  cvgRecommend();
+  cvgCalcCost();
+})();
+</script>
+</body>
+</html>

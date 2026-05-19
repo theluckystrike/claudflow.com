@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Prompt Chaining Patterns &mdash; Interactive Chain Builder &amp; Code Generator | ClaudFlow</title>
+  <meta name="description" content="Build AI prompt chains with 5 proven patterns: Sequential, Parallel, Conditional, Loop, and Map-Reduce. Interactive builder with data flow visualization and Python/JS code generation.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Prompt Chaining Patterns — Interactive Chain Builder &amp; Code Generator">
+  <meta property="og:description" content="Build AI prompt chains with 5 proven patterns: Sequential, Parallel, Conditional, Loop, and Map-Reduce. Interactive builder with code generation.">
+  <meta property="og:url" content="https://claudflow.com/guides/prompt-chaining-patterns.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Prompt Chaining Patterns — Interactive Chain Builder &amp; Code Generator">
+  <meta name="twitter:description" content="Build AI prompt chains with 5 proven patterns. Interactive builder with data flow visualization and code generation.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/guides/prompt-chaining-patterns.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/prompt-chaining-patterns.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/prompt-chaining-patterns.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Prompt Chaining Patterns — Interactive Chain Builder & Code Generator",
+    "description": "Build AI prompt chains with 5 proven patterns: Sequential, Parallel, Conditional, Loop, and Map-Reduce. Interactive builder with data flow visualization and Python/JS code generation.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "mainEntityOfPage": "https://claudflow.com/guides/prompt-chaining-patterns.html",
+    "image": "https://claudflow.com/assets/og-image.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is prompt chaining and why is it better than single prompts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Prompt chaining breaks a complex task into multiple focused steps where each prompt specializes in one sub-task. The output of each step feeds as input to the next. This produces significantly better results than a single monolithic prompt because each step can apply focused reasoning, the context stays manageable, and you can validate output at each stage before proceeding."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the five main prompt chaining patterns?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The five main patterns are: Sequential (linear A to B to C pipeline), Parallel (fan-out to multiple prompts running simultaneously then merge), Conditional (branching based on classification or quality check results), Loop (retry with feedback until output meets criteria), and Map-Reduce (split input into chunks, process each with the same prompt, then aggregate results)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I implement prompt chaining in Python?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use the Anthropic Python SDK to call claude.messages.create() for each step. Store the output of each call in a variable and pass it as part of the user message to the next call. For parallel patterns, use asyncio.gather() to run multiple API calls concurrently. The interactive code generator on this page produces ready-to-run Python code for all five patterns."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I choose the right chaining pattern for my use case?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Choose Sequential for tasks with clear step-by-step dependencies like content creation pipelines. Choose Parallel when independent aspects need analysis, like code review. Choose Conditional when different inputs require different processing paths. Choose Loop when output quality is variable and may need retry. Choose Map-Reduce when processing long documents or large datasets that exceed context limits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I combine multiple chaining patterns in one workflow?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Production workflows typically combine patterns. For example, a document analysis pipeline might use Conditional branching at the start to classify the document type, then Map-Reduce to process it in chunks, with Parallel analysis on each chunk, and a Loop validation step on the final output. The interactive builder on this page lets you add steps from any pattern and see the combined data flow."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .chain-builder { max-width:900px; margin:0 auto; padding:0 1.5rem; }
+    .chain-tool { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; margin-bottom:2rem; }
+    .chain-tool h3 { color:var(--accent); font-size:1.15rem; margin-bottom:1rem; }
+    .chain-steps { margin-bottom:1rem; }
+    .chain-step { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; margin-bottom:0.5rem; display:grid; grid-template-columns:auto 1fr auto; gap:0.75rem; align-items:start; }
+    .chain-step .step-num { background:var(--accent); color:#000; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; flex-shrink:0; margin-top:0.15rem; }
+    .chain-step .step-fields { display:flex; flex-direction:column; gap:0.4rem; }
+    .chain-step input, .chain-step textarea, .chain-step select { width:100%; padding:0.4rem 0.5rem; background:var(--bg-card); border:1px solid var(--border); border-radius:4px; color:var(--text); font-family:var(--font-body); font-size:0.85rem; }
+    .chain-step textarea { min-height:50px; resize:vertical; }
+    .chain-step input:focus, .chain-step textarea:focus { outline:none; border-color:var(--accent); }
+    .chain-step .step-remove { background:none; border:none; color:#e11d48; cursor:pointer; font-size:1.1rem; padding:0.2rem; }
+    .chain-step .field-row { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+    @media(max-width:600px){ .chain-step .field-row { grid-template-columns:1fr; } }
+    .chain-controls { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem; }
+    .chain-flow { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-bottom:1rem; min-height:60px; overflow-x:auto; }
+    .chain-flow .flow-blocks { display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem; }
+    .chain-flow .flow-block { background:var(--bg-card); border:1px solid var(--border); border-radius:4px; padding:0.3rem 0.6rem; font-size:0.78rem; white-space:nowrap; }
+    .chain-flow .flow-arrow { color:var(--accent); font-size:0.9rem; }
+    .chain-flow .flow-block.type-input { border-color:#22c55e; }
+    .chain-flow .flow-block.type-prompt { border-color:#06B6D4; }
+    .chain-flow .flow-block.type-condition { border-color:#eab308; }
+    .chain-flow .flow-block.type-transform { border-color:#a855f7; }
+    .chain-flow .flow-block.type-output { border-color:#ef4444; }
+    .chain-flow .flow-block.type-loop { border-color:#f97316; }
+    .chain-flow .flow-block.type-parallel { border-color:#06B6D4; border-style:dashed; }
+    .code-output { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; margin-top:1rem; overflow-x:auto; font-family:var(--font-display); font-size:0.82rem; white-space:pre-wrap; max-height:400px; overflow-y:auto; display:none; }
+    .code-output.visible { display:block; }
+    .code-tabs { display:flex; gap:0.5rem; margin-top:1rem; }
+    .code-tabs button { padding:0.35rem 0.75rem; }
+    .code-tabs button.active { background:var(--accent); color:#000; border-color:var(--accent); }
+    .pattern-lib { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0.75rem; margin-bottom:1.5rem; }
+    .pattern-card { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; cursor:pointer; transition:border-color 0.2s; text-align:center; }
+    .pattern-card:hover { border-color:var(--accent); }
+    .pattern-card .pname { font-size:0.9rem; font-weight:600; margin-bottom:0.25rem; }
+    .pattern-card .pdesc { font-size:0.75rem; color:var(--text-muted); }
+    .pattern-card.active { border-color:var(--accent); background:rgba(6,182,212,0.08); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:900px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/guides/" style="color:var(--accent);text-decoration:none;">Guides</a> &rsaquo;
+      <span style="color:var(--text-muted);">Prompt Chaining Patterns</span>
+    </nav>
+
+    <section style="margin-bottom:2rem;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Prompt Chaining Patterns</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;margin-bottom:0.5rem;">Interactive chain builder with data flow visualization and code generation for Python and JavaScript.</p>
+      <p style="color:var(--text-muted);font-size:0.88rem;">May 25, 2026 &middot; By <a href="/about.html" style="color:var(--accent);text-decoration:none;">Michael Lip</a></p>
+    </section>
+  </main>
+
+  <div class="chain-builder">
+    <div class="chain-tool">
+      <h3>Pattern Library</h3>
+      <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">Select a pattern to load its template, or build from scratch.</p>
+      <div class="pattern-lib" id="pattern-lib">
+        <div class="pattern-card" onclick="loadPattern('sequential')" data-pattern="sequential">
+          <div class="pname">Sequential</div>
+          <div class="pdesc">A &rarr; B &rarr; C linear pipeline</div>
+        </div>
+        <div class="pattern-card" onclick="loadPattern('parallel')" data-pattern="parallel">
+          <div class="pname">Parallel</div>
+          <div class="pdesc">Fan-out, process, merge</div>
+        </div>
+        <div class="pattern-card" onclick="loadPattern('conditional')" data-pattern="conditional">
+          <div class="pname">Conditional</div>
+          <div class="pdesc">Branch on classification</div>
+        </div>
+        <div class="pattern-card" onclick="loadPattern('loop')" data-pattern="loop">
+          <div class="pname">Loop</div>
+          <div class="pdesc">Retry until criteria met</div>
+        </div>
+        <div class="pattern-card" onclick="loadPattern('mapreduce')" data-pattern="mapreduce">
+          <div class="pname">Map-Reduce</div>
+          <div class="pdesc">Chunk, process, aggregate</div>
+        </div>
+      </div>
+
+      <h3>Chain Steps</h3>
+      <div class="chain-steps" id="chain-steps"></div>
+      <div class="chain-controls">
+        <button class="btn" onclick="addStep('input')">+ Input</button>
+        <button class="btn" onclick="addStep('prompt')">+ Prompt</button>
+        <button class="btn" onclick="addStep('condition')">+ Condition</button>
+        <button class="btn" onclick="addStep('transform')">+ Transform</button>
+        <button class="btn" onclick="addStep('output')">+ Output</button>
+        <button class="btn" onclick="addStep('loop')">+ Loop</button>
+        <button class="btn" onclick="addStep('parallel')">+ Parallel</button>
+        <button class="btn" style="margin-left:auto;" onclick="clearSteps()">Clear All</button>
+      </div>
+
+      <h3>Data Flow Visualization</h3>
+      <div class="chain-flow" id="chain-flow">
+        <div class="flow-blocks" id="flow-blocks">
+          <span style="color:var(--text-muted);font-size:0.85rem;">Add steps above to see the data flow.</span>
+        </div>
+      </div>
+
+      <h3>Generate Code</h3>
+      <div class="code-tabs" id="code-tabs">
+        <button class="btn active" onclick="genCode('python')">Python</button>
+        <button class="btn" onclick="genCode('javascript')">JavaScript</button>
+        <button class="btn" onclick="copyCode()">Copy</button>
+      </div>
+      <div class="code-output" id="code-output"></div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>Understanding Prompt Chaining Patterns</h2>
+
+    <p>Prompt chaining is the practice of breaking a complex AI task into multiple focused steps, where the output of each step feeds as input to the next. Instead of asking a single prompt to handle everything at once, you decompose the problem into manageable sub-tasks, each with its own specialized prompt. This produces dramatically better results because each step can apply focused reasoning within a bounded context, and you can validate intermediate outputs before they propagate through the pipeline.</p>
+
+    <p>The concept mirrors software engineering principles. Just as functions should do one thing well, prompts should focus on one sub-task. A monolithic prompt that tries to research, outline, write, edit, and format a blog post will produce mediocre output across all dimensions. A five-step chain with dedicated prompts for each stage produces noticeably better results at every stage because each prompt can devote its entire context window and reasoning capacity to a single concern.</p>
+
+    <h2>The Five Core Patterns</h2>
+
+    <h3>1. Sequential Pattern</h3>
+
+    <p>The Sequential pattern is the simplest and most common. Steps execute one after another in a linear pipeline, with each step consuming the output of the previous step. This is the natural structure for content creation, document processing, and any task with clear dependencies between stages. A typical sequential chain for blog writing might look like: Research Topic, Generate Outline, Write Draft, Edit for Clarity, Optimize for SEO. Each step has exactly one input and one output, making the flow easy to reason about and debug.</p>
+
+    <p>The key advantage of sequential chains is predictability. When something goes wrong, you can trace the failure to a specific step by examining the intermediate outputs. The key limitation is latency: every step must wait for the previous one to complete, so the total time is the sum of all step durations. Use sequential chains when steps have genuine dependencies and the output of one step is required input for the next.</p>
+
+    <h3>2. Parallel Pattern</h3>
+
+    <p>The Parallel pattern fans out from a single input to multiple prompts that run simultaneously, then merges their outputs back into a unified result. This is the ideal structure for analysis tasks where different aspects of the input need independent examination. Code review is the canonical example: bug analysis, security scanning, and performance auditing can all run on the same input without depending on each other's results.</p>
+
+    <p>Parallel chains reduce latency because the total time equals the duration of the slowest branch rather than the sum of all branches. They also improve quality because each branch can use a prompt specialized for its specific concern. The merge step at the end is critical. It must deduplicate overlapping findings, reconcile contradictions between branches, and prioritize the combined results. The merge prompt is often the most complex prompt in the entire chain. For prompt templates to use in parallel branches, <a href="https://claudhq.com">ClaudHQ</a> offers specialized analysis templates for different code review concerns.</p>
+
+    <h3>3. Conditional Pattern</h3>
+
+    <p>The Conditional pattern adds branching logic to your chain. A classifier step analyzes the input and routes it to different downstream chains based on the classification result. This enables one workflow to handle multiple input types without requiring separate pipelines for each type. Customer support automation is a clear example: classify the incoming message as billing, technical, feature request, or complaint, then route to the appropriate handling chain.</p>
+
+    <p>The critical success factor for conditional chains is the classifier prompt. It must produce deterministic, machine-parseable output. Do not ask the model to categorize the input in natural language. Instead, constrain its output to exactly one value from a predefined list. This eliminates ambiguity in the routing logic. For example, instruct the model to respond with exactly one word from the list: billing, technical, feature, complaint. Anything more complex introduces parsing failures at the branching point.</p>
+
+    <h3>4. Loop Pattern</h3>
+
+    <p>The Loop pattern adds retry logic to handle the reality that AI outputs are not always correct on the first attempt. A generation step produces output, a validation step evaluates it against quality criteria, and if the output fails validation, it loops back to the generation step with specific feedback about what needs to change. This continues until the output passes validation or a maximum retry count is reached.</p>
+
+    <p>Two details are essential for reliable loop patterns. First, always set a maximum retry count. Three attempts is a reasonable default. Without a cap, a failing validation loop consumes tokens indefinitely. Second, make the feedback specific. Do not send generic retry messages. Instead, tell the generation step exactly what failed: the output was 450 words but the minimum is 800, section 3 is missing examples, the tone shifted from professional to casual in paragraph 4. Specific feedback enables targeted corrections rather than random regeneration.</p>
+
+    <h3>5. Map-Reduce Pattern</h3>
+
+    <p>The Map-Reduce pattern handles inputs that exceed context window limits. A splitting step divides the input into manageable chunks, a mapping step processes each chunk with the same prompt, and a reducing step aggregates the chunk results into a final output. This is essential for long document analysis, large dataset processing, and any task where the input is too large for a single API call.</p>
+
+    <p>The splitting strategy determines the quality of the final output. Naive character-boundary splitting breaks sentences, paragraphs, and logical units. Better approaches split on paragraph or section boundaries with 200-token overlaps between adjacent chunks to prevent context loss at boundaries. The reduce step must handle deduplication of findings that appear in overlapping regions and reconcile any contradictions between chunks. Map-Reduce scales linearly with input size and parallelizes naturally because chunk processing is independent. For JSON data processing within Map-Reduce workflows, <a href="https://kappafy.com">Kappafy</a> provides validation and transformation utilities.</p>
+
+    <h2>Combining Patterns</h2>
+
+    <p>Production workflows rarely use a single pattern in isolation. A real document analysis pipeline might use Conditional branching at the start to classify the document type, Map-Reduce to process it in chunks, Parallel analysis on each chunk for different concerns, and a Loop validation step on the final output. The interactive chain builder above lets you mix steps from any pattern to design hybrid workflows. The code generator handles the orchestration logic regardless of which patterns you combine.</p>
+
+    <p>When combining patterns, keep the overall structure as flat as possible. Deeply nested chains with loops inside parallels inside conditionals become extremely difficult to debug. A better approach is to encapsulate complex sub-workflows as named functions and compose them at a higher level. This is exactly how the generated Python and JavaScript code is structured: each pattern becomes a function, and the main workflow composes them.</p>
+
+    <h2>Code Generation</h2>
+
+    <p>The interactive builder generates production-ready code for both Python and JavaScript. The Python output uses the Anthropic SDK with asyncio for parallel patterns and standard exception handling for error recovery. The JavaScript output uses the Anthropic SDK with Promise.all for parallel patterns and try-catch for error handling. Both outputs include comments explaining each step and placeholder prompt text that you replace with your actual prompts.</p>
+
+    <p>The generated code is designed as a starting point. It handles the orchestration logic, error handling, and data passing between steps. You customize it by replacing the placeholder prompt text, adjusting parameters like model selection and temperature, and adding your own input/output formatting. For API configuration and testing, <a href="https://claudkit.com">ClaudKit</a> provides tools for building and validating Claude API requests before integrating them into your chain code. For timestamp-based logging and monitoring of chain execution, <a href="https://epochpilot.com">EpochPilot</a> offers developer timestamp utilities.</p>
+
+    <h2>Practical Implementation Advice</h2>
+
+    <p>Start with the simplest pattern that could work for your use case. A three-step sequential chain that runs reliably is better than an elaborate branching workflow that fails in production. Add complexity only when you observe specific failures that a more advanced pattern would solve. If you see quality inconsistencies, add a Loop validation step. If latency is too high, introduce Parallel processing for independent steps. If different inputs need different handling, add Conditional branching.</p>
+
+    <p>Document the expected input and output format for every step. The most common cause of chain failures is format mismatches between adjacent steps: one step produces a bullet list but the next expects numbered items, or one step includes a conversational preamble that the next step cannot parse. Explicit format contracts between steps prevent most chain failures. This is why the chain builder includes input source and output format fields for every step. Use <a href="/tools/workflow-builder.html">the visual workflow designer</a> to map out your chain visually before writing code.</p>
+
+    <p>Version your chains. When you modify prompt text or adjust chain structure, keep the previous version accessible. Prompt engineering is empirical, and changes that seem like improvements sometimes degrade output quality on edge cases you did not test. Being able to roll back to a previous version is invaluable when an optimization makes things worse. The <a href="https://zovo.one/tools">Zovo Tools</a> network provides utilities for the entire lifecycle of workflow development from design through deployment.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What is prompt chaining and why is it better than single prompts?</summary>
+      <p>Prompt chaining breaks a complex task into multiple focused steps where each prompt specializes in one sub-task. The output of each step feeds as input to the next. This produces significantly better results than a single monolithic prompt because each step can apply focused reasoning, the context stays manageable, and you can validate output at each stage before proceeding.</p>
+    </details>
+
+    <details>
+      <summary>What are the five main prompt chaining patterns?</summary>
+      <p>The five main patterns are: Sequential (linear A to B to C pipeline), Parallel (fan-out to multiple prompts running simultaneously then merge), Conditional (branching based on classification or quality check results), Loop (retry with feedback until output meets criteria), and Map-Reduce (split input into chunks, process each with the same prompt, then aggregate results).</p>
+    </details>
+
+    <details>
+      <summary>How do I implement prompt chaining in Python?</summary>
+      <p>Use the Anthropic Python SDK to call claude.messages.create() for each step. Store the output of each call in a variable and pass it as part of the user message to the next call. For parallel patterns, use asyncio.gather() to run multiple API calls concurrently. The interactive code generator on this page produces ready-to-run Python code for all five patterns.</p>
+    </details>
+
+    <details>
+      <summary>How do I choose the right chaining pattern for my use case?</summary>
+      <p>Choose Sequential for tasks with clear step-by-step dependencies like content creation pipelines. Choose Parallel when independent aspects need analysis. Choose Conditional when different inputs require different processing paths. Choose Loop when output quality is variable and may need retry. Choose Map-Reduce when processing long documents that exceed context limits.</p>
+    </details>
+
+    <details>
+      <summary>Can I combine multiple chaining patterns in one workflow?</summary>
+      <p>Yes. Production workflows typically combine patterns. For example, a document analysis pipeline might use Conditional branching at the start to classify the document type, then Map-Reduce to process it in chunks, with Parallel analysis on each chunk, and a Loop validation step on the final output. The interactive builder lets you add steps from any pattern and see the combined data flow.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/">ClaudFlow Home &mdash; Canvas Builder</a></li>
+          <li><a href="/answers/claude-error-troubleshooting.html">Claude Error Troubleshooting</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+          <li><a href="/blog/ai-prompt-chaining-advanced.html">Advanced Prompt Chaining</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/workflow-automation-patterns.html">Workflow Automation Patterns</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var steps = [];
+  var currentLang = 'python';
+
+  var PATTERNS = {
+    sequential: [
+      {type:'input', label:'User Input', prompt:'Define the starting data, context, and requirements.', inputSource:'user', outputFormat:'text', next:'step2'},
+      {type:'prompt', label:'Process Step 1', prompt:'Analyze the input and produce a structured intermediate result. Focus on extracting key elements and organizing them.', inputSource:'step1', outputFormat:'structured', next:'step3'},
+      {type:'prompt', label:'Process Step 2', prompt:'Take the structured result from Step 1 and refine it. Add detail, fix inconsistencies, and prepare for final formatting.', inputSource:'step2', outputFormat:'structured', next:'step4'},
+      {type:'output', label:'Final Output', prompt:'Format the refined result into the final deliverable format. Include all required sections and formatting.', inputSource:'step3', outputFormat:'final', next:''}
+    ],
+    parallel: [
+      {type:'input', label:'Shared Input', prompt:'Define the input data that will be analyzed from multiple perspectives simultaneously.', inputSource:'user', outputFormat:'text', next:'step2,step3,step4'},
+      {type:'parallel', label:'Branch A Analysis', prompt:'Analyze the input from perspective A. Focus exclusively on this dimension. Produce findings with evidence.', inputSource:'step1', outputFormat:'findings', next:'step5'},
+      {type:'parallel', label:'Branch B Analysis', prompt:'Analyze the input from perspective B. Focus exclusively on this dimension. Produce findings with evidence.', inputSource:'step1', outputFormat:'findings', next:'step5'},
+      {type:'parallel', label:'Branch C Analysis', prompt:'Analyze the input from perspective C. Focus exclusively on this dimension. Produce findings with evidence.', inputSource:'step1', outputFormat:'findings', next:'step5'},
+      {type:'transform', label:'Merge Results', prompt:'Combine findings from all parallel branches. Deduplicate overlapping findings. Reconcile contradictions. Sort by priority.', inputSource:'step2,step3,step4', outputFormat:'merged', next:'step6'},
+      {type:'output', label:'Unified Report', prompt:'Format the merged findings into a final report with executive summary, prioritized findings, and recommendations.', inputSource:'step5', outputFormat:'report', next:''}
+    ],
+    conditional: [
+      {type:'input', label:'Input to Classify', prompt:'Provide the input that needs to be classified and routed to the appropriate handler.', inputSource:'user', outputFormat:'text', next:'step2'},
+      {type:'condition', label:'Classifier', prompt:'Classify the input into exactly one category. Respond with ONLY one word: category_a, category_b, or category_c.', inputSource:'step1', outputFormat:'category', next:'step3|step4|step5'},
+      {type:'prompt', label:'Category A Handler', prompt:'Process the input using the Category A approach. This path is specialized for inputs classified as category_a.', inputSource:'step1', outputFormat:'result', next:'step6'},
+      {type:'prompt', label:'Category B Handler', prompt:'Process the input using the Category B approach. This path is specialized for inputs classified as category_b.', inputSource:'step1', outputFormat:'result', next:'step6'},
+      {type:'prompt', label:'Category C Handler', prompt:'Process the input using the Category C approach. This path is specialized for inputs classified as category_c.', inputSource:'step1', outputFormat:'result', next:'step6'},
+      {type:'output', label:'Final Result', prompt:'Format the handler output into the standard output format regardless of which category path was taken.', inputSource:'step3|step4|step5', outputFormat:'final', next:''}
+    ],
+    loop: [
+      {type:'input', label:'Generation Input', prompt:'Define the task requirements, constraints, quality criteria, and maximum retry count (default: 3).', inputSource:'user', outputFormat:'text', next:'step2'},
+      {type:'prompt', label:'Generate Output', prompt:'Produce output that meets all specified requirements. If feedback from a previous attempt is provided, address each point specifically.', inputSource:'step1+feedback', outputFormat:'draft', next:'step3'},
+      {type:'condition', label:'Validate Quality', prompt:'Check the output against all quality criteria. For each criterion: PASS or FAIL with specific reason. If any FAIL and retries remain, provide specific feedback.', inputSource:'step2', outputFormat:'pass|fail+feedback', next:'step2|step4'},
+      {type:'output', label:'Validated Output', prompt:'The output has passed all quality checks. Format as final deliverable.', inputSource:'step2', outputFormat:'final', next:''}
+    ],
+    mapreduce: [
+      {type:'input', label:'Large Input Data', prompt:'Provide the full input document or dataset. Specify chunk size preference and overlap strategy.', inputSource:'user', outputFormat:'text', next:'step2'},
+      {type:'transform', label:'Split into Chunks', prompt:'Divide the input into chunks of approximately 2000-3000 tokens. Split on paragraph/section boundaries. Add 200-token overlap between adjacent chunks.', inputSource:'step1', outputFormat:'chunks[]', next:'step3'},
+      {type:'prompt', label:'Process Each Chunk', prompt:'Apply the analysis prompt to this individual chunk. Produce structured findings. Note the chunk position for context during aggregation.', inputSource:'step2[i]', outputFormat:'chunk_result', next:'step4'},
+      {type:'transform', label:'Aggregate Results', prompt:'Combine results from all chunks. Deduplicate findings from overlapping regions. Reconcile contradictions. Maintain document-order context.', inputSource:'step3[]', outputFormat:'aggregated', next:'step5'},
+      {type:'output', label:'Final Analysis', prompt:'Synthesize the aggregated chunk results into a comprehensive final analysis covering the entire input.', inputSource:'step4', outputFormat:'report', next:''}
+    ]
+  };
+
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  window.loadPattern = function(name){
+    var tpl = PATTERNS[name];
+    if(!tpl) return;
+    steps = JSON.parse(JSON.stringify(tpl));
+    document.querySelectorAll('.pattern-card').forEach(function(c){ c.classList.toggle('active', c.getAttribute('data-pattern')===name); });
+    renderSteps();
+    renderFlow();
+    document.getElementById('code-output').classList.remove('visible');
+  };
+
+  window.addStep = function(type){
+    var labels = {input:'Input',prompt:'AI Prompt',condition:'Condition',transform:'Transform',output:'Output',loop:'Loop Gate',parallel:'Parallel Branch'};
+    steps.push({type:type, label:labels[type]||type, prompt:'', inputSource:'', outputFormat:'text', next:''});
+    renderSteps();
+    renderFlow();
+  };
+
+  window.clearSteps = function(){
+    steps = [];
+    document.querySelectorAll('.pattern-card').forEach(function(c){ c.classList.remove('active'); });
+    renderSteps();
+    renderFlow();
+    document.getElementById('code-output').classList.remove('visible');
+  };
+
+  window.removeStep = function(idx){
+    steps.splice(idx,1);
+    renderSteps();
+    renderFlow();
+  };
+
+  function renderSteps(){
+    var container = document.getElementById('chain-steps');
+    var html = '';
+    for(var i=0;i<steps.length;i++){
+      var s = steps[i];
+      html += '<div class="chain-step">';
+      html += '<div class="step-num">'+(i+1)+'</div>';
+      html += '<div class="step-fields">';
+      html += '<input type="text" value="'+esc(s.label)+'" placeholder="Step label" onchange="updateStep('+i+\',\'label\',this.value)">';
+      html += '<div class="field-row">';
+      html += '<select onchange="updateStep('+i+\',\'type\',this.value)">';
+      var types = ['input','prompt','condition','transform','output','loop','parallel'];
+      for(var t=0;t<types.length;t++){
+        html += '<option value="'+types[t]+'"'+(s.type===types[t]?' selected':'')+'>'+types[t].charAt(0).toUpperCase()+types[t].slice(1)+'</option>';
+      }
+      html += '</select>';
+      html += '<input type="text" value="'+esc(s.outputFormat)+'" placeholder="Output format" onchange="updateStep('+i+\',\'outputFormat\',this.value)">';
+      html += '</div>';
+      html += '<textarea placeholder="Prompt template..." onchange="updateStep('+i+\',\'prompt\',this.value)">'+esc(s.prompt)+'</textarea>';
+      html += '<div class="field-row">';
+      html += '<input type="text" value="'+esc(s.inputSource)+'" placeholder="Input source (e.g. step1)" onchange="updateStep('+i+\',\'inputSource\',this.value)">';
+      html += '<input type="text" value="'+esc(s.next)+'" placeholder="Next step (e.g. step3)" onchange="updateStep('+i+\',\'next\',this.value)">';
+      html += '</div>';
+      html += '</div>';
+      html += '<button class="step-remove" onclick="removeStep('+i+')">&times;</button>';
+      html += '</div>';
+    }
+    container.innerHTML = html || '<p style="color:var(--text-muted);font-size:0.88rem;padding:0.5rem;">No steps yet. Select a pattern or add steps manually.</p>';
+  }
+
+  window.updateStep = function(idx, field, value){
+    if(steps[idx]) steps[idx][field] = value;
+    if(field==='type'||field==='label') renderFlow();
+  };
+
+  function renderFlow(){
+    var container = document.getElementById('flow-blocks');
+    if(steps.length===0){
+      container.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">Add steps above to see the data flow.</span>';
+      return;
+    }
+    var html = '';
+    for(var i=0;i<steps.length;i++){
+      if(i>0) html += '<span class="flow-arrow">&rarr;</span>';
+      html += '<span class="flow-block type-'+steps[i].type+'">'+(i+1)+'. '+esc(steps[i].label)+'</span>';
+    }
+    container.innerHTML = html;
+  }
+
+  window.genCode = function(lang){
+    currentLang = lang;
+    document.querySelectorAll('#code-tabs button').forEach(function(b,i){
+      b.classList.toggle('active', (i===0&&lang==='python')||(i===1&&lang==='javascript'));
+    });
+
+    var code = '';
+    if(lang==='python'){
+      code = generatePython();
+    } else {
+      code = generateJS();
+    }
+
+    var output = document.getElementById('code-output');
+    output.textContent = code;
+    output.classList.add('visible');
+  };
+
+  function generatePython(){
+    if(steps.length===0) return '# Add steps to your chain first.';
+    var hasParallel = steps.some(function(s){ return s.type==='parallel'; });
+    var hasLoop = steps.some(function(s){ return s.type==='loop'||s.type==='condition'; });
+
+    var c = 'import anthropic\n';
+    if(hasParallel) c += 'import asyncio\n';
+    c += '\nclient = anthropic.Anthropic()\n';
+    c += '\ndef call_claude(prompt: str, context: str = "") -> str:\n';
+    c += '    """Call Claude API with a prompt and optional context."""\n';
+    c += '    messages = [{"role": "user", "content": f"{context}\\n\\n{prompt}" if context else prompt}]\n';
+    c += '    response = client.messages.create(\n';
+    c += '        model="claude-sonnet-4-20250514",\n';
+    c += '        max_tokens=4096,\n';
+    c += '        messages=messages\n';
+    c += '    )\n';
+    c += '    return response.content[0].text\n\n';
+
+    if(hasParallel){
+      c += 'async def call_claude_async(prompt: str, context: str = "") -> str:\n';
+      c += '    """Async wrapper for parallel execution."""\n';
+      c += '    return call_claude(prompt, context)\n\n';
+    }
+
+    c += 'def run_chain(user_input: str) -> str:\n';
+    c += '    """Execute the prompt chain."""\n';
+    c += '    results = {}\n\n';
+
+    var parallelGroup = [];
+    for(var i=0;i<steps.length;i++){
+      var s = steps[i];
+      var stepId = 'step_'+(i+1);
+      var promptText = s.prompt.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+
+      if(s.type==='parallel'){
+        parallelGroup.push({idx:i, step:s, id:stepId, prompt:promptText});
+        if(i<steps.length-1 && steps[i+1].type==='parallel') continue;
+        c += '    # Parallel branches\n';
+        c += '    async def run_parallel():\n';
+        c += '        return await asyncio.gather(\n';
+        for(var p=0;p<parallelGroup.length;p++){
+          c += '            call_claude_async("'+parallelGroup[p].prompt+'", results.get("'+parallelGroup[p].step.inputSource+'", user_input))';
+          c += p<parallelGroup.length-1?',\n':'\n';
+        }
+        c += '        )\n';
+        c += '    parallel_results = asyncio.run(run_parallel())\n';
+        for(var p=0;p<parallelGroup.length;p++){
+          c += '    results["'+parallelGroup[p].id+'"] = parallel_results['+p+']\n';
+        }
+        c += '\n';
+        parallelGroup = [];
+        continue;
+      }
+
+      if(s.type==='input'){
+        c += '    # Step '+(i+1)+': '+s.label+'\n';
+        c += '    results["'+stepId+'"] = user_input\n\n';
+      } else if(s.type==='condition'||s.type==='loop'){
+        c += '    # Step '+(i+1)+': '+s.label+' (validation/condition)\n';
+        c += '    max_retries = 3\n';
+        c += '    for attempt in range(max_retries):\n';
+        c += '        results["'+stepId+'"] = call_claude("'+promptText+'", results.get("'+(s.inputSource||stepId)+'", user_input))\n';
+        c += '        if "PASS" in results["'+stepId+'"].upper():\n';
+        c += '            break\n';
+        c += '        # Retry with feedback if not passing\n\n';
+      } else {
+        c += '    # Step '+(i+1)+': '+s.label+'\n';
+        c += '    results["'+stepId+'"] = call_claude(\n';
+        c += '        "'+promptText+'",\n';
+        c += '        results.get("'+(s.inputSource||'step_'+i)+'", user_input)\n';
+        c += '    )\n\n';
+      }
+    }
+
+    c += '    return results["step_'+steps.length+'"]\n\n';
+    c += '\nif __name__ == "__main__":\n';
+    c += '    user_input = input("Enter input: ")\n';
+    c += '    result = run_chain(user_input)\n';
+    c += '    print(result)\n';
+    return c;
+  }
+
+  function generateJS(){
+    if(steps.length===0) return '// Add steps to your chain first.';
+    var c = 'import Anthropic from "@anthropic-ai/sdk";\n\n';
+    c += 'const client = new Anthropic();\n\n';
+    c += 'async function callClaude(prompt, context = "") {\n';
+    c += '  const message = context ? `${context}\\n\\n${prompt}` : prompt;\n';
+    c += '  const response = await client.messages.create({\n';
+    c += '    model: "claude-sonnet-4-20250514",\n';
+    c += '    max_tokens: 4096,\n';
+    c += '    messages: [{ role: "user", content: message }]\n';
+    c += '  });\n';
+    c += '  return response.content[0].text;\n';
+    c += '}\n\n';
+
+    c += 'async function runChain(userInput) {\n';
+    c += '  const results = {};\n\n';
+
+    var parallelGroup = [];
+    for(var i=0;i<steps.length;i++){
+      var s = steps[i];
+      var stepId = 'step_'+(i+1);
+      var promptText = s.prompt.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n').replace(/`/g,'\\`');
+
+      if(s.type==='parallel'){
+        parallelGroup.push({idx:i, step:s, id:stepId, prompt:promptText});
+        if(i<steps.length-1 && steps[i+1].type==='parallel') continue;
+        c += '  // Parallel branches\n';
+        c += '  const [';
+        for(var p=0;p<parallelGroup.length;p++){
+          c += parallelGroup[p].id;
+          if(p<parallelGroup.length-1) c += ', ';
+        }
+        c += '] = await Promise.all([\n';
+        for(var p=0;p<parallelGroup.length;p++){
+          c += '    callClaude("'+parallelGroup[p].prompt+'", results["'+parallelGroup[p].step.inputSource+'"] || userInput)';
+          c += p<parallelGroup.length-1?',\n':'\n';
+        }
+        c += '  ]);\n';
+        for(var p=0;p<parallelGroup.length;p++){
+          c += '  results["'+parallelGroup[p].id+'"] = '+parallelGroup[p].id+';\n';
+        }
+        c += '\n';
+        parallelGroup = [];
+        continue;
+      }
+
+      if(s.type==='input'){
+        c += '  // Step '+(i+1)+': '+s.label+'\n';
+        c += '  results["'+stepId+'"] = userInput;\n\n';
+      } else if(s.type==='condition'||s.type==='loop'){
+        c += '  // Step '+(i+1)+': '+s.label+' (validation/condition)\n';
+        c += '  const maxRetries = 3;\n';
+        c += '  for (let attempt = 0; attempt < maxRetries; attempt++) {\n';
+        c += '    results["'+stepId+'"] = await callClaude("'+promptText+'", results["'+(s.inputSource||stepId)+'"] || userInput);\n';
+        c += '    if (results["'+stepId+'"].toUpperCase().includes("PASS")) break;\n';
+        c += '  }\n\n';
+      } else {
+        c += '  // Step '+(i+1)+': '+s.label+'\n';
+        c += '  results["'+stepId+'"] = await callClaude(\n';
+        c += '    "'+promptText+'",\n';
+        c += '    results["'+(s.inputSource||'step_'+i)+'"] || userInput\n';
+        c += '  );\n\n';
+      }
+    }
+
+    c += '  return results["step_'+steps.length+'"];\n';
+    c += '}\n\n';
+    c += '// Usage\n';
+    c += 'const result = await runChain("Your input here");\n';
+    c += 'console.log(result);\n';
+    return c;
+  }
+
+  window.copyCode = function(){
+    var output = document.getElementById('code-output');
+    if(!output.classList.contains('visible')) return;
+    var text = output.textContent;
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(text).then(function(){
+        var btns = document.querySelectorAll('#code-tabs button');
+        if(btns[2]){ btns[2].textContent='Copied!'; setTimeout(function(){ btns[2].textContent='Copy'; },1500); }
+      });
+    }
+  };
+
+  renderSteps();
+  renderFlow();
+})();
+</script>
+</body>
+</html>

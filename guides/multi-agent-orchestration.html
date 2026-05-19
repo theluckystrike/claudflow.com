@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Multi-Agent Orchestration — Coordination Pattern Designer &amp; Message Flow Visualizer | ClaudFlow</title>
+  <meta name="description" content="Design multi-agent coordination patterns with a visual message flow builder. Route tasks between Claude agents using supervisor, pipeline, and broadcast topologies. Export orchestration configs. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Multi-Agent Orchestration — Coordination Pattern Designer & Message Flow Visualizer">
+  <meta property="og:description" content="Design multi-agent coordination patterns with visual message flow builder. Route tasks between Claude agents using supervisor, pipeline, and broadcast topologies.">
+  <meta property="og:url" content="https://claudflow.com/guides/multi-agent-orchestration.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Multi-Agent Orchestration — Coordination Pattern Designer & Message Flow Visualizer">
+  <meta name="twitter:description" content="Design multi-agent coordination patterns with visual message flow builder. Route tasks between Claude agents.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/guides/multi-agent-orchestration.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/multi-agent-orchestration.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/multi-agent-orchestration.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Multi-Agent Orchestration Designer",
+    "url": "https://claudflow.com/guides/multi-agent-orchestration.html",
+    "description": "Design multi-agent coordination patterns with a visual message flow builder. Route tasks between Claude agents using supervisor, pipeline, and broadcast topologies. Export orchestration configurations as JSON.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "Visual multi-agent topology designer with drag-and-drop agent nodes",
+      "Supervisor, pipeline, broadcast, and mesh orchestration patterns",
+      "Real-time message flow simulation between agents",
+      "Agent role configuration with system prompt templates",
+      "Message routing rules with conditional branching",
+      "Latency and cost estimation for multi-agent pipelines",
+      "Export orchestration config as JSON",
+      "Built-in pattern library with common multi-agent architectures",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is multi-agent orchestration and when should I use it?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Multi-agent orchestration is a pattern where multiple AI agents collaborate on a task, each with a specialized role. Instead of one monolithic prompt handling everything, you decompose the work into subtasks assigned to different agents. Use it when a single agent cannot handle the complexity, when different parts of a task need different system prompts or models, or when you need parallel processing. Common examples include code review pipelines where one agent analyzes security, another checks style, and a supervisor merges the results."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the main multi-agent topology patterns?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The four main topologies are: Supervisor (one coordinator agent delegates to specialized worker agents and merges results), Pipeline (agents process sequentially where each agent's output becomes the next agent's input), Broadcast (one input is sent to multiple agents simultaneously for parallel processing), and Mesh (agents communicate freely with each other based on routing rules). Supervisor is the most common for complex reasoning tasks. Pipeline works best for sequential transformations like draft-review-edit workflows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I handle failures in multi-agent systems?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Implement retry logic at the individual agent level with exponential backoff. Use a dead letter queue for messages that fail after maximum retries. Add timeout limits per agent to prevent cascading delays. For critical pipelines, implement circuit breakers that route around failed agents using fallback prompts or alternative models. The supervisor pattern naturally handles failures since the coordinator can detect when a worker returns an error and either retry or reassign the subtask."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the cost overhead of multi-agent versus single-agent approaches?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Multi-agent systems typically cost 2-5x more in token usage than single-agent approaches because each agent needs its own system prompt, context, and output tokens. The overhead comes from duplicate context (each agent receives shared background information), coordination messages (the supervisor's instructions), and result aggregation (merging outputs). However, multi-agent systems often produce higher quality output for complex tasks, and you can offset costs by using cheaper models for simpler subtasks while reserving expensive models for the reasoning-heavy coordinator."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I mix different AI models in a multi-agent orchestration?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, and you should. Mixed-model orchestration is one of the biggest advantages of multi-agent systems. Use Claude 4 Opus as the supervisor for complex reasoning and decision-making. Use Claude 3.5 Sonnet for fast classification and extraction workers. Use Gemini 2.5 Pro for workers that need to process very long documents. Use GPT-4o for workers focused on specific tasks where it excels. This approach optimizes both cost and quality by matching model capabilities to subtask requirements."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://claudflow.com/guides/" },
+      { "@type": "ListItem", "position": 3, "name": "Multi-Agent Orchestration" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .mao-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .mao-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .mao-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+    .mao-card h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .mao-card label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.25rem; margin-top:0.75rem; }
+    .mao-card label:first-of-type { margin-top:0; }
+    .mao-card select, .mao-card input, .mao-card textarea { width:100%; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.88rem; box-sizing:border-box; }
+    .mao-card textarea { min-height:70px; resize:vertical; }
+    .mao-card input:focus, .mao-card textarea:focus, .mao-card select:focus { outline:none; border-color:var(--accent); }
+
+    .mao-canvas { width:100%; min-height:400px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); position:relative; overflow:hidden; }
+    .mao-node { position:absolute; width:140px; background:var(--bg-card); border:2px solid var(--border); border-radius:var(--radius); padding:0.6rem; cursor:grab; user-select:none; z-index:2; transition:border-color 0.15s; }
+    .mao-node:hover { border-color:var(--accent); }
+    .mao-node.active { border-color:var(--accent); box-shadow:0 0 0 2px rgba(6,182,212,0.25); }
+    .mao-node .node-role { font-size:0.72rem; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+    .mao-node .node-name { font-size:0.85rem; font-weight:600; color:var(--text); margin-top:0.15rem; }
+    .mao-node .node-model { font-size:0.7rem; color:var(--text-muted); margin-top:0.1rem; }
+
+    .mao-topo-select { display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin-bottom:1rem; }
+    .mao-topo-btn { background:var(--bg); border:2px solid var(--border); border-radius:var(--radius); padding:0.75rem; cursor:pointer; text-align:center; transition:border-color 0.15s; }
+    .mao-topo-btn:hover { border-color:var(--accent); }
+    .mao-topo-btn.active { border-color:var(--accent); box-shadow:0 0 0 2px rgba(6,182,212,0.25); }
+    .mao-topo-btn .tname { font-size:0.88rem; font-weight:600; color:var(--text); }
+    .mao-topo-btn .tdesc { font-size:0.7rem; color:var(--text-muted); margin-top:0.2rem; }
+
+    .mao-agent-list { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.75rem; }
+    .mao-agent-item { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.6rem 0.75rem; display:flex; align-items:center; justify-content:space-between; }
+    .mao-agent-item .aname { font-size:0.85rem; font-weight:600; color:var(--text); }
+    .mao-agent-item .arole { font-size:0.72rem; color:var(--accent); }
+    .mao-agent-item .abtn { background:none; border:1px solid var(--border); border-radius:4px; color:var(--text-muted); cursor:pointer; padding:0.2rem 0.5rem; font-size:0.72rem; }
+    .mao-agent-item .abtn:hover { border-color:#ef4444; color:#ef4444; }
+
+    .mao-flow-log { max-height:200px; overflow-y:auto; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; font-family:monospace; font-size:0.78rem; color:var(--text-muted); }
+    .mao-flow-log .msg { margin-bottom:0.3rem; }
+    .mao-flow-log .msg-from { color:var(--accent); font-weight:600; }
+    .mao-flow-log .msg-to { color:#a855f7; font-weight:600; }
+
+    .mao-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .mao-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; text-align:center; }
+    .mao-stat .val { font-size:1.4rem; font-weight:700; color:var(--accent); }
+    .mao-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .mao-tips { margin-top:1.5rem; }
+    .mao-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .mao-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .mao-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .mao-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .mao-tip .tip-text strong { color:var(--text); }
+
+    .mao-export-bar { display:flex; gap:0.5rem; margin-top:1rem; }
+
+    @media (max-width:768px) {
+      .mao-grid { grid-template-columns:1fr; }
+      .mao-topo-select { grid-template-columns:1fr 1fr; }
+      .mao-stats { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/guides/" style="color:var(--accent);text-decoration:none;">Guides</a> &rsaquo;
+      <span style="color:var(--text-muted);">Multi-Agent Orchestration</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Multi-Agent Orchestration Designer</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Design multi-agent coordination patterns with visual message flow simulation. Choose topologies, configure agent roles, and estimate pipeline costs.</p>
+    </section>
+  </main>
+
+  <div class="mao-wrap">
+    <div class="mao-card" style="margin-bottom:1.5rem;">
+      <h3>Select Orchestration Topology</h3>
+      <div class="mao-topo-select" id="mao-topo-select">
+        <div class="mao-topo-btn active" data-topo="supervisor" onclick="maoSelectTopo('supervisor')">
+          <div class="tname">Supervisor</div>
+          <div class="tdesc">One coordinator delegates to workers</div>
+        </div>
+        <div class="mao-topo-btn" data-topo="pipeline" onclick="maoSelectTopo('pipeline')">
+          <div class="tname">Pipeline</div>
+          <div class="tdesc">Sequential agent chain</div>
+        </div>
+        <div class="mao-topo-btn" data-topo="broadcast" onclick="maoSelectTopo('broadcast')">
+          <div class="tname">Broadcast</div>
+          <div class="tdesc">Parallel fan-out to all agents</div>
+        </div>
+        <div class="mao-topo-btn" data-topo="mesh" onclick="maoSelectTopo('mesh')">
+          <div class="tname">Mesh</div>
+          <div class="tdesc">Free agent-to-agent routing</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mao-grid">
+      <div class="mao-card">
+        <h3>Agent Configuration</h3>
+        <label>Agent Name</label>
+        <input type="text" id="mao-agent-name" placeholder="e.g. SecurityReviewer">
+        <label>Role</label>
+        <select id="mao-agent-role">
+          <option value="supervisor">Supervisor</option>
+          <option value="worker">Worker</option>
+          <option value="validator">Validator</option>
+          <option value="aggregator">Aggregator</option>
+          <option value="router">Router</option>
+        </select>
+        <label>Model</label>
+        <select id="mao-agent-model">
+          <option value="claude-4-opus">Claude 4 Opus ($15/1M in)</option>
+          <option value="claude-3.5-sonnet" selected>Claude 3.5 Sonnet ($3/1M in)</option>
+          <option value="gpt-4o">GPT-4o ($2.50/1M in)</option>
+          <option value="gemini-2.5-pro">Gemini 2.5 Pro ($1.25/1M in)</option>
+        </select>
+        <label>System Prompt Sketch</label>
+        <textarea id="mao-agent-prompt" placeholder="You are a security reviewer. Analyze code for vulnerabilities..."></textarea>
+        <button class="btn btn-accent" style="margin-top:0.75rem;width:100%;" onclick="maoAddAgent()">Add Agent</button>
+        <div class="mao-agent-list" id="mao-agent-list"></div>
+      </div>
+
+      <div class="mao-card">
+        <h3>Message Flow Visualizer</h3>
+        <div class="mao-canvas" id="mao-canvas">
+          <svg id="mao-svg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></svg>
+        </div>
+        <button class="btn btn-accent" style="margin-top:0.75rem;" onclick="maoSimulate()">Simulate Message Flow</button>
+        <button class="btn" style="margin-top:0.75rem;" onclick="maoReset()">Reset</button>
+      </div>
+    </div>
+
+    <div class="mao-card" style="margin-bottom:1.5rem;">
+      <h3>Flow Simulation Log</h3>
+      <div class="mao-flow-log" id="mao-flow-log">
+        <div class="msg" style="color:var(--text-muted);font-style:italic;">Add agents and click "Simulate Message Flow" to see message routing...</div>
+      </div>
+    </div>
+
+    <div class="mao-card" style="margin-bottom:1.5rem;">
+      <h3>Pipeline Estimates</h3>
+      <div class="mao-stats" id="mao-stats">
+        <div class="mao-stat"><div class="val">0</div><div class="lbl">Agents</div></div>
+        <div class="mao-stat"><div class="val">0</div><div class="lbl">Messages / Run</div></div>
+        <div class="mao-stat"><div class="val">0</div><div class="lbl">Est. Tokens / Run</div></div>
+        <div class="mao-stat"><div class="val">$0.00</div><div class="lbl">Est. Cost / Run</div></div>
+        <div class="mao-stat"><div class="val">0ms</div><div class="lbl">Est. Latency</div></div>
+      </div>
+    </div>
+
+    <div class="mao-export-bar">
+      <button class="btn btn-accent" onclick="maoExport()">Export Orchestration Config (JSON)</button>
+      <button class="btn" onclick="maoLoadTemplate()">Load Example Pipeline</button>
+    </div>
+
+    <div class="mao-tips" style="margin-top:1.5rem;">
+      <h3>Multi-Agent Design Tips</h3>
+      <div class="mao-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Start with a supervisor pattern.</strong> The supervisor topology is the most debuggable because all communication flows through a single coordinator. This makes it easy to inspect what each worker received and returned. Only switch to mesh or broadcast when you have a proven need for parallel independent processing.</div>
+      </div>
+      <div class="mao-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Use cheap models for simple workers.</strong> Not every agent needs Claude 4 Opus. Classification agents, format validators, and data extraction workers perform well with Claude 3.5 Sonnet at one-fifth the cost. Reserve Opus for the supervisor that makes complex routing decisions.</div>
+      </div>
+      <div class="mao-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Keep agent system prompts focused.</strong> Each agent should have a single clear responsibility. A system prompt that tries to do too much defeats the purpose of multi-agent decomposition. If an agent's prompt exceeds 500 tokens, consider splitting it into two agents.</div>
+      </div>
+      <div class="mao-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Add a validator at the end of every pipeline.</strong> A final validation agent that checks the combined output against the original requirements catches errors that individual workers miss. This costs one extra API call but dramatically reduces the rate of incorrect final outputs.</div>
+      </div>
+      <div class="mao-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Design for idempotency.</strong> Each agent should produce the same output given the same input. This makes retries safe and debugging reproducible. Avoid agents that depend on external state or produce side effects during processing.</div>
+      </div>
+      <div class="mao-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Limit pipeline depth to 5 agents or fewer.</strong> Each agent adds latency and compounds error probability. Deep pipelines with 8 or more agents become fragile and slow. If your workflow needs more than 5 steps, look for opportunities to merge adjacent agents or parallelize independent branches.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Multi-Agent Orchestration Designer Works</h2>
+
+    <p>The Multi-Agent Orchestration Designer is a browser-based tool for planning how multiple AI agents collaborate on complex tasks. Instead of sending one massive prompt to a single model and hoping it handles every aspect correctly, multi-agent orchestration decomposes work into specialized subtasks. Each agent receives a focused system prompt, processes its piece of the puzzle, and passes results to the next stage. This tool lets you visually design these coordination patterns before writing any code.</p>
+
+    <p>Start by selecting an orchestration topology. The supervisor pattern places one coordinator agent at the center, receiving the user's original request and delegating subtasks to specialized worker agents. The pipeline pattern arranges agents in a linear sequence where each agent's output feeds directly into the next agent's input. The broadcast pattern sends the same input to multiple agents simultaneously for parallel processing, then merges results. The mesh pattern allows any agent to communicate with any other agent based on routing rules you define.</p>
+
+    <h2>Understanding Orchestration Topologies</h2>
+
+    <p>The supervisor topology is the most widely used pattern in production multi-agent systems. A single coordinator agent receives the user's request, breaks it into subtasks, dispatches each subtask to the appropriate worker agent, collects results, and synthesizes a final response. This pattern excels at complex reasoning tasks like code review, where you might have separate agents for security analysis, performance optimization, style checking, and documentation review. The supervisor reads all reports and produces a unified review. The downside is that the supervisor becomes a bottleneck since all communication flows through it, and its token usage is high because it must understand the full context.</p>
+
+    <p>The pipeline topology arranges agents in a strict linear order. Agent A processes the input and passes its output to Agent B, which processes and passes to Agent C, and so on. This pattern works beautifully for transformation workflows. Consider a content creation pipeline: a research agent gathers information, a drafting agent writes the initial text, an editing agent refines the prose, and a formatting agent applies structure and styling. Each agent focuses on one transformation. The disadvantage is that errors in early stages propagate through the entire chain, and the total latency is the sum of all individual agent latencies since nothing runs in parallel.</p>
+
+    <p>The broadcast topology sends the same input to multiple agents simultaneously. This is the pattern for tasks where you need diverse perspectives or parallel analysis. For example, send a business document simultaneously to a legal review agent, a financial analysis agent, and a compliance checking agent. Each works independently and their results are collected by an aggregator. Broadcast dramatically reduces latency compared to sequential processing because agents run in parallel. The trade-off is higher token cost since the full input is duplicated across all agents, and you need an aggregation step to merge potentially conflicting outputs.</p>
+
+    <p>The mesh topology is the most flexible and most complex pattern. Agents can communicate with any other agent based on routing rules. A routing agent might direct requests to different specialists based on content type, with specialists able to escalate to senior agents or request additional information from data retrieval agents. Mesh topologies emerge naturally in sophisticated assistant systems where user requests span multiple domains. The complexity cost is significant: debugging becomes harder, message ordering requires careful management, and the potential for circular routing must be guarded against.</p>
+
+    <h2>Agent Role Design Principles</h2>
+
+    <p>Each agent in your orchestration should have exactly one responsibility. The single-responsibility principle from software engineering applies directly to agent design. A security reviewer agent should only analyze security vulnerabilities. A style checker agent should only evaluate code style. When agents try to do multiple things, their system prompts become bloated, their outputs become unfocused, and debugging becomes impossible because you cannot tell which aspect of the agent's multifaceted role caused a particular output.</p>
+
+    <p>The system prompt for each agent should be as short as possible while still providing clear instructions. In multi-agent systems, system prompts are paid for on every single request to every single agent. If you have five agents each with 1,000-token system prompts, that is 5,000 tokens of overhead per orchestration run before any actual work happens. Compress system prompts to their essential instructions. Use structured formats instead of prose. Remove examples that duplicate what the model already knows. A well-designed agent system prompt often fits in 200 to 400 tokens.</p>
+
+    <p>Model selection per agent is one of the highest-leverage decisions in multi-agent design. The supervisor or coordinator agent typically needs the strongest reasoning model because it makes the highest-stakes decisions about task decomposition and result synthesis. Use Claude 4 Opus or a comparably capable model for this role. Worker agents that perform straightforward tasks like classification, extraction, or formatting can use Claude 3.5 Sonnet at one-fifth the cost. For workers that process very long documents, Gemini 2.5 Pro offers the largest context window at the lowest per-token price. This mixed-model approach can reduce total pipeline cost by 60 to 70 percent compared to using the most expensive model for every agent.</p>
+
+    <h2>Message Flow Patterns and Error Handling</h2>
+
+    <p>Messages between agents carry structured data, not free-form text. Define a clear schema for inter-agent messages that includes the task description, relevant context, expected output format, and metadata like timestamps and request IDs. Structured messages prevent agents from misinterpreting what they receive and make the entire pipeline inspectable. When debugging a failed orchestration run, you can examine each message in the flow to identify exactly where things went wrong.</p>
+
+    <p>Error handling in multi-agent systems requires layered strategies. At the individual agent level, implement retry logic with exponential backoff for transient API failures. At the orchestration level, implement timeouts that prevent a single stuck agent from blocking the entire pipeline. For the supervisor pattern, the coordinator should detect when a worker returns an error or a nonsensical response and either retry the subtask, assign it to a different worker, or gracefully degrade by proceeding without that worker's contribution. Circuit breakers that temporarily disable consistently failing agents prevent repeated wasted API calls.</p>
+
+    <p>Idempotency is critical for reliable multi-agent systems. Every agent should produce the same output given the same input, regardless of how many times it is called. This makes retries safe because re-executing a failed step does not corrupt the pipeline state. Avoid agents that depend on external mutable state, make network calls to non-idempotent services, or accumulate information across invocations. If an agent needs context from previous runs, pass that context explicitly in the input message rather than storing it in a database that the agent reads implicitly.</p>
+
+    <h2>Cost and Latency Optimization</h2>
+
+    <p>The total cost of a multi-agent orchestration is the sum of all individual agent API calls. Each agent consumes input tokens for its system prompt, the message it receives, and any context, plus output tokens for its response. A five-agent supervisor pipeline might involve seven API calls: one for the supervisor to decompose the task, one for each of the four workers, one for the supervisor to read results, and one for the supervisor to synthesize the final response. If the supervisor uses Claude 4 Opus and workers use Claude 3.5 Sonnet, the cost breakdown heavily favors optimizing the supervisor's token usage since it is the most expensive per token.</p>
+
+    <p>Latency depends on the topology. Pipeline latency is the sum of all sequential agent response times. With five agents averaging 2 seconds each, total latency is 10 seconds. Broadcast latency is the maximum of the parallel agent response times plus the aggregation step. With the same five agents running in parallel, latency drops to roughly 2 seconds plus aggregation time. Supervisor latency includes the initial decomposition call, the parallel worker calls, and the final synthesis call, typically 3 sequential round-trips. For user-facing applications where responsiveness matters, prefer broadcast or shallow supervisor patterns over deep pipelines.</p>
+
+    <p>Caching is especially powerful in multi-agent systems. System prompts and common context preambles that repeat across agents and across runs are ideal candidates for prompt caching. Anthropic's prompt caching can reduce the cost of cached token segments by 90 percent. Since multi-agent systems multiply system prompt costs by the number of agents, caching offers proportionally larger savings than in single-agent setups. For teams managing orchestration infrastructure, integrating with <a href="https://claudkit.com">ClaudKit API tools</a> can automate cache management across agent pools.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Multi-Agent Orchestration Designer runs entirely in your browser. Agent configurations, system prompt sketches, topology designs, and simulation logs are processed client-side using JavaScript. No data is sent to any server. Exported orchestration configurations are generated and downloaded locally as JSON files. There are no accounts, no cookies, no analytics, and no server-side processing. Your agent designs and proprietary system prompts remain completely private on your device at all times.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What is multi-agent orchestration and when should I use it?</summary>
+      <p>Multi-agent orchestration is a pattern where multiple AI agents collaborate on a task, each with a specialized role. Use it when a single agent cannot handle the complexity, when different parts of a task need different system prompts or models, or when you need parallel processing. Common examples include code review pipelines with separate security, style, and documentation agents.</p>
+    </details>
+
+    <details>
+      <summary>What are the main multi-agent topology patterns?</summary>
+      <p>The four main topologies are Supervisor (one coordinator delegates to workers), Pipeline (sequential agent chain), Broadcast (parallel fan-out), and Mesh (free agent-to-agent routing). Supervisor is the most common for complex reasoning. Pipeline works best for sequential transformations.</p>
+    </details>
+
+    <details>
+      <summary>How do I handle failures in multi-agent systems?</summary>
+      <p>Implement retry logic at the individual agent level with exponential backoff. Use timeouts to prevent cascading delays. For the supervisor pattern, the coordinator can detect worker failures and retry or reassign subtasks. Add circuit breakers for consistently failing agents.</p>
+    </details>
+
+    <details>
+      <summary>What is the cost overhead of multi-agent versus single-agent?</summary>
+      <p>Multi-agent systems typically cost 2-5x more in tokens due to duplicate context, coordination messages, and result aggregation. Offset costs by using cheaper models for simple workers and reserving expensive models for the reasoning-heavy coordinator.</p>
+    </details>
+
+    <details>
+      <summary>Can I mix different AI models in a multi-agent orchestration?</summary>
+      <p>Yes, and you should. Use Claude 4 Opus as the supervisor, Claude 3.5 Sonnet for fast workers, Gemini 2.5 Pro for long-document workers, and GPT-4o for specific tasks. This optimizes both cost and quality by matching model capabilities to subtask requirements.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/tools/system-prompt-tester.html">System Prompt A/B Tester</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+          <li><a href="/guides/claude-for-data-analysis.html">Claude for Data Analysis</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var agents = [];
+  var topology = 'supervisor';
+  var MODELS = {
+    'claude-4-opus':{ name:'Claude 4 Opus', cost:15.00, outCost:75.00, latency:3000 },
+    'claude-3.5-sonnet':{ name:'Claude 3.5 Sonnet', cost:3.00, outCost:15.00, latency:1500 },
+    'gpt-4o':{ name:'GPT-4o', cost:2.50, outCost:10.00, latency:2000 },
+    'gemini-2.5-pro':{ name:'Gemini 2.5 Pro', cost:1.25, outCost:5.00, latency:2500 }
+  };
+
+  function fmt(n){ return n.toLocaleString(); }
+
+  window.maoSelectTopo = function(t){
+    topology = t;
+    var btns = document.querySelectorAll('.mao-topo-btn');
+    for(var i=0;i<btns.length;i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-topo')===t);
+    renderCanvas();
+    updateStats();
+  };
+
+  window.maoAddAgent = function(){
+    var name = document.getElementById('mao-agent-name').value.trim();
+    if(!name){ alert('Enter an agent name'); return; }
+    var role = document.getElementById('mao-agent-role').value;
+    var model = document.getElementById('mao-agent-model').value;
+    var prompt = document.getElementById('mao-agent-prompt').value.trim();
+    agents.push({ name:name, role:role, model:model, prompt:prompt });
+    document.getElementById('mao-agent-name').value = '';
+    document.getElementById('mao-agent-prompt').value = '';
+    renderAgentList();
+    renderCanvas();
+    updateStats();
+  };
+
+  function renderAgentList(){
+    var list = document.getElementById('mao-agent-list');
+    var html = '';
+    for(var i=0;i<agents.length;i++){
+      html += '<div class="mao-agent-item"><div><span class="aname">'+agents[i].name+'</span> <span class="arole">'+agents[i].role+'</span></div><button class="abtn" onclick="maoRemoveAgent('+i+')">Remove</button></div>';
+    }
+    list.innerHTML = html;
+  }
+
+  window.maoRemoveAgent = function(idx){
+    agents.splice(idx,1);
+    renderAgentList();
+    renderCanvas();
+    updateStats();
+  };
+
+  function renderCanvas(){
+    var canvas = document.getElementById('mao-canvas');
+    var svg = document.getElementById('mao-svg');
+    var existing = canvas.querySelectorAll('.mao-node');
+    for(var i=0;i<existing.length;i++) existing[i].remove();
+    svg.innerHTML = '';
+    if(agents.length===0) return;
+
+    var w = canvas.offsetWidth || 600;
+    var h = canvas.offsetHeight || 400;
+    var positions = [];
+
+    if(topology==='supervisor'){
+      var sup = agents.find(function(a){ return a.role==='supervisor'; });
+      var workers = agents.filter(function(a){ return a.role!=='supervisor'; });
+      if(!sup && agents.length>0){ sup = agents[0]; workers = agents.slice(1); }
+      positions.push({ agent:sup, x:w/2-70, y:30 });
+      for(var i=0;i<workers.length;i++){
+        var xp = (w/(workers.length+1))*(i+1) - 70;
+        positions.push({ agent:workers[i], x:xp, y:h-120 });
+      }
+    } else if(topology==='pipeline'){
+      for(var i=0;i<agents.length;i++){
+        positions.push({ agent:agents[i], x:(w/(agents.length+1))*(i+1)-70, y:h/2-40 });
+      }
+    } else if(topology==='broadcast'){
+      positions.push({ agent:agents[0], x:w/2-70, y:30 });
+      for(var i=1;i<agents.length;i++){
+        var xp = (w/agents.length)*(i)-70;
+        positions.push({ agent:agents[i], x:xp, y:h-120 });
+      }
+    } else {
+      var cx = w/2; var cy = h/2; var r = Math.min(w,h)*0.3;
+      for(var i=0;i<agents.length;i++){
+        var angle = (2*Math.PI/agents.length)*i - Math.PI/2;
+        positions.push({ agent:agents[i], x:cx+r*Math.cos(angle)-70, y:cy+r*Math.sin(angle)-40 });
+      }
+    }
+
+    for(var i=0;i<positions.length;i++){
+      var p = positions[i];
+      var node = document.createElement('div');
+      node.className = 'mao-node';
+      node.style.left = p.x+'px';
+      node.style.top = p.y+'px';
+      node.innerHTML = '<div class="node-role">'+p.agent.role+'</div><div class="node-name">'+p.agent.name+'</div><div class="node-model">'+MODELS[p.agent.model].name+'</div>';
+      canvas.appendChild(node);
+    }
+
+    var lines = '';
+    if(topology==='supervisor' && positions.length>1){
+      for(var i=1;i<positions.length;i++){
+        lines += '<line x1="'+(positions[0].x+70)+'" y1="'+(positions[0].y+70)+'" x2="'+(positions[i].x+70)+'" y2="'+(positions[i].y)+'" stroke="var(--accent)" stroke-width="2" opacity="0.5" stroke-dasharray="6,4"/>';
+      }
+    } else if(topology==='pipeline'){
+      for(var i=0;i<positions.length-1;i++){
+        lines += '<line x1="'+(positions[i].x+140)+'" y1="'+(positions[i].y+40)+'" x2="'+(positions[i+1].x)+'" y2="'+(positions[i+1].y+40)+'" stroke="var(--accent)" stroke-width="2" opacity="0.5" stroke-dasharray="6,4"/>';
+      }
+    } else if(topology==='broadcast' && positions.length>1){
+      for(var i=1;i<positions.length;i++){
+        lines += '<line x1="'+(positions[0].x+70)+'" y1="'+(positions[0].y+70)+'" x2="'+(positions[i].x+70)+'" y2="'+(positions[i].y)+'" stroke="var(--accent)" stroke-width="2" opacity="0.5" stroke-dasharray="6,4"/>';
+      }
+    } else if(topology==='mesh'){
+      for(var i=0;i<positions.length;i++){
+        for(var j=i+1;j<positions.length;j++){
+          lines += '<line x1="'+(positions[i].x+70)+'" y1="'+(positions[i].y+40)+'" x2="'+(positions[j].x+70)+'" y2="'+(positions[j].y+40)+'" stroke="var(--accent)" stroke-width="1" opacity="0.3" stroke-dasharray="4,4"/>';
+        }
+      }
+    }
+    svg.innerHTML = lines;
+  }
+
+  function updateStats(){
+    var numAgents = agents.length;
+    var messages = 0;
+    var tokens = 0;
+    var cost = 0;
+    var latency = 0;
+
+    if(numAgents>0){
+      if(topology==='supervisor'){ messages = (numAgents-1)*2 + 2; latency = MODELS[agents[0].model].latency*3; }
+      else if(topology==='pipeline'){ messages = numAgents; for(var i=0;i<numAgents;i++) latency += MODELS[agents[i].model].latency; }
+      else if(topology==='broadcast'){ messages = numAgents + 1; latency = Math.max.apply(null,agents.map(function(a){return MODELS[a.model].latency;})) + 1500; }
+      else { messages = numAgents*(numAgents-1)/2; latency = MODELS[agents[0].model].latency * Math.min(numAgents,4); }
+
+      for(var i=0;i<agents.length;i++){
+        var m = MODELS[agents[i].model];
+        var promptTokens = Math.ceil((agents[i].prompt.length||200)/4) + 500;
+        var outTokens = 800;
+        tokens += promptTokens + outTokens;
+        cost += (promptTokens/1000000)*m.cost + (outTokens/1000000)*m.outCost;
+      }
+    }
+
+    var el = document.getElementById('mao-stats');
+    el.innerHTML = '<div class="mao-stat"><div class="val">'+numAgents+'</div><div class="lbl">Agents</div></div>'
+      +'<div class="mao-stat"><div class="val">'+messages+'</div><div class="lbl">Messages / Run</div></div>'
+      +'<div class="mao-stat"><div class="val">'+fmt(tokens)+'</div><div class="lbl">Est. Tokens / Run</div></div>'
+      +'<div class="mao-stat"><div class="val">$'+cost.toFixed(4)+'</div><div class="lbl">Est. Cost / Run</div></div>'
+      +'<div class="mao-stat"><div class="val">'+(latency/1000).toFixed(1)+'s</div><div class="lbl">Est. Latency</div></div>';
+  }
+
+  window.maoSimulate = function(){
+    var log = document.getElementById('mao-flow-log');
+    if(agents.length<2){ log.innerHTML='<div class="msg" style="color:#ef4444;">Add at least 2 agents to simulate message flow.</div>'; return; }
+    var html = '';
+    var ts = 0;
+
+    if(topology==='supervisor'){
+      var sup = agents.find(function(a){return a.role==='supervisor';}) || agents[0];
+      var workers = agents.filter(function(a){return a!==sup;});
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">User</span> -> <span class="msg-to">'+sup.name+'</span>: Initial request received</div>';
+      ts += 500;
+      for(var i=0;i<workers.length;i++){
+        html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+sup.name+'</span> -> <span class="msg-to">'+workers[i].name+'</span>: Delegated subtask '+(i+1)+'</div>';
+        ts += 200;
+      }
+      ts += 2000;
+      for(var i=0;i<workers.length;i++){
+        html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+workers[i].name+'</span> -> <span class="msg-to">'+sup.name+'</span>: Result returned</div>';
+        ts += 300;
+      }
+      ts += 1000;
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+sup.name+'</span> -> <span class="msg-to">User</span>: Synthesized final response</div>';
+    } else if(topology==='pipeline'){
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">User</span> -> <span class="msg-to">'+agents[0].name+'</span>: Input received</div>';
+      for(var i=0;i<agents.length-1;i++){
+        ts += MODELS[agents[i].model].latency;
+        html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+agents[i].name+'</span> -> <span class="msg-to">'+agents[i+1].name+'</span>: Processed output forwarded</div>';
+      }
+      ts += MODELS[agents[agents.length-1].model].latency;
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+agents[agents.length-1].name+'</span> -> <span class="msg-to">User</span>: Final result</div>';
+    } else if(topology==='broadcast'){
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">User</span> -> <span class="msg-to">Broadcast</span>: Input sent to all agents</div>';
+      ts += 100;
+      for(var i=0;i<agents.length;i++){
+        html += '<div class="msg">['+ts+'ms] <span class="msg-from">Broadcast</span> -> <span class="msg-to">'+agents[i].name+'</span>: Parallel dispatch</div>';
+      }
+      ts += 2500;
+      for(var i=0;i<agents.length;i++){
+        html += '<div class="msg">['+(ts+Math.random()*500|0)+'ms] <span class="msg-from">'+agents[i].name+'</span> -> <span class="msg-to">Aggregator</span>: Result returned</div>';
+      }
+      ts += 1000;
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">Aggregator</span> -> <span class="msg-to">User</span>: Merged response</div>';
+    } else {
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">User</span> -> <span class="msg-to">'+agents[0].name+'</span>: Initial request</div>';
+      for(var i=0;i<agents.length;i++){
+        for(var j=i+1;j<agents.length&&j<i+3;j++){
+          ts += 800;
+          html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+agents[i].name+'</span> <-> <span class="msg-to">'+agents[j].name+'</span>: Bidirectional exchange</div>';
+        }
+      }
+      ts += 1000;
+      html += '<div class="msg">['+ts+'ms] <span class="msg-from">'+agents[agents.length-1].name+'</span> -> <span class="msg-to">User</span>: Consensus response</div>';
+    }
+
+    log.innerHTML = html;
+  };
+
+  window.maoExport = function(){
+    var config = {
+      version:'1.0', exportedAt:new Date().toISOString(), topology:topology,
+      agents:agents.map(function(a){ return {name:a.name,role:a.role,model:a.model,systemPrompt:a.prompt}; })
+    };
+    var json = JSON.stringify(config,null,2);
+    var blob = new Blob([json],{type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'orchestration-config-'+Date.now()+'.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  window.maoLoadTemplate = function(){
+    agents = [
+      {name:'Coordinator',role:'supervisor',model:'claude-4-opus',prompt:'You are the coordinator. Decompose the user request into subtasks and assign them to workers. Merge results into a final response.'},
+      {name:'SecurityReviewer',role:'worker',model:'claude-3.5-sonnet',prompt:'You are a security reviewer. Analyze code for vulnerabilities including injection, XSS, CSRF, and auth bypasses.'},
+      {name:'StyleChecker',role:'worker',model:'claude-3.5-sonnet',prompt:'You are a style checker. Review code for consistency, naming conventions, and adherence to project guidelines.'},
+      {name:'PerformanceAnalyzer',role:'worker',model:'claude-3.5-sonnet',prompt:'You analyze code for performance issues including N+1 queries, memory leaks, and unnecessary allocations.'},
+      {name:'Validator',role:'validator',model:'claude-3.5-sonnet',prompt:'You validate the final merged review. Check for contradictions between reviewers and ensure all critical issues are highlighted.'}
+    ];
+    topology = 'supervisor';
+    var btns = document.querySelectorAll('.mao-topo-btn');
+    for(var i=0;i<btns.length;i++) btns[i].classList.toggle('active',btns[i].getAttribute('data-topo')==='supervisor');
+    renderAgentList();
+    renderCanvas();
+    updateStats();
+  };
+
+  window.maoReset = function(){
+    agents = [];
+    renderAgentList();
+    renderCanvas();
+    updateStats();
+    document.getElementById('mao-flow-log').innerHTML='<div class="msg" style="color:var(--text-muted);font-style:italic;">Add agents and click "Simulate Message Flow" to see message routing...</div>';
+  };
+
+  updateStats();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Visual Claude Workflow Designer with JSON Export | ClaudFlow</title>
+  <meta name="description" content="Design AI workflows visually with drag-and-drop blocks. Connect Input, AI Prompt, Condition, Transform, and Output blocks. Export as JSON. Import templates. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Visual Claude Workflow Designer with JSON Export">
+  <meta property="og:description" content="Design AI workflows visually with drag-and-drop blocks. Connect Input, AI Prompt, Condition, Transform, and Output blocks. Export as JSON. Import templates.">
+  <meta property="og:url" content="https://claudflow.com/tools/workflow-builder.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Visual Claude Workflow Designer with JSON Export">
+  <meta name="twitter:description" content="Design AI workflows visually with drag-and-drop blocks. Connect Input, AI Prompt, Condition, Transform, and Output blocks. Export as JSON.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/tools/workflow-builder.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/tools/workflow-builder.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/tools/workflow-builder.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Visual Workflow Designer",
+    "url": "https://claudflow.com/tools/workflow-builder.html",
+    "description": "Visual drag-and-drop AI workflow designer with JSON export and import. Build prompt chains using configurable blocks for Input, AI Prompt, Condition, Transform, and Output.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "Drag-and-drop block placement on canvas",
+      "Five block types: Input, AI Prompt, Condition, Transform, Output",
+      "Arrow connections between blocks with SVG rendering",
+      "Configurable block properties panel",
+      "Export workflow as JSON",
+      "Import workflow from JSON file",
+      "Pre-built templates: Blog Pipeline, Code Review, Data Analysis",
+      "Auto-save to localStorage",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I connect blocks in the visual workflow designer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Click the output port (bottom circle) on any block and drag to the input port (top circle) on the target block. An SVG arrow will render between them showing the data flow direction. You can delete connections by selecting the source block and clicking the X on the connection line."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What block types are available in the workflow designer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The designer offers five block types: Input blocks define starting data and variables, AI Prompt blocks contain the prompt text with placeholders, Condition blocks add if/else branching logic, Transform blocks reformat or restructure data between steps, and Output blocks define the final deliverable format."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I save and share my workflow designs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Click Export JSON to download your entire workflow as a portable JSON file containing all blocks, their positions, connections, and configured properties. Share this file with teammates or import it on another device. Workflows also auto-save to your browser localStorage between sessions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What pre-built templates are included?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Three production-ready templates are included: Blog Pipeline chains topic research through outline, draft, and SEO optimization. Code Review runs parallel bug, security, and performance analysis then merges findings. Data Analysis processes raw data through cleaning, statistical summary, and insight generation steps."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the workflow designer actually execute prompts against an AI model?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. The visual workflow designer is a planning and design tool. It lets you architect your prompt chain visually, configure each block's properties, and export the design as JSON. You then execute the prompts using your preferred tool or API — Claude, GPT-4, Gemini, or any other model. This separation means your designs are model-agnostic and portable."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .wf-canvas-wrap { max-width:1100px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .wf-toolbar { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; padding:1rem 0; border-bottom:1px solid var(--border); margin-bottom:1rem; }
+    .wf-toolbar .tgroup { display:flex; gap:0.5rem; align-items:center; }
+    .wf-toolbar .tgroup label { color:var(--text-muted); font-size:0.82rem; margin-right:0.25rem; }
+    .wf-toolbar .spacer { flex:1; }
+    .wf-canvas { width:100%; height:520px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); position:relative; overflow:hidden; cursor:default; }
+    .wf-canvas svg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+    .wf-block { position:absolute; min-width:150px; max-width:220px; background:var(--bg); border:2px solid var(--border); border-radius:var(--radius); padding:0.5rem 0.7rem; cursor:grab; user-select:none; z-index:2; transition:border-color 0.15s, box-shadow 0.15s; }
+    .wf-block:hover { border-color:var(--accent); }
+    .wf-block.selected { border-color:var(--accent); box-shadow:0 0 0 2px rgba(6,182,212,0.25); }
+    .wf-block .btype { font-size:0.65rem; font-weight:700; text-transform:uppercase; color:var(--accent); margin-bottom:2px; }
+    .wf-block .blabel { font-size:0.82rem; color:var(--text); word-break:break-word; }
+    .wf-block .bsub { font-size:0.7rem; color:var(--text-muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:190px; }
+    .wf-port { position:absolute; width:12px; height:12px; background:var(--accent); border:2px solid var(--bg); border-radius:50%; cursor:crosshair; z-index:3; }
+    .wf-port-out { bottom:-6px; right:20px; }
+    .wf-port-in { top:-6px; left:20px; }
+    .wf-del { position:absolute; top:-8px; right:-8px; width:18px; height:18px; background:#e11d48; color:#fff; border:none; border-radius:50%; font-size:0.65rem; cursor:pointer; display:none; align-items:center; justify-content:center; z-index:4; }
+    .wf-block.selected .wf-del { display:flex; }
+    .wf-props { max-width:1100px; margin:0 auto; padding:0 1.5rem; }
+    .wf-props-panel { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.5rem; display:none; }
+    .wf-props-panel.active { display:block; }
+    .wf-props-panel h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .wf-props-panel label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:0.25rem; margin-top:0.75rem; }
+    .wf-props-panel input, .wf-props-panel textarea, .wf-props-panel select { width:100%; padding:0.5rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.88rem; }
+    .wf-props-panel textarea { min-height:80px; resize:vertical; }
+    .wf-props-panel input:focus, .wf-props-panel textarea:focus { outline:none; border-color:var(--accent); }
+    .wf-props-panel .prop-actions { display:flex; gap:0.5rem; margin-top:1rem; }
+    .wf-json-out { max-width:1100px; margin:0 auto; padding:0 1.5rem; }
+    .wf-json-out pre { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; max-height:300px; overflow:auto; font-size:0.8rem; font-family:var(--font-display); display:none; margin-bottom:1.5rem; }
+    .wf-json-out pre.visible { display:block; }
+    .wf-hint { color:var(--text-muted); font-size:0.78rem; margin-top:0.4rem; }
+
+    .btype-input { color:#22c55e !important; }
+    .btype-prompt { color:var(--accent) !important; }
+    .btype-condition { color:#eab308 !important; }
+    .btype-transform { color:#a855f7 !important; }
+    .btype-output { color:#ef4444 !important; }
+    .border-input { border-color:#22c55e !important; }
+    .border-prompt { border-color:var(--accent) !important; }
+    .border-condition { border-color:#eab308 !important; }
+    .border-transform { border-color:#a855f7 !important; }
+    .border-output { border-color:#ef4444 !important; }
+
+    @media (max-width:640px) {
+      .wf-canvas { height:380px; }
+      .wf-toolbar { gap:0.35rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/tools/" style="color:var(--accent);text-decoration:none;">Tools</a> &rsaquo;
+      <span style="color:var(--text-muted);">Visual Workflow Designer</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Visual Workflow Designer</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Drag-and-drop AI workflow builder with configurable blocks, arrow connections, JSON export, and pre-built templates.</p>
+    </section>
+  </main>
+
+  <div class="wf-canvas-wrap">
+    <div class="wf-toolbar">
+      <div class="tgroup">
+        <label>Add Block:</label>
+        <button class="btn" onclick="addBlock('input')">Input</button>
+        <button class="btn" onclick="addBlock('prompt')">AI Prompt</button>
+        <button class="btn" onclick="addBlock('condition')">Condition</button>
+        <button class="btn" onclick="addBlock('transform')">Transform</button>
+        <button class="btn" onclick="addBlock('output')">Output</button>
+      </div>
+      <div class="tgroup">
+        <label>Templates:</label>
+        <button class="btn" onclick="loadTemplate('blog')">Blog Pipeline</button>
+        <button class="btn" onclick="loadTemplate('review')">Code Review</button>
+        <button class="btn" onclick="loadTemplate('data')">Data Analysis</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="tgroup">
+        <button class="btn" onclick="exportJSON()">Export JSON</button>
+        <button class="btn" onclick="triggerImport()">Import</button>
+        <button class="btn" onclick="clearCanvas()">Clear</button>
+        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importJSON(event)">
+      </div>
+    </div>
+    <div class="wf-canvas" id="wf-canvas">
+      <svg id="wf-svg"></svg>
+    </div>
+    <p class="wf-hint">Click Add Block to place blocks. Drag blocks to reposition. Drag from bottom port to top port to connect. Click a block to select and edit properties below.</p>
+  </div>
+
+  <div class="wf-props">
+    <div class="wf-props-panel" id="props-panel">
+      <h3>Block Properties</h3>
+      <label>Label</label>
+      <input type="text" id="prop-label" placeholder="Block label">
+      <label>Type</label>
+      <select id="prop-type">
+        <option value="input">Input</option>
+        <option value="prompt">AI Prompt</option>
+        <option value="condition">Condition</option>
+        <option value="transform">Transform</option>
+        <option value="output">Output</option>
+      </select>
+      <label>Content / Prompt Text</label>
+      <textarea id="prop-content" placeholder="Block content, prompt text, condition logic, transform rules..."></textarea>
+      <label>Notes</label>
+      <input type="text" id="prop-notes" placeholder="Optional notes or description">
+      <div class="prop-actions">
+        <button class="btn btn-accent" onclick="saveProps()">Save</button>
+        <button class="btn" onclick="deleteSelected()">Delete Block</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wf-json-out">
+    <pre id="json-output"></pre>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Visual Workflow Designer Works</h2>
+
+    <p>The Visual Workflow Designer is a browser-based canvas tool for architecting AI prompt chains as connected block diagrams. Rather than writing ad-hoc prompts and manually copying outputs between steps, you map out your entire multi-step process on a drag-and-drop surface. Every block represents a distinct stage in your pipeline, and the connections between blocks define how data flows from one stage to the next. The result is a portable, shareable, version-controllable JSON file that documents your exact workflow architecture.</p>
+
+    <p>This tool is designed for teams and individuals who build production AI workflows. Content teams use it to plan blog post pipelines that move from topic research through outline generation, draft writing, and SEO optimization. Development teams use it to prototype code review chains that run parallel bug, security, and performance analysis before merging findings into a unified report. Data teams use it to model extraction-transformation-analysis pipelines where each step has clear inputs, outputs, and failure modes.</p>
+
+    <h2>Block Types and Configuration</h2>
+
+    <p>The designer supports five block types, each serving a specific role in the workflow. Input blocks define the starting data. They describe what variables, documents, or user inputs enter the pipeline. AI Prompt blocks contain the actual prompt text that will be sent to a language model. These blocks support placeholder syntax so you can reference output from upstream blocks. Condition blocks add branching logic. They define the criteria that determine which downstream path the data follows, enabling if-else routing for different input types or quality thresholds. Transform blocks restructure data between steps. When the output format of one block does not match the expected input format of the next, a Transform block handles the conversion. Output blocks define the final deliverable. They specify what the completed pipeline produces and in what format.</p>
+
+    <p>Each block has configurable properties accessible through the Properties Panel below the canvas. Select any block by clicking it, and the panel populates with its current label, type, content, and notes. Change any property and click Save to update the block in place. The type selector lets you re-categorize a block without deleting and recreating it. The content field supports multi-line text, which is especially useful for AI Prompt blocks where the prompt text can be several paragraphs long.</p>
+
+    <h2>Connections and Data Flow</h2>
+
+    <p>Connections represent the flow of data between blocks. To create a connection, drag from the output port at the bottom of one block to the input port at the top of another block. An SVG arrow renders between them showing the direction of data flow. Connections update in real time as you drag blocks around the canvas, so the layout stays readable regardless of how you rearrange things. A single block can have multiple outgoing connections, which is how you model parallel processing paths. For example, a classification block might connect to three different handler blocks, each processing a different category of input.</p>
+
+    <p>Deleting a connection is done by selecting the source block and removing it. When you delete a block, all connections to and from that block are automatically cleaned up. The SVG rendering ensures that connection lines never overlap with block content, and lines curve naturally around the canvas to maintain visual clarity.</p>
+
+    <h2>Pre-Built Templates</h2>
+
+    <p>Three production-ready templates are included to help you get started immediately. The Blog Pipeline template creates a five-stage workflow that moves through topic research, outline generation, first draft writing, editorial review, and SEO optimization. Each AI Prompt block contains real prompt text that you can customize for your specific niche and voice. The Code Review template demonstrates parallel processing by running bug analysis, security scanning, and performance auditing simultaneously on the same code input, then merging all findings into a prioritized report. The Data Analysis template models a data processing pipeline with cleaning, statistical summary, insight extraction, and visualization generation stages.</p>
+
+    <p>Loading a template replaces the current canvas contents. If you want to preserve your current work, export it as JSON before loading a template. Templates are designed as starting points. The expectation is that you will customize the prompt text, add additional blocks for your specific use case, and adjust the connections to match your exact workflow requirements.</p>
+
+    <h2>JSON Export and Import</h2>
+
+    <p>The Export JSON button generates a complete snapshot of your workflow. The JSON file contains every block with its type, label, content, notes, and canvas position. It also contains every connection with source and target block identifiers. This file is portable across devices and shareable with teammates. Store it in version control alongside your code to track how your AI workflows evolve over time.</p>
+
+    <p>The Import button accepts any workflow JSON file exported from this tool. It restores all blocks, connections, and positions exactly as they were when exported. This makes it easy to share workflows across a team, maintain a library of reusable workflow templates, or back up your designs before making major changes. For teams that use <a href="https://claudhq.com">ClaudHQ</a> prompt templates, you can combine the workflow structure from this tool with individual prompt templates from the ClaudHQ library to build comprehensive, production-ready pipelines.</p>
+
+    <h2>Design Patterns and Best Practices</h2>
+
+    <p>The most effective workflows follow a few key patterns. Linear chains are the simplest: each block connects to exactly one downstream block, and data flows in a straight line from Input to Output. This pattern works well for sequential tasks like document summarization or translation pipelines. Branching workflows use a Condition block to route different inputs through different paths. The condition block evaluates the input and sends it to the appropriate handler chain. This is the standard pattern for classification-driven workflows like customer support routing or content categorization.</p>
+
+    <p>Parallel fan-out patterns split a single input to multiple processing blocks that run independently. This is ideal for analysis tasks where different aspects of the input need specialized attention. After the parallel blocks complete, a merge block aggregates their outputs. The Code Review template demonstrates this exact pattern. Error-handling patterns add fallback connections from blocks that might fail. If the primary AI Prompt block produces output that does not meet quality thresholds, a Condition block routes the data to a simpler fallback prompt rather than crashing the pipeline.</p>
+
+    <p>For developers who want to execute these workflow designs programmatically, <a href="https://claudkit.com">ClaudKit</a> provides API tools that can consume the JSON exports from this designer and run each step against the Claude API. For visual prompt library management, <a href="https://claudhq.com">ClaudHQ</a> maintains tested prompt templates that integrate directly into AI Prompt blocks. Teams using structured data workflows can leverage <a href="https://kappafy.com">Kappafy</a> for JSON validation and transformation utilities that complement the Transform blocks in your designs.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Visual Workflow Designer runs entirely in your browser. No data is sent to any server. Your workflow designs are stored in browser localStorage and persist between sessions. The export files are generated client-side and downloaded directly to your device. There are no accounts, no tracking cookies, no analytics scripts, and no server-side processing. The complete source is static HTML, CSS, and JavaScript hosted on GitHub Pages. Your workflow designs, prompt text, and all other content remain private on your device at all times.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>How do I connect blocks in the visual workflow designer?</summary>
+      <p>Click the output port (bottom circle) on any block and drag to the input port (top circle) on the target block. An SVG arrow will render between them showing the data flow direction. You can delete connections by selecting the source block and clicking the X on the connection line.</p>
+    </details>
+
+    <details>
+      <summary>What block types are available in the workflow designer?</summary>
+      <p>The designer offers five block types: Input blocks define starting data and variables, AI Prompt blocks contain the prompt text with placeholders, Condition blocks add if/else branching logic, Transform blocks reformat or restructure data between steps, and Output blocks define the final deliverable format.</p>
+    </details>
+
+    <details>
+      <summary>Can I save and share my workflow designs?</summary>
+      <p>Yes. Click Export JSON to download your entire workflow as a portable JSON file containing all blocks, their positions, connections, and configured properties. Share this file with teammates or import it on another device. Workflows also auto-save to your browser localStorage between sessions.</p>
+    </details>
+
+    <details>
+      <summary>What pre-built templates are included?</summary>
+      <p>Three production-ready templates are included: Blog Pipeline chains topic research through outline, draft, and SEO optimization. Code Review runs parallel bug, security, and performance analysis then merges findings. Data Analysis processes raw data through cleaning, statistical summary, and insight generation steps.</p>
+    </details>
+
+    <details>
+      <summary>Does the workflow designer actually execute prompts against an AI model?</summary>
+      <p>No. The visual workflow designer is a planning and design tool. It lets you architect your prompt chain visually, configure each block's properties, and export the design as JSON. You then execute the prompts using your preferred tool or API. This separation means your designs are model-agnostic and portable.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/">ClaudFlow Home &mdash; Canvas Builder</a></li>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/answers/claude-error-troubleshooting.html">Claude Error Troubleshooting</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+          <li><a href="/blog/ai-prompt-chaining-advanced.html">Advanced Prompt Chaining</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/workflow-automation-patterns.html">Workflow Automation Patterns</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var canvas = document.getElementById('wf-canvas');
+  var svg = document.getElementById('wf-svg');
+  var blocks = [];
+  var connections = [];
+  var selectedId = null;
+  var dragState = null;
+  var connectState = null;
+  var idCounter = 1;
+
+  var COLORS = { input:'#22c55e', prompt:'#06B6D4', condition:'#eab308', transform:'#a855f7', output:'#ef4444' };
+  var LABELS = { input:'Input', prompt:'AI Prompt', condition:'Condition', transform:'Transform', output:'Output' };
+
+  function uid(){ return 'b' + (idCounter++); }
+
+  function save(){
+    try { localStorage.setItem('cf-wfdesigner', JSON.stringify({blocks:blocks,connections:connections,idCounter:idCounter})); } catch(e){}
+  }
+  function load(){
+    try {
+      var d = JSON.parse(localStorage.getItem('cf-wfdesigner'));
+      if(d && d.blocks){ blocks=d.blocks; connections=d.connections||[]; idCounter=d.idCounter||blocks.length+1; }
+    } catch(e){}
+  }
+
+  function render(){
+    var existingEls = canvas.querySelectorAll('.wf-block');
+    for(var e=0;e<existingEls.length;e++) existingEls[e].remove();
+    svg.innerHTML = '';
+
+    for(var i=0;i<blocks.length;i++){
+      var b = blocks[i];
+      var el = document.createElement('div');
+      el.className = 'wf-block' + (b.id===selectedId?' selected':'');
+      el.style.left = b.x+'px';
+      el.style.top = b.y+'px';
+      el.setAttribute('data-id', b.id);
+
+      el.innerHTML = '<div class="btype btype-'+b.type+'">'+LABELS[b.type]+'</div>'
+        +'<div class="blabel">'+esc(b.label)+'</div>'
+        +(b.content?'<div class="bsub">'+esc(b.content.substring(0,40))+'</div>':'')
+        +'<div class="wf-port wf-port-in"></div>'
+        +'<div class="wf-port wf-port-out"></div>'
+        +'<button class="wf-del" onclick="event.stopPropagation();window._wfDeleteBlock(\''+b.id+'\');">&times;</button>';
+
+      el.addEventListener('mousedown', blockMouseDown);
+      el.addEventListener('click', function(ev){
+        var bid = this.getAttribute('data-id');
+        selectBlock(bid);
+        ev.stopPropagation();
+      });
+
+      var portOut = el.querySelector('.wf-port-out');
+      portOut.addEventListener('mousedown', function(ev){
+        ev.stopPropagation();
+        var bid = this.parentElement.getAttribute('data-id');
+        connectState = { from:bid, startX:ev.clientX, startY:ev.clientY };
+      });
+
+      var portIn = el.querySelector('.wf-port-in');
+      portIn.addEventListener('mouseup', function(ev){
+        ev.stopPropagation();
+        if(connectState){
+          var toBid = this.parentElement.getAttribute('data-id');
+          if(connectState.from !== toBid){
+            var exists = false;
+            for(var c=0;c<connections.length;c++){
+              if(connections[c].from===connectState.from && connections[c].to===toBid) exists=true;
+            }
+            if(!exists){
+              connections.push({from:connectState.from, to:toBid});
+              save();
+            }
+          }
+          connectState = null;
+          render();
+        }
+      });
+
+      canvas.appendChild(el);
+    }
+
+    for(var c=0;c<connections.length;c++){
+      var conn = connections[c];
+      var fromB = findBlock(conn.from);
+      var toB = findBlock(conn.to);
+      if(!fromB||!toB) continue;
+
+      var fromEl = canvas.querySelector('[data-id="'+conn.from+'"]');
+      var toEl = canvas.querySelector('[data-id="'+conn.to+'"]');
+      if(!fromEl||!toEl) continue;
+
+      var x1 = fromB.x + fromEl.offsetWidth - 20;
+      var y1 = fromB.y + fromEl.offsetHeight;
+      var x2 = toB.x + 20;
+      var y2 = toB.y;
+      var color = COLORS[fromB.type] || '#06B6D4';
+
+      var midY = (y1+y2)/2;
+      var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d','M'+x1+','+y1+' C'+x1+','+midY+' '+x2+','+midY+' '+x2+','+y2);
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke',color);
+      path.setAttribute('stroke-width','2');
+      path.setAttribute('stroke-dasharray','6,3');
+      svg.appendChild(path);
+
+      var arrow = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      arrow.setAttribute('cx',x2);
+      arrow.setAttribute('cy',y2);
+      arrow.setAttribute('r','4');
+      arrow.setAttribute('fill',color);
+      svg.appendChild(arrow);
+    }
+  }
+
+  function findBlock(id){
+    for(var i=0;i<blocks.length;i++) if(blocks[i].id===id) return blocks[i];
+    return null;
+  }
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function blockMouseDown(ev){
+    if(ev.target.classList.contains('wf-port')||ev.target.classList.contains('wf-del')) return;
+    var bid = this.getAttribute('data-id');
+    var b = findBlock(bid);
+    if(!b) return;
+    var rect = canvas.getBoundingClientRect();
+    var offX = ev.clientX - b.x - rect.left;
+    var offY = ev.clientY - b.y - rect.top;
+    dragState = { id:bid, offX:offX, offY:offY };
+    ev.preventDefault();
+  }
+
+  canvas.addEventListener('mousemove', function(ev){
+    if(dragState){
+      var b = findBlock(dragState.id);
+      if(!b) return;
+      var rect = canvas.getBoundingClientRect();
+      b.x = Math.max(0, Math.min(rect.width-160, ev.clientX - rect.left - dragState.offX));
+      b.y = Math.max(0, Math.min(rect.height-60, ev.clientY - rect.top - dragState.offY));
+      render();
+    }
+  });
+
+  canvas.addEventListener('mouseup', function(){
+    if(dragState){ save(); dragState=null; }
+    connectState = null;
+  });
+
+  canvas.addEventListener('click', function(ev){
+    if(ev.target===canvas||ev.target===svg){
+      selectedId=null;
+      document.getElementById('props-panel').classList.remove('active');
+      render();
+    }
+  });
+
+  function selectBlock(id){
+    selectedId = id;
+    var b = findBlock(id);
+    if(!b) return;
+    document.getElementById('prop-label').value = b.label||'';
+    document.getElementById('prop-type').value = b.type||'prompt';
+    document.getElementById('prop-content').value = b.content||'';
+    document.getElementById('prop-notes').value = b.notes||'';
+    document.getElementById('props-panel').classList.add('active');
+    render();
+  }
+
+  window.saveProps = function(){
+    if(!selectedId) return;
+    var b = findBlock(selectedId);
+    if(!b) return;
+    b.label = document.getElementById('prop-label').value;
+    b.type = document.getElementById('prop-type').value;
+    b.content = document.getElementById('prop-content').value;
+    b.notes = document.getElementById('prop-notes').value;
+    save(); render();
+  };
+
+  window.deleteSelected = function(){
+    if(!selectedId) return;
+    window._wfDeleteBlock(selectedId);
+  };
+
+  window._wfDeleteBlock = function(id){
+    blocks = blocks.filter(function(b){ return b.id!==id; });
+    connections = connections.filter(function(c){ return c.from!==id && c.to!==id; });
+    if(selectedId===id){ selectedId=null; document.getElementById('props-panel').classList.remove('active'); }
+    save(); render();
+  };
+
+  window.addBlock = function(type){
+    var labels = { input:'User Input', prompt:'AI Prompt Step', condition:'Check Result', transform:'Format Data', output:'Final Output' };
+    var b = { id:uid(), type:type, label:labels[type]||type, content:'', notes:'', x:40+Math.random()*300, y:40+Math.random()*350 };
+    blocks.push(b);
+    save(); render();
+    selectBlock(b.id);
+  };
+
+  window.clearCanvas = function(){
+    if(!confirm('Clear all blocks and connections?')) return;
+    blocks=[]; connections=[]; selectedId=null;
+    document.getElementById('props-panel').classList.remove('active');
+    document.getElementById('json-output').classList.remove('visible');
+    save(); render();
+  };
+
+  window.exportJSON = function(){
+    var data = { version:'1.0', exportedAt:new Date().toISOString(), blocks:blocks.map(function(b){ return {id:b.id,type:b.type,label:b.label,content:b.content,notes:b.notes,x:Math.round(b.x),y:Math.round(b.y)}; }), connections:connections };
+    var json = JSON.stringify(data, null, 2);
+    var pre = document.getElementById('json-output');
+    pre.textContent = json;
+    pre.classList.add('visible');
+
+    var blob = new Blob([json], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'claudflow-workflow-'+Date.now()+'.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  window.triggerImport = function(){ document.getElementById('import-file').click(); };
+
+  window.importJSON = function(ev){
+    var file = ev.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try {
+        var data = JSON.parse(e.target.result);
+        if(data.blocks){
+          blocks = data.blocks;
+          connections = data.connections || [];
+          idCounter = 1;
+          for(var i=0;i<blocks.length;i++){
+            var num = parseInt(blocks[i].id.replace('b',''),10);
+            if(num>=idCounter) idCounter=num+1;
+          }
+          selectedId=null;
+          document.getElementById('props-panel').classList.remove('active');
+          save(); render();
+        }
+      } catch(err){ alert('Invalid JSON file.'); }
+    };
+    reader.readAsText(file);
+    ev.target.value='';
+  };
+
+  var TEMPLATES = {
+    blog: {
+      blocks: [
+        {id:'b1',type:'input',label:'Topic & Keywords',content:'Define the blog topic, target keywords, audience, and tone of voice.',notes:'',x:80,y:20},
+        {id:'b2',type:'prompt',label:'Research & Outline',content:'Research the topic and generate a detailed outline with H2/H3 headings, key points per section, and supporting data to include.',notes:'',x:60,y:120},
+        {id:'b3',type:'prompt',label:'Write First Draft',content:'Using the outline, write a complete first draft. Match the specified tone. Include examples, data points, and actionable takeaways in each section.',notes:'',x:50,y:230},
+        {id:'b4',type:'condition',label:'Quality Check',content:'Does the draft meet minimum word count? Are all outline sections covered? Is the tone consistent throughout?',notes:'Retry if fails',x:280,y:230},
+        {id:'b5',type:'prompt',label:'SEO Optimization',content:'Optimize the draft for target keywords. Add meta description, title tag, internal links, and image alt text suggestions. Ensure keyword density is 1-2%.',notes:'',x:200,y:350},
+        {id:'b6',type:'output',label:'Final Blog Post',content:'Formatted blog post with: title, meta description, headers, body, internal links, CTA, and publishing checklist.',notes:'',x:160,y:450}
+      ],
+      connections: [{from:'b1',to:'b2'},{from:'b2',to:'b3'},{from:'b3',to:'b4'},{from:'b4',to:'b5'},{from:'b5',to:'b6'}]
+    },
+    review: {
+      blocks: [
+        {id:'b1',type:'input',label:'Code to Review',content:'Paste or reference the code files, pull request, or diff to review. Specify language and framework.',notes:'',x:200,y:20},
+        {id:'b2',type:'prompt',label:'Bug Analysis',content:'Analyze the code for logical bugs, edge cases, null pointer risks, off-by-one errors, and incorrect assumptions. List each issue with line reference and severity.',notes:'',x:20,y:140},
+        {id:'b3',type:'prompt',label:'Security Scan',content:'Audit the code against OWASP Top 10. Check for injection, broken auth, sensitive data exposure, and insecure dependencies. Flag each with evidence.',notes:'',x:200,y:140},
+        {id:'b4',type:'prompt',label:'Performance Audit',content:'Identify performance issues: O(n^2) loops, unnecessary allocations, missing caching, N+1 queries, blocking calls. Suggest specific optimizations.',notes:'',x:380,y:140},
+        {id:'b5',type:'transform',label:'Merge Findings',content:'Combine all findings from bug, security, and performance analysis. Deduplicate overlapping issues. Sort by severity: critical, high, medium, low.',notes:'',x:200,y:280},
+        {id:'b6',type:'output',label:'Review Report',content:'Unified code review report with prioritized findings, fix suggestions, and overall code health score.',notes:'',x:200,y:400}
+      ],
+      connections: [{from:'b1',to:'b2'},{from:'b1',to:'b3'},{from:'b1',to:'b4'},{from:'b2',to:'b5'},{from:'b3',to:'b5'},{from:'b4',to:'b5'},{from:'b5',to:'b6'}]
+    },
+    data: {
+      blocks: [
+        {id:'b1',type:'input',label:'Raw Data Source',content:'Define the data source: CSV file, API response, database query result. Specify schema, row count estimate, and known quality issues.',notes:'',x:120,y:20},
+        {id:'b2',type:'transform',label:'Data Cleaning',content:'Remove duplicates, handle missing values (impute or drop), standardize formats (dates, currencies, units), fix encoding issues.',notes:'',x:100,y:130},
+        {id:'b3',type:'prompt',label:'Statistical Summary',content:'Calculate descriptive statistics: mean, median, mode, std dev, percentiles. Identify distributions and outliers. Generate summary table.',notes:'',x:80,y:250},
+        {id:'b4',type:'prompt',label:'Insight Extraction',content:'Identify top 5 actionable insights from the data. For each: state the finding, supporting evidence, confidence level, and recommended action.',notes:'',x:280,y:250},
+        {id:'b5',type:'transform',label:'Format Results',content:'Combine statistical summary and insights into a structured report format with charts, tables, and narrative sections.',notes:'',x:180,y:370},
+        {id:'b6',type:'output',label:'Analysis Report',content:'Complete data analysis report: executive summary, methodology, statistical findings, key insights, recommendations, and appendix with raw stats.',notes:'',x:180,y:470}
+      ],
+      connections: [{from:'b1',to:'b2'},{from:'b2',to:'b3'},{from:'b2',to:'b4'},{from:'b3',to:'b5'},{from:'b4',to:'b5'},{from:'b5',to:'b6'}]
+    }
+  };
+
+  window.loadTemplate = function(name){
+    var tpl = TEMPLATES[name];
+    if(!tpl) return;
+    if(blocks.length>0 && !confirm('Load template? This replaces your current canvas.')) return;
+    blocks = JSON.parse(JSON.stringify(tpl.blocks));
+    connections = JSON.parse(JSON.stringify(tpl.connections));
+    idCounter = 10;
+    selectedId = null;
+    document.getElementById('props-panel').classList.remove('active');
+    save(); render();
+  };
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>

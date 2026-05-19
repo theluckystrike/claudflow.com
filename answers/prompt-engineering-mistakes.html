@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Prompt Engineering Mistakes Quiz — Test Your Knowledge &amp; Get Fix Suggestions | ClaudFlow</title>
+  <meta name="description" content="Test your prompt engineering skills with an interactive quiz. Identify 15 common mistakes in real prompts, get fix suggestions, and learn best practices for Claude, GPT-4o, and Gemini. Free, no sign-up.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Prompt Engineering Mistakes Quiz — Test Your Knowledge & Get Fix Suggestions">
+  <meta property="og:description" content="Test your prompt engineering skills with an interactive quiz. Identify 15 common mistakes in real prompts and get fix suggestions.">
+  <meta property="og:url" content="https://claudflow.com/answers/prompt-engineering-mistakes.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Prompt Engineering Mistakes Quiz — Test Your Knowledge & Get Fix Suggestions">
+  <meta name="twitter:description" content="Test your prompt engineering skills. Identify 15 common mistakes in real prompts and learn best practices.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/answers/prompt-engineering-mistakes.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/answers/prompt-engineering-mistakes.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/answers/prompt-engineering-mistakes.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Prompt Engineering Mistakes Quiz",
+    "url": "https://claudflow.com/answers/prompt-engineering-mistakes.html",
+    "description": "Test your prompt engineering skills with an interactive quiz covering 15 common mistakes. Identify issues in real prompt examples, get detailed fix suggestions, and learn best practices for Claude, GPT-4o, and Gemini.",
+    "applicationCategory": "Education",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "featureList": [
+      "15-question interactive quiz on common prompt engineering mistakes",
+      "Real prompt examples with identifiable issues",
+      "Detailed explanations and fix suggestions for each mistake",
+      "Score tracking with performance categories",
+      "Before and after prompt comparison for each question",
+      "Covers vagueness, token waste, hallucination risk, and format issues",
+      "Applicable to Claude, GPT-4o, Gemini, and other LLMs",
+      "100% browser-based, no server required"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What are the most common prompt engineering mistakes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The most common prompt engineering mistakes are: being too vague (saying 'be helpful' without specific instructions), not specifying output format (letting the model choose unpredictable formats), including unnecessary context that wastes tokens, not providing examples for complex tasks, writing overly long system prompts that dilute key instructions, not setting constraints on output length, using ambiguous language that the model interprets differently than intended, and failing to handle edge cases in the prompt. These mistakes compound in production, causing inconsistent outputs and wasted API costs."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I prevent Claude from hallucinating?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To reduce hallucinations: explicitly instruct the model to say 'I don't know' when unsure, provide reference documents via RAG so the model has factual grounding, ask the model to cite its sources or quote from provided context, use lower temperature settings for factual tasks, add verification steps that check outputs against known facts, and avoid asking questions that require knowledge beyond the model's training data without providing that knowledge in the context. No technique eliminates hallucinations completely, but these reduce them significantly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Should I use few-shot examples in my prompts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, for tasks with specific output formats or domain-specific patterns. Few-shot examples are the most reliable way to teach the model your expected output structure. Use 1-3 examples for simple format requirements and 3-5 for complex or unusual formats. Each example should demonstrate a different aspect of the desired behavior. However, examples consume tokens on every API call, so keep them concise. For simple tasks where the format is obvious (like classification into predefined categories), zero-shot with clear instructions often performs equally well."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long should a system prompt be?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The ideal system prompt is 200-500 tokens for most applications. Under 200 tokens, you likely lack sufficient specificity for consistent behavior. Over 500 tokens, you are probably including redundant instructions or unnecessary context that dilutes the important directives. The key is information density: every token should convey a distinct, actionable instruction. Use structured formats (numbered lists, bullet points) instead of prose paragraphs. Test whether removing any sentence changes the model's behavior; if removing it has no effect, it is wasted tokens."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between a good and bad prompt?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A good prompt is specific (defines exactly what to do), constrained (sets clear boundaries on output), formatted (specifies the expected output structure), and testable (you can objectively evaluate whether the output meets the prompt's requirements). A bad prompt is vague ('be helpful'), unconstrained ('answer the question'), unformatted ('give me information'), and subjective ('make it good'). The difference shows up most clearly when the same prompt is run 10 times: a good prompt produces consistent outputs, while a bad prompt produces wildly different results each time."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Answers", "item": "https://claudflow.com/answers/" },
+      { "@type": "ListItem", "position": 3, "name": "Prompt Engineering Mistakes" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .pem-wrap { max-width:800px; margin:0 auto; padding:0 1.5rem 2rem; }
+    .pem-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.25rem; }
+    .pem-card h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+
+    .pem-progress { width:100%; height:8px; background:var(--bg); border-radius:4px; overflow:hidden; margin-bottom:1rem; }
+    .pem-progress-fill { height:100%; background:var(--accent); border-radius:4px; transition:width 0.3s; }
+
+    .pem-question-num { font-size:0.82rem; color:var(--text-muted); margin-bottom:0.5rem; }
+    .pem-prompt-box { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; font-family:monospace; font-size:0.82rem; color:var(--text); line-height:1.6; margin:0.75rem 0; white-space:pre-wrap; }
+    .pem-options { display:flex; flex-direction:column; gap:0.5rem; margin:1rem 0; }
+    .pem-option { background:var(--bg); border:2px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; cursor:pointer; font-size:0.88rem; color:var(--text); transition:border-color 0.15s; }
+    .pem-option:hover { border-color:var(--accent); }
+    .pem-option.selected { border-color:var(--accent); background:rgba(6,182,212,0.05); }
+    .pem-option.correct { border-color:#22c55e; background:rgba(34,197,94,0.1); }
+    .pem-option.wrong { border-color:#ef4444; background:rgba(239,68,68,0.1); }
+
+    .pem-explanation { background:var(--bg); border-left:3px solid var(--accent); padding:1rem; margin:1rem 0; font-size:0.85rem; color:var(--text-muted); line-height:1.6; display:none; }
+    .pem-explanation.visible { display:block; }
+    .pem-explanation strong { color:var(--text); }
+
+    .pem-fix { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0; display:none; }
+    .pem-fix.visible { display:grid; }
+    .pem-fix-col h4 { font-size:0.82rem; margin-bottom:0.5rem; }
+    .pem-fix-col.before h4 { color:#ef4444; }
+    .pem-fix-col.after h4 { color:#22c55e; }
+    .pem-fix-col .pem-prompt-box { font-size:0.75rem; min-height:80px; }
+
+    .pem-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:0.75rem; margin:1rem 0; }
+    .pem-stat { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; text-align:center; }
+    .pem-stat .val { font-size:1.4rem; font-weight:700; color:var(--accent); }
+    .pem-stat .lbl { font-size:0.72rem; color:var(--text-muted); margin-top:0.15rem; }
+
+    .pem-results { display:none; }
+    .pem-results.visible { display:block; }
+    .pem-grade { font-size:2rem; font-weight:700; text-align:center; margin:1rem 0; }
+    .pem-grade-label { text-align:center; font-size:1.1rem; color:var(--text-muted); margin-bottom:1rem; }
+
+    .pem-tips { margin-top:1.5rem; }
+    .pem-tips h3 { font-size:1rem; color:var(--accent); margin-bottom:0.75rem; }
+    .pem-tip { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.5rem; display:flex; gap:0.75rem; align-items:flex-start; }
+    .pem-tip .tip-icon { flex-shrink:0; width:24px; height:24px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#000; }
+    .pem-tip .tip-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .pem-tip .tip-text strong { color:var(--text); }
+
+    @media (max-width:768px) {
+      .pem-fix { grid-template-columns:1fr; }
+      .pem-stats { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/answers/" style="color:var(--accent);text-decoration:none;">Answers</a> &rsaquo;
+      <span style="color:var(--text-muted);">Prompt Engineering Mistakes</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1.5rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Prompt Engineering Mistakes Quiz</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;">Identify common prompt engineering mistakes in real examples. Learn what goes wrong and how to fix it. 15 questions covering vagueness, token waste, hallucination risk, and format issues.</p>
+    </section>
+  </main>
+
+  <div class="pem-wrap">
+    <div class="pem-card">
+      <div class="pem-progress"><div class="pem-progress-fill" id="pem-progress" style="width:0%;"></div></div>
+      <div class="pem-question-num" id="pem-qnum">Question 1 of 15</div>
+      <div id="pem-question"></div>
+      <div class="pem-options" id="pem-options"></div>
+      <div class="pem-explanation" id="pem-explanation"></div>
+      <div class="pem-fix" id="pem-fix">
+        <div class="pem-fix-col before"><h4>Before (Problem)</h4><div class="pem-prompt-box" id="pem-before"></div></div>
+        <div class="pem-fix-col after"><h4>After (Fixed)</h4><div class="pem-prompt-box" id="pem-after"></div></div>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+        <button class="btn btn-accent" id="pem-next-btn" onclick="pemNext()" style="display:none;">Next Question</button>
+      </div>
+    </div>
+
+    <div class="pem-results" id="pem-results">
+      <div class="pem-card">
+        <h3>Quiz Results</h3>
+        <div class="pem-grade" id="pem-grade"></div>
+        <div class="pem-grade-label" id="pem-grade-label"></div>
+        <div class="pem-stats" id="pem-result-stats"></div>
+        <button class="btn btn-accent" style="width:100%;margin-top:1rem;" onclick="pemRestart()">Retake Quiz</button>
+      </div>
+    </div>
+
+    <div class="pem-tips">
+      <h3>Prompt Engineering Best Practices</h3>
+      <div class="pem-tip">
+        <div class="tip-icon">1</div>
+        <div class="tip-text"><strong>Be specific, not vague.</strong> Replace "be helpful" with exact instructions like "answer in 2-3 sentences using technical terminology appropriate for a senior engineer." Vague instructions produce unpredictable outputs because the model fills in the gaps with its own interpretation, which varies between calls.</div>
+      </div>
+      <div class="pem-tip">
+        <div class="tip-icon">2</div>
+        <div class="tip-text"><strong>Always specify the output format.</strong> If you need JSON, say "respond with valid JSON matching this schema." If you need a list, say "respond with a numbered list of exactly 5 items." Without format specification, the model chooses its own format, which changes between calls and breaks downstream parsing.</div>
+      </div>
+      <div class="pem-tip">
+        <div class="tip-icon">3</div>
+        <div class="tip-text"><strong>Set explicit constraints.</strong> Define what the model should NOT do alongside what it should do. "Do not include disclaimers or caveats. Do not use bullet points. Maximum 200 words." Constraints prevent the model's default behaviors from overriding your requirements.</div>
+      </div>
+      <div class="pem-tip">
+        <div class="tip-icon">4</div>
+        <div class="tip-text"><strong>Use structured prompts over prose.</strong> Numbered instructions, labeled sections, and clear delimiters are parsed more reliably than paragraph-form instructions. "1. Read the code. 2. Identify bugs. 3. For each bug, output: {line, severity, description, fix}." is better than a prose paragraph explaining the same thing.</div>
+      </div>
+      <div class="pem-tip">
+        <div class="tip-icon">5</div>
+        <div class="tip-text"><strong>Test with 10+ diverse inputs.</strong> A prompt that works on your test example might fail on inputs that are shorter, longer, ambiguous, adversarial, or in a different domain. Build a test suite that covers your actual input distribution, not just the happy path. The <a href="/tools/system-prompt-tester.html" style="color:var(--accent);">System Prompt A/B Tester</a> structures this process.</div>
+      </div>
+      <div class="pem-tip">
+        <div class="tip-icon">6</div>
+        <div class="tip-text"><strong>Instruct the model on uncertainty.</strong> Add "If you are unsure or the information is not in the provided context, say 'I don't have enough information to answer this.' Do not guess or make up facts." This single instruction dramatically reduces hallucinations in production.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>How the Prompt Engineering Mistakes Quiz Works</h2>
+
+    <p>The Prompt Engineering Mistakes Quiz tests your ability to identify common problems in real-world prompts. Each question presents a system prompt or user prompt with a specific issue, and you must identify what is wrong from four options. After answering, you see a detailed explanation of the mistake, why it causes problems in practice, and a before-and-after comparison showing how to fix it. The quiz covers 15 categories of mistakes that account for the vast majority of quality issues in production LLM applications.</p>
+
+    <p>The quiz is designed for both beginners learning prompt engineering fundamentals and experienced practitioners who want to validate their knowledge. The questions progress from obvious issues like vague instructions to subtle problems like instruction ordering effects and implicit assumption errors. Each question is based on mistakes observed in real production prompts, not theoretical edge cases. The fix suggestions are practical and immediately applicable to your own prompts.</p>
+
+    <h2>The 15 Categories of Prompt Engineering Mistakes</h2>
+
+    <p>Vagueness is the most common mistake and the easiest to fix. Prompts that say "be helpful" or "answer well" provide no actionable guidance to the model. The model interprets vague instructions differently on each call, producing inconsistent outputs. The fix is specificity: replace every vague adjective with a concrete instruction. "Be concise" becomes "answer in 2-3 sentences." "Be accurate" becomes "cite the source document for every claim." Specificity is the single highest-leverage improvement for any prompt.</p>
+
+    <p>Missing output format specification causes the second most production issues. When the prompt does not specify the expected output structure, the model chooses its own format, which varies between calls. One response might be a paragraph, the next a bullet list, the next a numbered list. Downstream code that parses the output breaks unpredictably. Always specify the exact output format: "Respond with a JSON object containing keys: summary (string), sentiment (positive/negative/neutral), confidence (float 0-1)."</p>
+
+    <p>Token waste occurs when system prompts include unnecessary context, redundant instructions, or excessive politeness that consumes tokens without changing model behavior. "You are an incredibly helpful, knowledgeable, and friendly assistant who always aims to provide the best possible answer to every question" can be compressed to "You are a helpful assistant." The model already tries to be helpful, so restating it wastes 15 tokens per request. At 10,000 requests per day, that is 150,000 wasted tokens daily, costing $0.45 per day with Sonnet pricing. Multiply this across every unnecessary token and the waste becomes significant.</p>
+
+    <p>Hallucination risk increases when prompts encourage the model to answer questions it does not have information for. Prompts that do not include an "I don't know" escape hatch force the model to generate an answer even when it is uncertain. The fix is explicit uncertainty handling: "If the answer is not in the provided documents, say 'This information is not available in the provided context.' Do not guess or infer beyond what is explicitly stated." This instruction is the single most effective hallucination reduction technique and should be included in every factual system prompt.</p>
+
+    <p>Instruction ordering effects are a subtle mistake. Models pay more attention to instructions at the beginning and end of the system prompt than instructions in the middle. Burying the most important constraint in the middle of a long prompt reduces its effectiveness. Place your most critical instructions first and last. Format rules, safety constraints, and output specifications should be at the top. Secondary preferences and style guidelines can go in the middle.</p>
+
+    <h2>Common Patterns in Bad Prompts</h2>
+
+    <p>The kitchen sink prompt tries to handle every possible scenario in a single system prompt. It contains dozens of instructions covering every edge case the developer thought of, resulting in a 3,000-token prompt that the model struggles to follow consistently. The fix is to prioritize: identify the 5 most important instructions and cut everything else. If specific edge cases need handling, add them as conditional rules rather than blanket instructions.</p>
+
+    <p>The conflicting instruction prompt gives the model contradictory directions. "Be concise" followed by "provide thorough explanations" three paragraphs later creates a conflict the model resolves unpredictably. Review your prompt for contradictions by reading each instruction in isolation and checking whether any pair conflicts. When you need both conciseness and thoroughness, be explicit about when each applies: "For simple questions, answer in 1-2 sentences. For complex questions, provide a detailed explanation."</p>
+
+    <p>The role confusion prompt assigns a role that conflicts with the task. "You are a creative storyteller" combined with "extract the exact dollar amounts from this invoice" confuses the model about whether to prioritize creative interpretation or exact extraction. The role should match the primary task. For extraction tasks, use roles like "precise data extractor." For creative tasks, use roles like "creative writer." Mismatched roles degrade output quality on the primary task.</p>
+
+    <h2>Privacy and Local Execution</h2>
+
+    <p>The Prompt Engineering Mistakes Quiz runs entirely in your browser. Quiz questions, answers, scores, and progress are processed client-side using JavaScript. No data is sent to any server. There are no accounts, no cookies, no analytics, and no server-side processing. Your quiz results remain completely private on your device.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What are the most common prompt engineering mistakes?</summary>
+      <p>Being too vague, not specifying output format, including unnecessary context that wastes tokens, not providing examples for complex tasks, writing overly long system prompts, not setting output length constraints, using ambiguous language, and failing to handle edge cases.</p>
+    </details>
+
+    <details>
+      <summary>How do I prevent Claude from hallucinating?</summary>
+      <p>Explicitly instruct the model to say "I don't know" when unsure, provide reference documents via RAG, ask for source citations, use lower temperature for factual tasks, add verification steps, and avoid questions requiring knowledge beyond what is in the context.</p>
+    </details>
+
+    <details>
+      <summary>Should I use few-shot examples in my prompts?</summary>
+      <p>Yes, for tasks with specific output formats. Use 1-3 examples for simple formats, 3-5 for complex ones. Each example should demonstrate a different aspect. For simple tasks where format is obvious, zero-shot with clear instructions often works equally well.</p>
+    </details>
+
+    <details>
+      <summary>How long should a system prompt be?</summary>
+      <p>The ideal is 200-500 tokens. Under 200, you likely lack specificity. Over 500, you are probably including redundant instructions. Test whether removing any sentence changes behavior; if not, it is wasted tokens.</p>
+    </details>
+
+    <details>
+      <summary>What is the difference between a good and bad prompt?</summary>
+      <p>A good prompt is specific, constrained, formatted, and testable. A bad prompt is vague, unconstrained, unformatted, and subjective. Run the same prompt 10 times: a good prompt produces consistent outputs, a bad prompt produces wildly different results.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/system-prompt-tester.html">System Prompt A/B Tester</a></li>
+          <li><a href="/tools/context-window-optimizer.html">Context Window Optimizer</a></li>
+          <li><a href="/tools/token-cost-tracker.html">Token Cost Tracker</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration</a></li>
+          <li><a href="/answers/claude-memory-strategies.html">Claude Memory Strategies</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/claude-use-case-gallery.html">Claude Use Case Gallery</a></li>
+          <li><a href="/research/agent-pattern-library.html">Agent Pattern Library</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var QUESTIONS = [
+    {prompt:'You are a helpful assistant. Answer questions well.',question:'What is the primary mistake in this system prompt?',options:['Too short','Too vague - no specific instructions','Missing role definition','Wrong tone'],correct:1,explanation:'This prompt is too vague. "Helpful" and "well" are subjective and provide no actionable guidance. The model interprets these differently on each call, producing inconsistent outputs.',before:'You are a helpful assistant. Answer questions well.',after:'You are a Python programming assistant. Answer questions about Python in 2-3 sentences. Include a code example when relevant. If the question is outside Python, say "I can only help with Python questions."'},
+    {prompt:'You are an expert data analyst. Analyze the data I give you and provide insights. Be thorough and comprehensive. Cover all angles. Make sure to include everything important. Give me a detailed analysis with all relevant information.',question:'What is the main issue with this prompt?',options:['Missing output format specification','Role is too specific','Too many sentences','Should use bullet points'],correct:0,explanation:'The prompt asks for analysis but never specifies the output format. "Thorough," "comprehensive," and "detailed" all say the same thing. Without format specification, the model produces unpredictable structures that break downstream parsing.',before:'Analyze the data and provide insights. Be thorough and comprehensive. Cover all angles.',after:'Analyze the data. Output a JSON object with: {summary: string (2-3 sentences), key_metrics: [{name, value, trend}], risks: [string], recommendations: [string]}. Maximum 5 items per array.'},
+    {prompt:'You are a friendly, warm, kind, helpful, knowledgeable, professional, expert customer support agent who always strives to go above and beyond to help every customer.',question:'What problem does this prompt have?',options:['Not enough adjectives','Token waste on redundant modifiers','Role is inappropriate','Missing safety instructions'],correct:1,explanation:'Seven adjectives that all mean roughly the same thing waste tokens on every API call. The model does not become more helpful with more synonyms. Each redundant word costs tokens multiplied by every request.',before:'You are a friendly, warm, kind, helpful, knowledgeable, professional, expert customer support agent who always strives to go above and beyond.',after:'You are a customer support agent. Tone: friendly and professional. Focus: resolve the issue in the fewest turns possible.'},
+    {prompt:'Answer any question the user asks. Provide accurate information on any topic.',question:'What critical element is missing from this prompt?',options:['Few-shot examples','Uncertainty handling (when to say "I don\'t know")','Temperature setting','Model selection'],correct:1,explanation:'Without an instruction to handle uncertainty, the model will fabricate answers rather than admitting ignorance. This is the primary cause of hallucinations in production. Always include an explicit "I don\'t know" escape hatch.',before:'Answer any question the user asks. Provide accurate information on any topic.',after:'Answer questions using only the information provided in the context. If the answer is not in the provided context, say "I don\'t have enough information to answer this." Do not guess or infer beyond what is explicitly stated.'},
+    {prompt:'Generate a blog post about machine learning. Make it good. It should be interesting and informative.',question:'What makes this prompt ineffective?',options:['No length constraint or structural specification','Topic is too broad','Should specify the audience','All of the above'],correct:3,explanation:'This prompt fails on multiple levels: no word count or length constraint, no structural requirements (headings, sections), no target audience, and no specific angle on the broad topic. "Good," "interesting," and "informative" are subjective and unactionable.',before:'Generate a blog post about machine learning. Make it good.',after:'Write a 1,000-word blog post titled "3 Machine Learning Techniques Every Data Scientist Should Know in 2026." Audience: intermediate data scientists. Structure: intro (100 words), 3 sections with H2 headings (250 words each), conclusion with call to action (150 words). Tone: conversational but technically precise.'},
+    {prompt:'You are a code reviewer.\n\nBe thorough in your reviews.\nCheck for bugs.\nCheck for security issues.\nCheck for performance.\nAlso be concise in your feedback.\nDon\'t write too much.',question:'What contradiction exists in this prompt?',options:['Code reviewer vs. code writer','Thorough vs. concise','Bug check vs. security check','Multiple instructions vs. single instruction'],correct:1,explanation:'"Be thorough" and "be concise / don\'t write too much" are contradictory instructions. The model cannot know which to prioritize, leading to inconsistent review depth across calls.',before:'Be thorough in your reviews.\nAlso be concise in your feedback.\nDon\'t write too much.',after:'For each issue found, output one line: {severity: critical/warning/info} | {file:line} | {description in under 20 words} | {suggested fix in under 20 words}. Report all issues but keep each entry to a single line.'},
+    {prompt:'Summarize this article. Also translate it to French. And extract the key entities. Output everything.',question:'What structural problem does this prompt have?',options:['Too many tasks in a single prompt without clear separation','Missing model specification','Should use XML tags','Article is too long'],correct:0,explanation:'Multiple unrelated tasks (summarize, translate, extract entities) in one prompt without clear output structure leads to jumbled responses. Either use separate API calls per task or define an explicit output schema with labeled sections for each task.',before:'Summarize this article. Also translate it to French. And extract the key entities. Output everything.',after:'Process this article and output a JSON object with exactly three keys:\n1. "summary": English summary in 3 sentences\n2. "french_translation": Full French translation\n3. "entities": Array of {name, type} objects for key entities'},
+    {prompt:'You are an AI assistant. When the user asks about our product, answer based on the documentation. When they ask about competitors, say you don\'t have that information. When they ask off-topic questions, redirect them. When they ask technical questions, be detailed. When they ask simple questions, be brief.',question:'What is the issue with this conditional instruction pattern?',options:['Too many conditions creates ambiguity about overlapping cases','Should use if-else syntax','Conditions are too specific','Missing a default case'],correct:0,explanation:'Five separate conditions with no priority ordering creates ambiguity. What happens when a question is both about the product AND technical? Or simple AND off-topic? The model resolves ambiguities unpredictably. Prioritize conditions and handle overlaps explicitly.',before:'When technical, be detailed. When simple, be brief. When off-topic, redirect.',after:'Priority rules (apply in order):\n1. Off-topic (not about our product): Redirect to product focus\n2. Competitor questions: "I can only help with [Product] questions"\n3. All product questions: Answer from docs. Technical depth: match the question complexity. Max 200 words.'},
+    {prompt:'Please analyze the following customer feedback and provide sentiment analysis. I would really appreciate if you could also identify the main themes and any actionable suggestions. Thank you so much for your help with this task!',question:'What efficiency problem does this prompt have?',options:['Missing the word "please"','Unnecessary politeness tokens that waste money at scale','Should be shorter','Wrong task description'],correct:1,explanation:'"Please," "I would really appreciate," "Thank you so much for your help with this task!" add ~30 tokens per request with zero impact on model behavior. At 10,000 requests/day, that is 300,000 wasted tokens daily. Models do not respond better to politeness.',before:'Please analyze the following customer feedback and provide sentiment analysis. I would really appreciate if you could also identify the main themes and any actionable suggestions. Thank you so much!',after:'Analyze this customer feedback. Output: {sentiment: positive/negative/neutral, themes: [string], actionable_suggestions: [string]}'},
+    {prompt:'You are a medical assistant. Answer health questions from patients.',question:'What dangerous omission does this medical prompt have?',options:['Missing HIPAA compliance instructions','No disclaimer about not being a real doctor','No mention of emergency situations','All of the above'],correct:3,explanation:'Medical prompts without disclaimers, emergency handling, and compliance instructions create serious liability. The prompt must state it is not a substitute for medical advice, instruct users to call emergency services for urgent situations, and comply with healthcare data regulations.',before:'You are a medical assistant. Answer health questions from patients.',after:'You are a health information assistant. You are NOT a doctor. ALWAYS include: "This is general health information, not medical advice. Consult a healthcare provider for diagnosis and treatment." For emergencies: "Call 911 or go to the nearest emergency room immediately." Never diagnose conditions or prescribe treatments.'},
+    {prompt:'Write me some code to do the thing with the database.',question:'What fundamental issue makes this prompt fail?',options:['No programming language specified','No database type specified','No description of what "the thing" is','All of the above: completely underspecified'],correct:3,explanation:'This prompt specifies nothing actionable: no programming language, no database type (SQL, NoSQL, graph), no operation (read, write, migrate, backup), no schema, no error handling requirements. The model must guess everything, producing code that probably does not match what you need.',before:'Write me some code to do the thing with the database.',after:'Write a Python function using SQLAlchemy that:\n- Connects to a PostgreSQL database\n- Queries the "users" table for active users (status="active")\n- Returns a list of dicts with keys: id, email, created_at\n- Includes error handling for connection failures\n- Type hints on all parameters and return value'},
+    {prompt:'You are a creative writer. Write exactly what I tell you. Do not add any creative elements. Follow my instructions precisely. Be creative and original.',question:'What makes this prompt self-contradictory?',options:['Creative writer role vs. "do not add creative elements"','Too many instructions','Missing word count','Wrong role name'],correct:0,explanation:'The prompt assigns a "creative writer" role but then says "do not add creative elements" and "follow precisely," then contradicts that with "be creative and original." The model receives four conflicting signals and cannot satisfy all of them simultaneously.',before:'You are a creative writer. Do not add any creative elements. Follow instructions precisely. Be creative and original.',after:'You are a content writer. Write the exact content I describe. Maintain the structure and key points I specify. Within that structure, use engaging language and varied sentence patterns to keep the text readable.'},
+    {prompt:'Classify this email as spam or not spam.\n\nExamples:\n"Buy cheap watches now!" -> Spam\n"Buy discount pills online!" -> Spam\n"Get rich quick with this trick!" -> Spam\n"FREE money waiting for you!" -> Spam\n"Click here to claim your prize!" -> Spam',question:'What is wrong with the few-shot examples?',options:['Not enough examples','All examples are the same class (spam), no not-spam examples','Examples are too short','Should use JSON format'],correct:1,explanation:'All five examples are spam with zero not-spam examples. The model learns a biased pattern and may classify legitimate emails as spam. Few-shot examples must include examples of EVERY output class in balanced proportions.',before:'Examples:\n"Buy cheap watches!" -> Spam\n"Buy discount pills!" -> Spam\n"Get rich quick!" -> Spam',after:'Examples:\n"Buy cheap watches!" -> Spam\n"Meeting at 3pm tomorrow" -> Not Spam\n"FREE money!!!" -> Spam\n"Invoice #4521 attached" -> Not Spam\n"Click to claim prize!" -> Spam\n"Can you review the Q3 report?" -> Not Spam'},
+    {prompt:'You are a SQL expert. The user will ask database questions.\n\nIMPORTANT: Always use PostgreSQL syntax.\n\nNote: Support MySQL too if they ask.\n\nRemember: Default to PostgreSQL.\n\nAlso: SQLite queries should work too.\n\nP.S. Oracle syntax is fine as well.',question:'What instruction pattern problem exists here?',options:['Too many database types','Scattered contradictory instructions that erode the "default" rule','Should only support one database','Missing table schemas'],correct:1,explanation:'The prompt starts with "always use PostgreSQL" but then adds exceptions for MySQL, SQLite, and Oracle, scattered across multiple postscripts. By the end, the "always" instruction is meaningless. Contradictions added as afterthoughts erode the primary instruction.',before:'IMPORTANT: Always use PostgreSQL.\nNote: Support MySQL too.\nRemember: Default to PostgreSQL.\nAlso: SQLite works too.\nP.S. Oracle is fine.',after:'Default: PostgreSQL syntax.\nIf the user specifies a different database (MySQL, SQLite, Oracle), use that syntax instead.\nAlways state which database syntax you are using at the top of your response.'},
+    {prompt:'Analyze this legal contract. Tell me if there are any problems.',question:'What makes this legal analysis prompt inadequate?',options:['No jurisdiction specified','No definition of what constitutes a "problem"','No comparison framework or checklist','All of the above: completely unstructured for a critical task'],correct:3,explanation:'Legal analysis requires jurisdiction context (US, UK, EU law differs dramatically), a definition of "problems" (missing clauses, non-standard terms, regulatory violations), and a structured review framework. This prompt produces superficial analysis that misses critical issues because the model has no guidance on what to look for.',before:'Analyze this legal contract. Tell me if there are any problems.',after:'Analyze this contract under US commercial law (UCC). Review for:\n1. Missing standard clauses (indemnification, limitation of liability, termination, dispute resolution, governing law)\n2. One-sided terms that favor one party\n3. Ambiguous language that could be disputed\n4. Regulatory compliance issues\nFor each issue: {clause_reference, severity: high/medium/low, description, suggested_revision}'}
+  ];
+
+  var currentQ = 0;
+  var score = 0;
+  var answered = false;
+
+  function renderQuestion(){
+    var q = QUESTIONS[currentQ];
+    document.getElementById('pem-qnum').textContent = 'Question '+(currentQ+1)+' of '+QUESTIONS.length;
+    document.getElementById('pem-progress').style.width = ((currentQ/QUESTIONS.length)*100)+'%';
+
+    var qEl = document.getElementById('pem-question');
+    qEl.innerHTML = '<div class="pem-prompt-box">'+q.prompt.replace(/\n/g,'<br>')+'</div><p style="font-size:0.92rem;font-weight:600;color:var(--text);margin-top:0.75rem;">'+q.question+'</p>';
+
+    var opts = document.getElementById('pem-options');
+    var html = '';
+    for(var i=0;i<q.options.length;i++){
+      html += '<div class="pem-option" data-idx="'+i+'" onclick="pemAnswer('+i+')">'+String.fromCharCode(65+i)+'. '+q.options[i]+'</div>';
+    }
+    opts.innerHTML = html;
+
+    document.getElementById('pem-explanation').classList.remove('visible');
+    document.getElementById('pem-fix').classList.remove('visible');
+    document.getElementById('pem-next-btn').style.display = 'none';
+    answered = false;
+  }
+
+  window.pemAnswer = function(idx){
+    if(answered) return;
+    answered = true;
+    var q = QUESTIONS[currentQ];
+    var options = document.querySelectorAll('.pem-option');
+    for(var i=0;i<options.length;i++){
+      if(i===q.correct) options[i].classList.add('correct');
+      else if(i===idx && i!==q.correct) options[i].classList.add('wrong');
+      options[i].style.pointerEvents = 'none';
+    }
+    if(idx===q.correct) score++;
+
+    var expl = document.getElementById('pem-explanation');
+    expl.innerHTML = '<strong>'+(idx===q.correct?'Correct!':'Incorrect. The answer is: '+q.options[q.correct])+'</strong><br><br>'+q.explanation;
+    expl.classList.add('visible');
+
+    document.getElementById('pem-before').textContent = q.before;
+    document.getElementById('pem-after').textContent = q.after;
+    document.getElementById('pem-fix').classList.add('visible');
+
+    if(currentQ < QUESTIONS.length-1){
+      document.getElementById('pem-next-btn').style.display = 'inline-block';
+      document.getElementById('pem-next-btn').textContent = 'Next Question';
+    } else {
+      document.getElementById('pem-next-btn').style.display = 'inline-block';
+      document.getElementById('pem-next-btn').textContent = 'See Results';
+    }
+  };
+
+  window.pemNext = function(){
+    if(currentQ < QUESTIONS.length-1){
+      currentQ++;
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  };
+
+  function showResults(){
+    document.getElementById('pem-results').classList.add('visible');
+    var pct = Math.round((score/QUESTIONS.length)*100);
+    var grade, color;
+    if(pct>=90){ grade='Prompt Engineering Expert'; color='#22c55e'; }
+    else if(pct>=70){ grade='Skilled Practitioner'; color='var(--accent)'; }
+    else if(pct>=50){ grade='Intermediate - Keep Learning'; color='#eab308'; }
+    else { grade='Beginner - Review the Tips Below'; color='#ef4444'; }
+
+    document.getElementById('pem-grade').innerHTML = '<span style="color:'+color+';">'+score+'/'+QUESTIONS.length+'</span>';
+    document.getElementById('pem-grade-label').textContent = grade;
+    document.getElementById('pem-result-stats').innerHTML = '<div class="pem-stat"><div class="val">'+score+'</div><div class="lbl">Correct</div></div>'
+      +'<div class="pem-stat"><div class="val">'+(QUESTIONS.length-score)+'</div><div class="lbl">Incorrect</div></div>'
+      +'<div class="pem-stat"><div class="val">'+pct+'%</div><div class="lbl">Score</div></div>'
+      +'<div class="pem-stat"><div class="val">'+grade.split(' - ')[0]+'</div><div class="lbl">Level</div></div>';
+    document.getElementById('pem-progress').style.width = '100%';
+  }
+
+  window.pemRestart = function(){
+    currentQ = 0; score = 0;
+    document.getElementById('pem-results').classList.remove('visible');
+    renderQuestion();
+  };
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>

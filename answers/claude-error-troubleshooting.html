@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude API Error Troubleshooting &mdash; Searchable Error Code Database | ClaudFlow</title>
+  <meta name="description" content="Searchable database of 25+ Claude API errors with HTTP status codes, causes, fix steps, and example code. Filter by category: auth, rate limit, input validation, server errors.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude API Error Troubleshooting — Searchable Error Code Database">
+  <meta property="og:description" content="Searchable database of 25+ Claude API errors with HTTP status codes, causes, fix steps, and example code. Filter by category.">
+  <meta property="og:url" content="https://claudflow.com/answers/claude-error-troubleshooting.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Claude API Error Troubleshooting — Searchable Error Code Database">
+  <meta name="twitter:description" content="Searchable database of 25+ Claude API errors with HTTP status codes, causes, fix steps, and example code.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/answers/claude-error-troubleshooting.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/answers/claude-error-troubleshooting.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/answers/claude-error-troubleshooting.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Claude API Error Troubleshooting — Searchable Error Code Database",
+    "description": "Comprehensive database of Claude API error codes with HTTP status codes, root causes, step-by-step fix instructions, and working code examples. Filterable by category.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-25",
+    "dateModified": "2026-05-25",
+    "mainEntityOfPage": "https://claudflow.com/answers/claude-error-troubleshooting.html",
+    "image": "https://claudflow.com/assets/og-image.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does Claude API error 429 rate_limit_error mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "HTTP 429 rate_limit_error means you have exceeded the API rate limit for your current plan. The Claude API enforces limits on requests per minute (RPM) and tokens per minute (TPM). To fix this, implement exponential backoff with jitter in your retry logic, reduce request frequency, batch smaller requests together, or upgrade your API plan for higher limits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I fix Claude API authentication_error invalid_api_key?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The authentication_error with type invalid_api_key (HTTP 401) means your API key is missing, malformed, or revoked. Verify the key starts with 'sk-ant-', check for leading/trailing whitespace, confirm the key is active in the Anthropic Console, and ensure the x-api-key header is set correctly. Environment variable issues are the most common cause."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What causes Claude API overloaded_error and how do I handle it?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "HTTP 529 overloaded_error occurs when Claude API servers are at capacity. This is a temporary condition. Implement retry with exponential backoff starting at 5-10 seconds. Do not retry immediately as this worsens the overload. Consider queuing requests and processing them when capacity returns. Monitor the Anthropic status page for ongoing incidents."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why am I getting invalid_request_error for my Claude API messages?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The invalid_request_error (HTTP 400) covers multiple input validation failures: messages array is empty or malformed, the model name is incorrect, max_tokens exceeds the model limit, content contains unsupported types, or roles are not alternating correctly between user and assistant. Check your request body matches the API specification exactly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I handle Claude API context window exceeded errors?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "When total input tokens plus max_tokens exceeds the model context window, you get an invalid_request_error. Claude Sonnet supports 200K tokens. To fix this, reduce your input by summarizing conversation history, truncating older messages, implementing a sliding window over the conversation, or using the Map-Reduce pattern to process long inputs in chunks."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
+  </script>
+  <style>
+    .error-tool { max-width:900px; margin:0 auto; padding:0 1.5rem; }
+    .error-search-wrap { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:1.25rem; margin-bottom:1.5rem; }
+    .error-search-wrap h3 { color:var(--accent); font-size:1.15rem; margin-bottom:1rem; }
+    .error-search-row { display:flex; gap:0.75rem; margin-bottom:0.75rem; flex-wrap:wrap; }
+    .error-search-row input { flex:1; min-width:200px; padding:0.55rem 0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-family:var(--font-body); font-size:0.9rem; }
+    .error-search-row input:focus { outline:none; border-color:var(--accent); }
+    .error-filters { display:flex; gap:0.5rem; flex-wrap:wrap; }
+    .error-filters button { padding:0.4rem 0.8rem; font-size:0.82rem; }
+    .error-filters button.active { background:var(--accent); color:#000; border-color:var(--accent); }
+    .error-count { color:var(--text-muted); font-size:0.82rem; margin-top:0.5rem; }
+    .error-list { display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem; }
+    .error-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:border-color 0.2s; }
+    .error-card:hover { border-color:var(--accent); }
+    .error-card-header { display:flex; align-items:center; gap:0.75rem; padding:0.85rem 1rem; cursor:pointer; user-select:none; }
+    .error-card-header .err-status { background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:0.2rem 0.5rem; font-family:var(--font-display); font-size:0.78rem; font-weight:700; flex-shrink:0; min-width:40px; text-align:center; }
+    .error-card-header .err-status.s4xx { color:#eab308; border-color:#eab308; }
+    .error-card-header .err-status.s5xx { color:#ef4444; border-color:#ef4444; }
+    .error-card-header .err-status.s2xx { color:#22c55e; border-color:#22c55e; }
+    .error-card-header .err-name { font-family:var(--font-display); font-size:0.88rem; color:var(--text); flex:1; }
+    .error-card-header .err-cat { font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; background:var(--bg); padding:0.15rem 0.5rem; border-radius:3px; flex-shrink:0; }
+    .error-card-header .err-toggle { color:var(--text-muted); font-size:0.9rem; transition:transform 0.2s; flex-shrink:0; }
+    .error-card.open .err-toggle { transform:rotate(180deg); }
+    .error-card-body { display:none; padding:0 1rem 1rem; border-top:1px solid var(--border); }
+    .error-card.open .error-card-body { display:block; padding-top:1rem; }
+    .error-card-body h4 { font-size:0.85rem; color:var(--accent); margin:0.75rem 0 0.35rem; font-family:var(--font-display); }
+    .error-card-body h4:first-child { margin-top:0; }
+    .error-card-body p { font-size:0.88rem; color:var(--text-muted); margin-bottom:0.5rem; line-height:1.6; }
+    .error-card-body ul { margin:0 0 0.75rem 1.25rem; }
+    .error-card-body li { font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem; }
+    .error-card-body pre { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; font-family:var(--font-display); font-size:0.78rem; overflow-x:auto; margin:0.5rem 0 0.75rem; white-space:pre-wrap; }
+    .error-card-body code { font-family:var(--font-display); font-size:0.82rem; }
+    .error-card-body .fix-steps { counter-reset:fix; list-style:none; margin-left:0; padding-left:0; }
+    .error-card-body .fix-steps li { counter-increment:fix; padding-left:1.5rem; position:relative; }
+    .error-card-body .fix-steps li::before { content:counter(fix)"."; position:absolute; left:0; color:var(--accent); font-weight:600; font-size:0.82rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:900px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/answers/" style="color:var(--accent);text-decoration:none;">Answers</a> &rsaquo;
+      <span style="color:var(--text-muted);">Claude Error Troubleshooting</span>
+    </nav>
+
+    <section style="margin-bottom:2rem;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">Claude API Error Troubleshooting</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;margin-bottom:0.5rem;">Searchable database of 25+ Claude API errors with causes, fix steps, and example code.</p>
+      <p style="color:var(--text-muted);font-size:0.88rem;">May 25, 2026 &middot; By <a href="/about.html" style="color:var(--accent);text-decoration:none;">Michael Lip</a></p>
+    </section>
+  </main>
+
+  <div class="error-tool">
+    <div class="error-search-wrap">
+      <h3>Search Error Codes</h3>
+      <div class="error-search-row">
+        <input type="text" id="error-search" placeholder="Search by error code, name, HTTP status, or keyword..." oninput="filterErrors()">
+      </div>
+      <div class="error-filters" id="error-filters">
+        <button class="btn active" onclick="setFilter('all')">All</button>
+        <button class="btn" onclick="setFilter('auth')">Auth</button>
+        <button class="btn" onclick="setFilter('rate_limit')">Rate Limit</button>
+        <button class="btn" onclick="setFilter('input')">Input</button>
+        <button class="btn" onclick="setFilter('server')">Server</button>
+        <button class="btn" onclick="setFilter('streaming')">Streaming</button>
+        <button class="btn" onclick="setFilter('billing')">Billing</button>
+      </div>
+      <div class="error-count" id="error-count"></div>
+    </div>
+    <div class="error-list" id="error-list"></div>
+  </div>
+
+  <div class="last-updated" style="text-align:center;margin:1rem 0;"><time datetime="2026-05-25">Last updated: May 25, 2026</time></div>
+
+  <section class="page-content" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;line-height:1.7;">
+    <h2>Understanding Claude API Errors</h2>
+
+    <p>The Claude API returns structured error responses that identify what went wrong and why. Every error response includes an HTTP status code, an error type string, and a human-readable message. Understanding these errors is essential for building reliable AI workflows because error handling determines whether your prompt chain degrades gracefully or crashes completely when something unexpected happens.</p>
+
+    <p>Errors fall into six categories. Authentication errors mean your API key is invalid, expired, or missing. Rate limit errors mean you are sending requests too fast or consuming too many tokens per minute. Input validation errors mean your request body is malformed, missing required fields, or contains values outside acceptable ranges. Server errors mean the API infrastructure is experiencing problems. Streaming errors occur specifically when using server-sent events for streamed responses. Billing errors mean your account has payment issues or has exceeded spending limits.</p>
+
+    <h2>Error Handling Strategy for Prompt Chains</h2>
+
+    <p>When building multi-step AI workflows with <a href="/">ClaudFlow</a>, error handling at each step determines the reliability of the entire pipeline. The recommended strategy uses three tiers of error handling. Tier one handles retryable errors like rate limits and server overload with exponential backoff. Tier two handles recoverable errors like context length exceeded by reducing input size and retrying. Tier three handles non-recoverable errors like authentication failures by failing fast with a clear error message rather than wasting tokens on retries that will never succeed.</p>
+
+    <p>The searchable database above covers every error you will encounter when building with the Claude API. Each entry includes the exact HTTP status code, the error type string from the response body, the root cause, step-by-step fix instructions, and a working code example showing proper error handling. Use the category filters to quickly find errors related to your current issue, or search by error code, status code, or keyword.</p>
+
+    <h2>Retryable vs Non-Retryable Errors</h2>
+
+    <p>Not all errors should be retried. Retrying a non-retryable error wastes time, money, and creates unnecessary load on the API. The distinction is straightforward. Retryable errors are caused by temporary conditions that will resolve on their own: rate limits reset after the time window passes, server overload clears as load decreases, and network timeouts often succeed on the next attempt. Non-retryable errors are caused by permanent conditions that require code changes: invalid API keys need to be replaced, malformed request bodies need to be fixed, and insufficient permissions require account configuration changes.</p>
+
+    <p>For retryable errors, implement exponential backoff with jitter. Start with a 1-second delay, double it on each retry, and add random jitter to prevent thundering herd effects when multiple clients retry simultaneously. Cap the maximum delay at 60 seconds and the maximum retry count at 5 attempts. For rate limit errors specifically, the API returns a Retry-After header indicating exactly how long to wait before the next request will succeed. Use this value when available instead of estimating.</p>
+
+    <h2>Common Error Patterns in Production</h2>
+
+    <p>Several error patterns appear frequently in production AI applications. The most common is context window overflow in long conversations. As conversation history grows, the total token count eventually exceeds the model's context window. The fix is implementing a sliding window that summarizes older messages or truncates the conversation history. The <a href="/guides/prompt-chaining-patterns.html">prompt chaining patterns guide</a> covers the Map-Reduce pattern for handling long inputs.</p>
+
+    <p>The second most common pattern is rate limit exhaustion during batch processing. When processing hundreds of items through a prompt chain, naive sequential processing hits rate limits quickly. The fix is implementing a token bucket or leaky bucket rate limiter that spaces requests to stay within your plan's RPM and TPM limits. For parallel branches in your <a href="/tools/workflow-builder.html">workflow designs</a>, add rate limiting between parallel API calls to prevent burst-triggered rate limits.</p>
+
+    <p>The third common pattern is intermittent server errors during high-traffic periods. The Claude API occasionally returns 500 or 529 errors during peak usage. These are always temporary. Implement retry logic with exponential backoff and your workflow will handle these transparently. Do not surface transient server errors to end users unless all retry attempts are exhausted.</p>
+
+    <h2>Monitoring and Alerting</h2>
+
+    <p>Production AI workflows should log every API error with the full error response, the request that triggered it, and the timestamp. This data enables you to identify patterns: are you hitting rate limits at specific times of day, are certain prompts consistently triggering validation errors, are server errors correlated with specific model versions or features. <a href="https://epochpilot.com">EpochPilot</a> provides timestamp utilities for building monitoring dashboards. <a href="https://lochbot.com">LochBot</a> offers security monitoring tools that complement API error tracking.</p>
+
+    <p>Set up alerts for error rate thresholds rather than individual errors. A single 429 rate limit error is expected behavior. A sustained 10% error rate over 5 minutes indicates a systemic issue. A single 401 authentication error after a deployment indicates a configuration problem. Threshold-based alerting reduces noise and surfaces the errors that actually require human attention.</p>
+
+    <h2>Error Handling in Different Languages</h2>
+
+    <p>The Anthropic Python SDK raises specific exception classes for different error types: anthropic.APIConnectionError for network issues, anthropic.RateLimitError for 429 responses, anthropic.APIStatusError for other HTTP errors. The JavaScript SDK similarly throws typed errors. Using typed exceptions in your try-catch blocks enables precise error handling where each error category triggers the appropriate recovery strategy. The code examples in each error entry above show the correct exception handling for both Python and JavaScript.</p>
+
+    <p>For teams building with the Claude API, <a href="https://claudkit.com">ClaudKit</a> provides API request builders and testing tools that help you construct valid requests and debug errors before deploying to production. For prompt template management, <a href="https://claudhq.com">ClaudHQ</a> maintains a library of tested prompts that are pre-validated against common input errors. The <a href="https://zovo.one/tools">Zovo Tools</a> network provides a comprehensive set of developer utilities for every stage of AI application development.</p>
+  </section>
+
+  <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>What does Claude API error 429 rate_limit_error mean?</summary>
+      <p>HTTP 429 rate_limit_error means you have exceeded the API rate limit for your current plan. The Claude API enforces limits on requests per minute and tokens per minute. To fix this, implement exponential backoff with jitter in your retry logic, reduce request frequency, batch smaller requests together, or upgrade your API plan for higher limits.</p>
+    </details>
+
+    <details>
+      <summary>How do I fix Claude API authentication_error invalid_api_key?</summary>
+      <p>The authentication_error with type invalid_api_key (HTTP 401) means your API key is missing, malformed, or revoked. Verify the key starts with "sk-ant-", check for leading/trailing whitespace, confirm the key is active in the Anthropic Console, and ensure the x-api-key header is set correctly. Environment variable issues are the most common cause.</p>
+    </details>
+
+    <details>
+      <summary>What causes Claude API overloaded_error and how do I handle it?</summary>
+      <p>HTTP 529 overloaded_error occurs when Claude API servers are at capacity. This is a temporary condition. Implement retry with exponential backoff starting at 5-10 seconds. Do not retry immediately as this worsens the overload. Consider queuing requests and processing them when capacity returns.</p>
+    </details>
+
+    <details>
+      <summary>Why am I getting invalid_request_error for my Claude API messages?</summary>
+      <p>The invalid_request_error (HTTP 400) covers multiple input validation failures: messages array is empty or malformed, the model name is incorrect, max_tokens exceeds the model limit, content contains unsupported types, or roles are not alternating correctly between user and assistant. Check your request body matches the API specification exactly.</p>
+    </details>
+
+    <details>
+      <summary>How do I handle Claude API context window exceeded errors?</summary>
+      <p>When total input tokens plus max_tokens exceeds the model context window, you get an invalid_request_error. Claude Sonnet supports 200K tokens. To fix this, reduce your input by summarizing conversation history, truncating older messages, implementing a sliding window, or using the Map-Reduce pattern to process long inputs in chunks.</p>
+    </details>
+  </section>
+
+  <section class="content-discovery" style="max-width:960px;margin:3rem auto;padding:0 1rem;">
+    <style>
+      .content-discovery h2 { text-align:center; margin-bottom:2rem; }
+      .content-discovery .disc-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; margin-bottom:2.5rem; }
+      .content-discovery .disc-group h3 { font-size:1.1rem; margin-bottom:0.75rem; color:var(--accent); border-bottom:1px solid var(--border); padding-bottom:0.5rem; }
+      .content-discovery .disc-group ul { list-style:none; padding:0; margin:0; }
+      .content-discovery .disc-group li { margin-bottom:0.4rem; }
+      .content-discovery .disc-group a { color:var(--text); text-decoration:none; font-size:0.9rem; }
+      .content-discovery .disc-group a:hover { color:var(--accent); text-decoration:underline; }
+    </style>
+    <h2>Explore ClaudFlow</h2>
+    <div class="disc-grid">
+      <div class="disc-group">
+        <h3>Related Tools</h3>
+        <ul>
+          <li><a href="/tools/workflow-builder.html">Visual Workflow Designer</a></li>
+          <li><a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns</a></li>
+          <li><a href="/">ClaudFlow Home &mdash; Canvas Builder</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Guides</h3>
+        <ul>
+          <li><a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation</a></li>
+          <li><a href="/blog/ai-prompt-chaining-advanced.html">Advanced Prompt Chaining</a></li>
+        </ul>
+      </div>
+      <div class="disc-group">
+        <h3>Research</h3>
+        <ul>
+          <li><a href="/research/workflow-automation-patterns.html">Workflow Automation Patterns</a></li>
+          <li><a href="/research/ai-workflow-architectures.html">AI Workflow Architectures</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;">
+      <div style="width:48px;height:48px;background:var(--accent);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;font-size:1.1rem;">ML</div>
+      <div>
+        <div style="font-weight:600;margin-bottom:0.25rem;">Michael Lip</div>
+        <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">Solo developer building free tools for the AI engineering community. Creator of <a href="https://zovo.one" style="color:var(--accent);text-decoration:none;">Zovo Tools</a>, a network of 18 developer utilities. Focused on making AI workflows accessible to everyone, no sign-up required.</p>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow.com&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex &mdash; A/B Testing</a>
+            <a href="https://claudhq.com">ClaudHQ &mdash; AI Code Tools &amp; Fixes</a>
+            <a href="https://claudkit.com">ClaudKit &mdash; API</a>
+            <a href="https://enhio.com">Enhio &mdash; Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot &mdash; Timestamps</a>
+            <a href="https://gen8x.com">Gen8X &mdash; Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X &mdash; AI Models</a>
+            <a href="https://heytensor.com">HeyTensor &mdash; ML Tools</a>
+            <a href="https://invokebot.com">InvokeBot &mdash; Webhooks</a>
+            <a href="https://kappafy.com">Kappafy &mdash; JSON</a>
+            <a href="https://kappakit.com">KappaKit &mdash; Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM &mdash; LLM Costs</a>
+            <a href="https://krzen.com">Krzen &mdash; Image Tools</a>
+            <a href="https://lochbot.com">LochBot &mdash; Security</a>
+            <a href="https://lockml.com">LockML &mdash; ML Compare</a>
+            <a href="https://ml3x.com">ML3X &mdash; Matrix Math</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+(function(){
+  var currentFilter = 'all';
+  var searchTerm = '';
+
+  var ERRORS = [
+    {code:'authentication_error', status:401, name:'Invalid API Key', category:'auth',
+      cause:'The API key is missing, malformed, expired, or has been revoked. The x-api-key header is not present or contains an invalid value.',
+      fixes:['Verify the key starts with "sk-ant-api03-" or the current prefix format','Check for leading/trailing whitespace in the key string','Confirm the key is active in the Anthropic Console at console.anthropic.com','Ensure the x-api-key header is set correctly (not Authorization: Bearer)','Check your environment variable is loaded correctly: echo $ANTHROPIC_API_KEY'],
+      example:'import anthropic\n\n# Correct: API key from environment\nclient = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY env var\n\n# Or explicit:\nclient = anthropic.Anthropic(api_key="sk-ant-api03-...")\n\ntry:\n    response = client.messages.create(\n        model="claude-sonnet-4-20250514",\n        max_tokens=1024,\n        messages=[{"role":"user","content":"Hello"}]\n    )\nexcept anthropic.AuthenticationError as e:\n    print(f"Auth failed: {e}")'},
+    {code:'permission_error', status:403, name:'Forbidden / Insufficient Permissions', category:'auth',
+      cause:'Your API key does not have permission to access the requested resource. This can occur when using a key for a model or feature not available on your plan.',
+      fixes:['Check your API plan supports the requested model (e.g., Opus may require a higher tier)','Verify the API key has the correct scope and permissions','Check if your organization has restricted access to certain models','Contact Anthropic support if you believe this is an error'],
+      example:'try:\n    response = client.messages.create(\n        model="claude-opus-4-20250514",  # May require higher plan\n        max_tokens=1024,\n        messages=[{"role":"user","content":"Hello"}]\n    )\nexcept anthropic.PermissionDeniedError as e:\n    print(f"Permission denied: {e}")\n    # Fall back to a model available on your plan\n    response = client.messages.create(\n        model="claude-sonnet-4-20250514",\n        max_tokens=1024,\n        messages=[{"role":"user","content":"Hello"}]\n    )'},
+    {code:'rate_limit_error', status:429, name:'Rate Limit Exceeded', category:'rate_limit',
+      cause:'You have exceeded the requests per minute (RPM) or tokens per minute (TPM) limit for your API plan. The API enforces both request count and token throughput limits.',
+      fixes:['Implement exponential backoff with jitter: start at 1s, double each retry, add random 0-500ms','Check the Retry-After response header for the exact wait time','Reduce request frequency by batching operations','Implement a client-side rate limiter (token bucket or leaky bucket)','Upgrade your API plan for higher limits at console.anthropic.com'],
+      example:'import anthropic\nimport time\nimport random\n\ndef call_with_retry(client, max_retries=5, **kwargs):\n    for attempt in range(max_retries):\n        try:\n            return client.messages.create(**kwargs)\n        except anthropic.RateLimitError as e:\n            if attempt == max_retries - 1:\n                raise\n            # Exponential backoff with jitter\n            delay = (2 ** attempt) + random.uniform(0, 0.5)\n            retry_after = e.response.headers.get("retry-after")\n            if retry_after:\n                delay = float(retry_after)\n            print(f"Rate limited. Waiting {delay:.1f}s...")\n            time.sleep(delay)'},
+    {code:'rate_limit_error', status:429, name:'Token Throughput Limit', category:'rate_limit',
+      cause:'You have exceeded the tokens per minute (TPM) limit. This is separate from the request count limit and triggered by high-volume token usage.',
+      fixes:['Reduce the max_tokens parameter to request only what you need','Shorten input prompts by removing unnecessary context','Implement request queuing with controlled throughput','Space requests to stay within your TPM allocation','Monitor token usage per request to identify expensive calls'],
+      example:'# Implement a simple token-aware rate limiter\nimport time\n\nclass TokenRateLimiter:\n    def __init__(self, tpm_limit=100000):\n        self.tpm_limit = tpm_limit\n        self.tokens_used = 0\n        self.window_start = time.time()\n\n    def wait_if_needed(self, estimated_tokens):\n        now = time.time()\n        if now - self.window_start >= 60:\n            self.tokens_used = 0\n            self.window_start = now\n        if self.tokens_used + estimated_tokens > self.tpm_limit:\n            wait = 60 - (now - self.window_start)\n            if wait > 0:\n                time.sleep(wait)\n            self.tokens_used = 0\n            self.window_start = time.time()\n        self.tokens_used += estimated_tokens'},
+    {code:'invalid_request_error', status:400, name:'Malformed Request Body', category:'input',
+      cause:'The request body is not valid JSON, is missing required fields, or contains fields with incorrect types. Common when constructing requests manually.',
+      fixes:['Validate your JSON is well-formed before sending','Ensure the messages array contains at least one message','Verify the model field contains a valid model identifier','Check that max_tokens is a positive integer','Use the official SDK instead of raw HTTP requests to avoid formatting issues'],
+      example:'# Common mistakes and corrections:\n\n# WRONG: missing messages\nclient.messages.create(model="claude-sonnet-4-20250514", max_tokens=1024)\n\n# WRONG: messages is not an array\nclient.messages.create(model="claude-sonnet-4-20250514", max_tokens=1024,\n    messages={"role":"user","content":"Hello"})\n\n# CORRECT:\nclient.messages.create(\n    model="claude-sonnet-4-20250514",\n    max_tokens=1024,\n    messages=[{"role":"user","content":"Hello"}]\n)'},
+    {code:'invalid_request_error', status:400, name:'Invalid Model Name', category:'input',
+      cause:'The model identifier in your request does not match any available model. Model names change with new releases and old names are eventually deprecated.',
+      fixes:['Use the current model name format: claude-sonnet-4-20250514, claude-opus-4-20250514, claude-haiku-35-20241022','Check the Anthropic docs for the latest model identifiers','Remove version suffixes if using the latest alias (e.g., claude-sonnet-4-20250514)','Verify the model is available on your plan tier'],
+      example:'# Current model identifiers (as of 2026):\nMODELS = {\n    "opus": "claude-opus-4-20250514",\n    "sonnet": "claude-sonnet-4-20250514",\n    "haiku": "claude-haiku-35-20241022",\n}\n\nresponse = client.messages.create(\n    model=MODELS["sonnet"],\n    max_tokens=1024,\n    messages=[{"role":"user","content":"Hello"}]\n)'},
+    {code:'invalid_request_error', status:400, name:'Context Window Exceeded', category:'input',
+      cause:'The total token count (input tokens + max_tokens) exceeds the model context window. Claude Sonnet and Opus support 200K tokens. Haiku supports 200K tokens.',
+      fixes:['Count input tokens before sending using the tokenizer or a rough estimate (1 token ~ 4 chars)','Reduce max_tokens to only what you need for the response','Summarize or truncate conversation history for long conversations','Implement sliding window: keep recent N messages, summarize older ones','Use Map-Reduce pattern for long documents: split into chunks, process each, aggregate'],
+      example:'def trim_conversation(messages, max_input_tokens=150000):\n    """Keep recent messages within token budget."""\n    # Rough token estimate: 1 token ~ 4 characters\n    total = sum(len(m["content"]) // 4 for m in messages)\n\n    while total > max_input_tokens and len(messages) > 1:\n        removed = messages.pop(0)\n        total -= len(removed["content"]) // 4\n\n    return messages\n\n# Usage:\nmessages = trim_conversation(messages)\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    max_tokens=4096,\n    messages=messages\n)'},
+    {code:'invalid_request_error', status:400, name:'Invalid Message Role Sequence', category:'input',
+      cause:'The messages array has roles in an invalid sequence. Messages must alternate between "user" and "assistant" roles, and the first message must be from "user".',
+      fixes:['Ensure the first message has role "user"','Alternate roles: user, assistant, user, assistant, ...','Do not include consecutive messages with the same role; merge them instead','The system prompt goes in the top-level "system" field, not in messages'],
+      example:'# WRONG: consecutive user messages\nmessages = [\n    {"role":"user","content":"First question"},\n    {"role":"user","content":"Second question"}  # Error!\n]\n\n# CORRECT: merge into one user message\nmessages = [\n    {"role":"user","content":"First question\\n\\nSecond question"}\n]\n\n# WRONG: system prompt in messages\nmessages = [\n    {"role":"system","content":"You are helpful"},  # Error!\n    {"role":"user","content":"Hello"}\n]\n\n# CORRECT: system prompt as top-level parameter\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    max_tokens=1024,\n    system="You are helpful",\n    messages=[{"role":"user","content":"Hello"}]\n)'},
+    {code:'invalid_request_error', status:400, name:'Max Tokens Too Large', category:'input',
+      cause:'The max_tokens value exceeds the maximum allowed for the specified model. Different models have different maximum output token limits.',
+      fixes:['Check the model documentation for maximum output token limits','Claude Sonnet 4: max 16384 output tokens (or 64K with extended thinking)','Claude Opus 4: max 16384 output tokens (or 64K with extended thinking)','Reduce max_tokens to fit within the model limit','For very long outputs, split the generation across multiple calls'],
+      example:'# Check model output limits:\n# claude-sonnet-4-20250514: 16384 (standard), 64000 (extended thinking)\n# claude-opus-4-20250514: 16384 (standard), 64000 (extended thinking)\n\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    max_tokens=8192,  # Safe for all current models\n    messages=[{"role":"user","content":"Write a detailed analysis..."}]\n)'},
+    {code:'invalid_request_error', status:400, name:'Empty Content', category:'input',
+      cause:'A message in the messages array has empty or null content. Every message must have non-empty content.',
+      fixes:['Check that no message has content: "" or content: null','Validate user input before constructing the messages array','Remove any messages with empty content from the array','Ensure content is a string, not undefined or None'],
+      example:'# WRONG:\nmessages = [\n    {"role":"user","content":""}  # Empty content\n]\n\n# WRONG:\nmessages = [\n    {"role":"user","content":None}  # Null content\n]\n\n# CORRECT: validate before sending\ndef create_message(user_input):\n    if not user_input or not user_input.strip():\n        raise ValueError("User input cannot be empty")\n    return client.messages.create(\n        model="claude-sonnet-4-20250514",\n        max_tokens=1024,\n        messages=[{"role":"user","content":user_input.strip()}]\n    )'},
+    {code:'invalid_request_error', status:400, name:'Invalid Content Type', category:'input',
+      cause:'The content field contains an unsupported type. For vision requests, the image format or encoding is invalid.',
+      fixes:['For text: content must be a string or array of content blocks','For images: use base64 encoding with supported formats (JPEG, PNG, GIF, WebP)','Check image size is within the 20MB limit','Ensure media_type matches the actual image format','For multi-modal: use the content blocks format with type: "text" and type: "image"'],
+      example:'import base64\n\n# Text message:\nmessages = [{"role":"user","content":"Hello"}]\n\n# Image message:\nwith open("image.png","rb") as f:\n    img_data = base64.standard_b64encode(f.read()).decode("utf-8")\n\nmessages = [{\n    "role":"user",\n    "content":[\n        {"type":"image","source":{"type":"base64","media_type":"image/png","data":img_data}},\n        {"type":"text","text":"What is in this image?"}\n    ]\n}]'},
+    {code:'overloaded_error', status:529, name:'API Overloaded', category:'server',
+      cause:'Claude API servers are at capacity and cannot process your request. This is a temporary condition during high-traffic periods.',
+      fixes:['Implement retry with exponential backoff starting at 5-10 seconds','Do NOT retry immediately; this worsens the overload','Queue requests and process them when capacity returns','Check status.anthropic.com for ongoing incidents','Consider spreading workload across off-peak hours'],
+      example:'import time\nimport random\n\ndef call_with_overload_retry(client, max_retries=5, **kwargs):\n    for attempt in range(max_retries):\n        try:\n            return client.messages.create(**kwargs)\n        except anthropic.APIStatusError as e:\n            if e.status_code == 529:\n                delay = (2 ** attempt) * 5 + random.uniform(0, 2)\n                print(f"API overloaded. Waiting {delay:.1f}s (attempt {attempt+1}/{max_retries})")\n                time.sleep(delay)\n            else:\n                raise\n    raise Exception("API overloaded after all retries")'},
+    {code:'internal_server_error', status:500, name:'Internal Server Error', category:'server',
+      cause:'An unexpected error occurred on the API server. This is not caused by your request and is always temporary.',
+      fixes:['Retry the request after a brief delay (2-5 seconds)','Log the full error response for debugging','Check status.anthropic.com for known issues','If persistent, contact Anthropic support with the request ID from the response headers','Do not modify your request; the error is server-side'],
+      example:'import anthropic\nimport time\n\ndef resilient_call(client, max_retries=3, **kwargs):\n    for attempt in range(max_retries):\n        try:\n            return client.messages.create(**kwargs)\n        except anthropic.InternalServerError as e:\n            if attempt == max_retries - 1:\n                raise\n            print(f"Server error (attempt {attempt+1}). Retrying in 3s...")\n            time.sleep(3)'},
+    {code:'api_error', status:500, name:'Generic API Error', category:'server',
+      cause:'An unspecified API error. This is a catch-all for server-side issues that do not fit other error categories.',
+      fixes:['Retry with exponential backoff','Log the full response including headers for the request-id','Check if the error is reproducible with the same input','Try the request with a different model to isolate the issue','Report persistent errors to Anthropic support with the request-id'],
+      example:'try:\n    response = client.messages.create(\n        model="claude-sonnet-4-20250514",\n        max_tokens=1024,\n        messages=[{"role":"user","content":"Hello"}]\n    )\nexcept anthropic.APIError as e:\n    print(f"API error: {e}")\n    print(f"Status: {e.status_code}")\n    print(f"Request ID: {e.response.headers.get(\'request-id\', \'unknown\')}")'},
+    {code:'request_too_large', status:413, name:'Request Payload Too Large', category:'input',
+      cause:'The total request payload exceeds the maximum allowed size. This includes the full JSON body with all message content, system prompt, and metadata.',
+      fixes:['Reduce the length of messages content','Compress or resize images in multi-modal requests','Split very long conversations into smaller requests','Remove unnecessary conversation history','Use a shorter system prompt if possible'],
+      example:'# Check payload size before sending\nimport json\n\ndef check_payload_size(messages, system="", max_mb=10):\n    payload = json.dumps({"messages":messages,"system":system})\n    size_mb = len(payload.encode("utf-8")) / (1024*1024)\n    if size_mb > max_mb:\n        raise ValueError(f"Payload too large: {size_mb:.1f}MB (max {max_mb}MB)")\n    return True'},
+    {code:'not_found_error', status:404, name:'Resource Not Found', category:'input',
+      cause:'The requested API endpoint does not exist. This usually indicates an incorrect URL path or API version.',
+      fixes:['Check the API base URL: https://api.anthropic.com','Verify the endpoint path: /v1/messages','Ensure you are using the correct API version header: anthropic-version: 2023-06-01','Check for typos in the URL','Verify you are not using a deprecated endpoint'],
+      example:'import anthropic\n\n# The SDK handles endpoint URLs automatically\n# If using raw HTTP:\nimport requests\n\nurl = "https://api.anthropic.com/v1/messages"  # Correct endpoint\nheaders = {\n    "x-api-key": "sk-ant-api03-...",\n    "anthropic-version": "2023-06-01",\n    "content-type": "application/json"\n}\n\nresponse = requests.post(url, headers=headers, json={\n    "model": "claude-sonnet-4-20250514",\n    "max_tokens": 1024,\n    "messages": [{"role":"user","content":"Hello"}]\n})'},
+    {code:'streaming_error', status:0, name:'Stream Connection Dropped', category:'streaming',
+      cause:'The server-sent events (SSE) connection was closed unexpectedly during a streaming response. This can be caused by network issues, proxy timeouts, or server-side interruptions.',
+      fixes:['Implement reconnection logic for dropped streams','Buffer partial responses to avoid losing data','Set appropriate timeout values on your HTTP client','If using a proxy or CDN, increase the timeout settings','Use the event ID to resume from where the stream stopped'],
+      example:'import anthropic\n\ndef stream_with_recovery(client, **kwargs):\n    """Stream with recovery on connection drops."""\n    full_text = ""\n    try:\n        with client.messages.stream(**kwargs) as stream:\n            for text in stream.text_stream:\n                full_text += text\n                print(text, end="", flush=True)\n    except anthropic.APIConnectionError:\n        print(f"\\n\\nStream dropped. Recovered {len(full_text)} chars.")\n        # Optionally continue generation from where it stopped\n    return full_text'},
+    {code:'streaming_error', status:0, name:'Event Parse Error', category:'streaming',
+      cause:'A server-sent event could not be parsed correctly. The event data is malformed or the event type is unrecognized.',
+      fixes:['Use the official SDK which handles SSE parsing automatically','If parsing manually, handle the event types: message_start, content_block_start, content_block_delta, content_block_stop, message_delta, message_stop','Ignore unrecognized event types rather than failing','Log unparseable events for debugging'],
+      example:'# The SDK handles SSE parsing. For manual parsing:\nimport json\n\ndef parse_sse_event(event_type, event_data):\n    known_types = [\n        "message_start", "content_block_start",\n        "content_block_delta", "content_block_stop",\n        "message_delta", "message_stop", "ping", "error"\n    ]\n    if event_type not in known_types:\n        print(f"Unknown event type: {event_type}")\n        return None  # Skip unknown events\n    try:\n        return json.loads(event_data)\n    except json.JSONDecodeError:\n        print(f"Failed to parse event data: {event_data[:100]}")\n        return None'},
+    {code:'billing_error', status:402, name:'Payment Required', category:'billing',
+      cause:'Your account has a billing issue. This can mean your payment method failed, your credit balance is exhausted, or your spending limit has been reached.',
+      fixes:['Check your billing status at console.anthropic.com/settings/billing','Update your payment method if it has expired or was declined','Add credits to your account if using prepaid billing','Increase your spending limit in the console settings','Contact Anthropic billing support for account-specific issues'],
+      example:'try:\n    response = client.messages.create(\n        model="claude-sonnet-4-20250514",\n        max_tokens=1024,\n        messages=[{"role":"user","content":"Hello"}]\n    )\nexcept anthropic.APIStatusError as e:\n    if e.status_code == 402:\n        print("Billing issue. Check your account at console.anthropic.com")\n        print(f"Details: {e.message}")\n        # Do not retry billing errors\n        raise'},
+    {code:'billing_error', status:402, name:'Spending Limit Reached', category:'billing',
+      cause:'You have reached the monthly or daily spending limit configured on your account. This is a safety feature to prevent unexpected charges.',
+      fixes:['Check current spending in the Anthropic Console','Increase your spending limit if appropriate','Wait for the limit reset (monthly or daily depending on configuration)','Implement client-side spending tracking to anticipate limit hits','Set up alerts at 80% of your limit to avoid unexpected failures'],
+      example:'# Track spending client-side\nclass SpendingTracker:\n    def __init__(self, daily_limit_usd=100):\n        self.daily_limit = daily_limit_usd\n        self.daily_spend = 0.0\n\n    def estimate_cost(self, input_tokens, output_tokens, model="claude-sonnet-4-20250514"):\n        # Approximate pricing (check current rates)\n        rates = {"claude-sonnet-4-20250514": (3.0, 15.0)}  # per 1M tokens\n        inp, out = rates.get(model, (3.0, 15.0))\n        return (input_tokens * inp + output_tokens * out) / 1_000_000\n\n    def check_budget(self, estimated_cost):\n        if self.daily_spend + estimated_cost > self.daily_limit:\n            raise Exception(f"Would exceed daily limit: ${self.daily_spend:.2f} + ${estimated_cost:.2f} > ${self.daily_limit}")\n        self.daily_spend += estimated_cost'},
+    {code:'timeout_error', status:0, name:'Request Timeout', category:'server',
+      cause:'The API did not respond within the configured timeout period. This can happen with very long prompts, complex reasoning tasks, or during high-traffic periods.',
+      fixes:['Increase the client timeout setting (default is often 60-120 seconds)','Reduce the complexity of the request (shorter prompt, lower max_tokens)','Use streaming mode for long-running requests to get partial results sooner','Implement retry logic for timeout errors','Check if the issue is network-related (firewall, proxy, VPN)'],
+      example:'import anthropic\nimport httpx\n\n# Increase timeout for long-running requests\nclient = anthropic.Anthropic(\n    timeout=httpx.Timeout(300.0, connect=10.0)  # 5 min total, 10s connect\n)\n\n# Or use streaming for immediate partial results:\nwith client.messages.stream(\n    model="claude-sonnet-4-20250514",\n    max_tokens=4096,\n    messages=[{"role":"user","content":"Write a very detailed analysis..."}]\n) as stream:\n    for text in stream.text_stream:\n        print(text, end="", flush=True)'},
+    {code:'connection_error', status:0, name:'Connection Failed', category:'server',
+      cause:'Cannot establish a connection to the API server. Possible causes include DNS resolution failure, network connectivity issues, firewall blocking, or the API being unreachable.',
+      fixes:['Check your internet connection','Verify DNS can resolve api.anthropic.com','Check if a firewall or proxy is blocking outbound HTTPS','Try from a different network to isolate the issue','Check status.anthropic.com for API outages','Verify SSL/TLS certificates are up to date on your system'],
+      example:'import anthropic\nimport time\n\ndef connect_with_retry(max_retries=3):\n    for attempt in range(max_retries):\n        try:\n            client = anthropic.Anthropic()\n            # Test connection with a minimal request\n            response = client.messages.create(\n                model="claude-sonnet-4-20250514",\n                max_tokens=10,\n                messages=[{"role":"user","content":"ping"}]\n            )\n            return client\n        except anthropic.APIConnectionError as e:\n            if attempt == max_retries - 1:\n                raise\n            print(f"Connection failed (attempt {attempt+1}): {e}")\n            time.sleep(2 ** attempt)'},
+    {code:'invalid_request_error', status:400, name:'Tool Use Schema Error', category:'input',
+      cause:'When using tool use (function calling), the tool schema is invalid. The JSON Schema definition has syntax errors or uses unsupported schema features.',
+      fixes:['Validate your tool schema against JSON Schema draft 2020-12','Ensure each tool has a unique name, description, and valid input_schema','Check that parameter types are valid JSON Schema types','Remove unsupported keywords like $ref or oneOf from simple schemas','Test your schema with a JSON Schema validator before sending'],
+      example:'# Correct tool definition:\ntools = [{\n    "name": "get_weather",\n    "description": "Get current weather for a location",\n    "input_schema": {\n        "type": "object",\n        "properties": {\n            "location": {\n                "type": "string",\n                "description": "City and state, e.g. San Francisco, CA"\n            },\n            "unit": {\n                "type": "string",\n                "enum": ["celsius", "fahrenheit"],\n                "description": "Temperature unit"\n            }\n        },\n        "required": ["location"]\n    }\n}]\n\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    max_tokens=1024,\n    tools=tools,\n    messages=[{"role":"user","content":"What is the weather in London?"}]\n)'},
+    {code:'invalid_request_error', status:400, name:'System Prompt Too Long', category:'input',
+      cause:'The system prompt exceeds the maximum allowed length. While there is no hard character limit, excessively long system prompts consume context window tokens.',
+      fixes:['Keep system prompts concise and focused (under 2000 tokens recommended)','Move detailed instructions into the user message instead','Use structured formatting (bullet points) for clarity without verbosity','Remove redundant instructions that the model already follows by default','Split complex system prompts across multiple turns using conversation history'],
+      example:'# Instead of a very long system prompt:\n# BAD: 5000-word system prompt with extensive examples\n\n# GOOD: concise system prompt + detailed user message\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    max_tokens=1024,\n    system="You are a code review assistant. Output structured JSON with fields: issues, severity, suggestions.",\n    messages=[{\n        "role":"user",\n        "content":"Review this code. Follow these detailed guidelines:\\n\\n[detailed instructions here]\\n\\nCode:\\n```\\n[code here]\\n```"\n    }]\n)'}
+  ];
+
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderErrors(){
+    var list = document.getElementById('error-list');
+    var filtered = ERRORS.filter(function(e){
+      if(currentFilter!=='all' && e.category!==currentFilter) return false;
+      if(searchTerm){
+        var term = searchTerm.toLowerCase();
+        var haystack = (e.code+' '+e.name+' '+e.status+' '+e.cause+' '+e.category).toLowerCase();
+        return haystack.indexOf(term)!==-1;
+      }
+      return true;
+    });
+
+    document.getElementById('error-count').textContent = 'Showing '+filtered.length+' of '+ERRORS.length+' errors';
+
+    if(filtered.length===0){
+      list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">No errors match your search. Try a different query or filter.</div>';
+      return;
+    }
+
+    var html = '';
+    for(var i=0;i<filtered.length;i++){
+      var e = filtered[i];
+      var statusClass = e.status>=500?'s5xx':e.status>=400?'s4xx':'s2xx';
+      if(e.status===0) statusClass='s5xx';
+      var statusDisplay = e.status===0?'---':e.status;
+
+      html += '<div class="error-card" data-idx="'+i+'">';
+      html += '<div class="error-card-header" onclick="toggleCard(this.parentElement)">';
+      html += '<span class="err-status '+statusClass+'">'+statusDisplay+'</span>';
+      html += '<span class="err-name">'+esc(e.code)+'</span>';
+      html += '<span class="err-cat">'+esc(e.category.replace('_',' '))+'</span>';
+      html += '<span class="err-toggle">&#9660;</span>';
+      html += '</div>';
+      html += '<div class="error-card-body">';
+      html += '<h4>'+esc(e.name)+'</h4>';
+      html += '<h4>Cause</h4>';
+      html += '<p>'+esc(e.cause)+'</p>';
+      html += '<h4>Fix Steps</h4>';
+      html += '<ul class="fix-steps">';
+      for(var f=0;f<e.fixes.length;f++){
+        html += '<li>'+esc(e.fixes[f])+'</li>';
+      }
+      html += '</ul>';
+      html += '<h4>Example Code</h4>';
+      html += '<pre>'+esc(e.example)+'</pre>';
+      html += '</div>';
+      html += '</div>';
+    }
+    list.innerHTML = html;
+  }
+
+  window.toggleCard = function(card){
+    card.classList.toggle('open');
+  };
+
+  window.setFilter = function(filter){
+    currentFilter = filter;
+    document.querySelectorAll('#error-filters button').forEach(function(b){
+      b.classList.toggle('active', b.textContent.toLowerCase().replace(' ','_')===filter || (filter==='all'&&b.textContent==='All'));
+    });
+    renderErrors();
+  };
+
+  window.filterErrors = function(){
+    searchTerm = document.getElementById('error-search').value;
+    renderErrors();
+  };
+
+  renderErrors();
+})();
+</script>
+</body>
+</html>
