@@ -86,4 +86,81 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/answers/claude-memory-strategies.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/answers/prompt-engineering-mistakes.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/blog/index.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/guides/claude-for-data-analysis.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/guides/index.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/guides/multi-agent-orchestration.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/index.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/research/claude-use-case-gallery.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/research/index.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/tools/system-prompt-tester.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Sprint 7 Auto-Added -->
+  <url>
+    <loc>https://claudflow.com/tools/token-cost-tracker.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
