@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>MCP Server Integration Guide — Connect Claude to Any Data Source | ClaudFlow</title>
+  <meta name="description" content="Step-by-step MCP server integration guide for Claude. Build a config wizard, connect databases, REST APIs, and filesystems. Includes interactive JSON config builder and test connection simulator.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="MCP Server Integration Guide — Connect Claude to Any Data Source">
+  <meta property="og:description" content="Step-by-step MCP server integration guide for Claude. Interactive config builder wizard for databases, APIs, and filesystems. Test connection simulator included.">
+  <meta property="og:url" content="https://claudflow.com/guides/mcp-server-integration-guide.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MCP Server Integration Guide — Connect Claude to Any Data Source">
+  <meta name="twitter:description" content="Step-by-step MCP server integration guide for Claude. Interactive config builder wizard for databases, APIs, and filesystems.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/guides/mcp-server-integration-guide.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/mcp-server-integration-guide.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/mcp-server-integration-guide.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "MCP Server Integration Guide — Connect Claude to Any Data Source",
+    "description": "Step-by-step MCP server integration guide for Claude. Build a config wizard, connect databases, REST APIs, and filesystems. Includes interactive JSON config builder and test connection simulator.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-28",
+    "dateModified": "2026-05-28",
+    "mainEntityOfPage": "https://claudflow.com/guides/mcp-server-integration-guide.html",
+    "image": "https://claudflow.com/assets/og-image.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://claudflow.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://claudflow.com/guides/"},{"@type":"ListItem","position":3,"name":"MCP Server Integration Guide"}]}
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "MCP Config Builder Wizard",
+    "description": "Interactive wizard that generates MCP server JSON configuration for databases, REST APIs, and filesystems. Includes a test connection simulator.",
+    "url": "https://claudflow.com/guides/mcp-server-integration-guide.html",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is MCP (Model Context Protocol)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MCP (Model Context Protocol) is an open standard developed by Anthropic that lets Claude connect to external data sources and tools. An MCP server exposes resources, tools, and prompts that Claude can call during a conversation, turning static LLM interactions into dynamic, data-aware workflows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I connect Claude to a PostgreSQL database with MCP?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Install the @modelcontextprotocol/server-postgres package, then add a server entry to your claude_desktop_config.json with command: 'npx', args: ['-y', '@modelcontextprotocol/server-postgres', 'postgresql://user:pass@host:5432/dbname']. Claude will then be able to list tables, run queries, and inspect schemas directly from the chat."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can MCP servers connect to REST APIs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. You can write a custom MCP server that wraps any REST API. The server defines tool handlers that call your API endpoints and return structured results to Claude. The MCP SDK is available for TypeScript and Python, making it straightforward to wrap an OpenAPI spec into a fully functional MCP server in under 50 lines of code."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between MCP tools, resources, and prompts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MCP tools are callable functions Claude can invoke (like a database query or API call). Resources are file-like data sources Claude can read (documents, schemas, configs). Prompts are pre-built conversation templates the server exposes. Most integrations use tools and resources; prompts are useful for domain-specific workflows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is MCP secure for production use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MCP servers run locally by default, so they inherit your machine's security context. For production deployments use read-only database credentials, environment variables for secrets (never hardcode them in the config), network policies to restrict server access, and audit logging of all tool calls. Anthropic's MCP specification also supports OAuth for remote servers."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Mono', 'Fira Code', monospace;
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e4e4ef;
+      --text-muted: #8888aa;
+      --accent: #06B6D4;
+      --accent-dim: rgba(6, 182, 212, 0.12);
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --orange: #f97316;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .nav-zovo {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-zovo:hover { border-color: var(--accent); color: var(--accent); }
+
+    .article-container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    .breadcrumb {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .article-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .article-meta {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .article-meta a { color: var(--accent); text-decoration: none; }
+
+    .article-container h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .article-container h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+    }
+    .article-container p { margin-bottom: 1.25rem; color: var(--text); }
+    .article-container ul, .article-container ol { margin: 0 0 1.25rem 1.5rem; }
+    .article-container li { margin-bottom: 0.5rem; }
+    .article-container strong { color: #fff; }
+    .article-container a { color: var(--accent); text-decoration: none; }
+    .article-container a:hover { text-decoration: underline; }
+
+    .article-container pre {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+      font-size: 0.88rem;
+    }
+    .article-container code {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+    }
+    .article-container p code, .article-container li code {
+      background: var(--bg-card);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .key-takeaway {
+      background: var(--accent-dim);
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+    .key-takeaway strong { color: var(--accent); }
+
+    .toc {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .toc h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .toc ol { list-style: decimal; margin: 0 0 0 1.25rem; }
+    .toc li { margin-bottom: 0.35rem; font-size: 0.95rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* --- Wizard Tool --- */
+    .tool-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2.5rem 0;
+    }
+    .tool-section h3 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .tool-section .tool-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Wizard steps indicator */
+    .wizard-steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .wizard-step-tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.6rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-right: 1px solid var(--border);
+      transition: all 0.2s;
+      cursor: default;
+      font-family: var(--font-mono);
+    }
+    .wizard-step-tab:last-child { border-right: none; }
+    .wizard-step-tab.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+    .wizard-step-tab.done {
+      background: rgba(34,197,94,0.08);
+      color: var(--green);
+    }
+
+    /* Wizard panels */
+    .wizard-panel { display: none; }
+    .wizard-panel.active { display: block; }
+
+    .tool-label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+    .tool-select, .tool-input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 1rem;
+    }
+    .tool-select:focus, .tool-input:focus { border-color: var(--accent); }
+    .tool-select option { background: var(--bg); }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) {
+      .source-grid { grid-template-columns: 1fr 1fr; }
+      .article-header h1 { font-size: 1.7rem; }
+      .article-container { padding: 2rem 1rem 3rem; }
+      .tool-section { padding: 1.25rem; }
+    }
+    .source-card {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .source-card:hover { border-color: var(--accent); }
+    .source-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .source-card .source-icon {
+      font-size: 1.6rem;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .source-card .source-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .source-card .source-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 600px) { .tool-row { grid-template-columns: 1fr; } }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .tool-btn:hover { opacity: 0.85; }
+    .tool-btn.secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .tool-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Config output */
+    .config-output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      white-space: pre;
+      overflow-x: auto;
+      color: #c9d1d9;
+      margin-top: 1rem;
+      position: relative;
+    }
+    .config-key { color: #79c0ff; }
+    .config-string { color: #a5d6ff; }
+    .config-comment { color: #6e7681; }
+    .config-number { color: #f2cc60; }
+
+    .copy-btn {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.6rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+      margin-top: 0.75rem;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Test simulator */
+    .test-log {
+      background: #020209;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      min-height: 160px;
+      margin-top: 1rem;
+      overflow-y: auto;
+      max-height: 280px;
+    }
+    .log-line { display: block; }
+    .log-line.info { color: var(--accent); }
+    .log-line.success { color: var(--green); }
+    .log-line.warn { color: var(--yellow); }
+    .log-line.err { color: var(--red); }
+    .log-line.muted { color: #444460; }
+
+    /* Setup steps */
+    .setup-steps { margin: 1rem 0; }
+    .setup-step {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      align-items: flex-start;
+    }
+    .setup-num {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .setup-content { flex: 1; }
+    .setup-content strong { color: #fff; display: block; margin-bottom: 0.25rem; }
+    .setup-content p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+
+    .further-reading {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .further-reading h3 { margin-top: 0; }
+    .further-reading a { display: block; margin-bottom: 0.5rem; font-size: 0.95rem; }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .footer-inner { max-width: 600px; margin: 0 auto; }
+    .footer-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); margin-bottom: 0.25rem; }
+    .footer-tagline { margin-bottom: 1rem; }
+    .footer-cta {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      background: var(--accent);
+      color: #000;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .footer-copy { font-size: 0.8rem; }
+    .footer-copy a { color: var(--accent); text-decoration: none; }
+
+    .zovo-network {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+    .zovo-network-inner { max-width: 900px; margin: 0 auto; }
+    .zovo-network-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .zovo-network-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .zovo-network-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .zovo-network-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      vertical-align: middle;
+      margin-left: 0.4rem;
+    }
+    .badge-db { background: rgba(168,85,247,0.15); color: var(--purple); }
+    .badge-api { background: rgba(6,182,212,0.15); color: var(--accent); }
+    .badge-fs { background: rgba(34,197,94,0.15); color: var(--green); }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+    .comparison-table th {
+      background: var(--bg-card);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .comparison-table td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .comparison-table tr:nth-child(even) td { background: rgba(18,18,26,0.5); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">claudflow</a>
+  <ul class="nav-links">
+    <li><a href="/">Tool</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/blog/">Blog</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+  </div>
+</nav>
+
+<main class="article-container">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/guides/">Guides</a> &rsaquo; MCP Server Integration Guide
+  </nav>
+
+  <header class="article-header">
+    <h1>MCP Server Integration Guide — Connect Claude to Any Data Source</h1>
+    <div class="article-meta">
+      <span>May 28, 2026</span>
+      <span>By <a href="https://zovo.one">Michael Lip</a></span>
+      <span>18 min read</span>
+    </div>
+  </header>
+
+  <div class="toc">
+    <h4>In This Guide</h4>
+    <ol>
+      <li><a href="#what-is-mcp">What Is MCP and Why It Matters</a></li>
+      <li><a href="#source-types">Three Integration Categories</a></li>
+      <li><a href="#config-wizard">Interactive MCP Config Builder Wizard</a></li>
+      <li><a href="#database-guide">Database Integrations in Depth</a></li>
+      <li><a href="#api-guide">REST API Integrations</a></li>
+      <li><a href="#filesystem-guide">Filesystem and File Server Integrations</a></li>
+      <li><a href="#security">Security and Production Hardening</a></li>
+      <li><a href="#troubleshooting">Troubleshooting Common Errors</a></li>
+    </ol>
+  </div>
+
+  <h2 id="what-is-mcp">What Is MCP and Why It Matters</h2>
+  <p>The <strong>Model Context Protocol (MCP)</strong> is an open standard that gives Claude a live connection to external systems — databases, APIs, file servers, and custom tools — without embedding data directly into the context window. Instead of copy-pasting a CSV or writing a long prompt describing your database schema, you configure an MCP server once and Claude can query it on demand.</p>
+  <p>MCP follows a client-server architecture. The <strong>MCP client</strong> (built into Claude Desktop and compatible hosts) sends requests over a local transport (stdio or SSE). The <strong>MCP server</strong> is a small process you run that exposes three primitives:</p>
+  <ul>
+    <li><strong>Tools</strong> — callable functions (query a database, POST to an API, list files)</li>
+    <li><strong>Resources</strong> — file-like data Claude can read (a schema, a config, a document)</li>
+    <li><strong>Prompts</strong> — reusable conversation templates the server exposes for specific workflows</li>
+  </ul>
+  <div class="key-takeaway">
+    <strong>Key insight:</strong> MCP lets Claude act as a dynamic agent over live data rather than a static summarizer of pasted content. A single configured MCP server can replace dozens of copy-paste operations per day.
+  </div>
+
+  <h2 id="source-types">Three Integration Categories</h2>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Examples</th>
+        <th>Best MCP Package</th>
+        <th>Complexity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Database</strong> <span class="badge badge-db">DB</span></td>
+        <td>PostgreSQL, MySQL, SQLite, MongoDB</td>
+        <td>@modelcontextprotocol/server-postgres, mcp-server-sqlite</td>
+        <td>Low — connection string only</td>
+      </tr>
+      <tr>
+        <td><strong>REST API</strong> <span class="badge badge-api">API</span></td>
+        <td>GitHub, Notion, Slack, custom services</td>
+        <td>@modelcontextprotocol/server-github, custom TypeScript/Python</td>
+        <td>Medium — needs auth config</td>
+      </tr>
+      <tr>
+        <td><strong>Filesystem</strong> <span class="badge badge-fs">FS</span></td>
+        <td>Local files, project directories, S3</td>
+        <td>@modelcontextprotocol/server-filesystem, mcp-server-s3</td>
+        <td>Low — path config only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 id="config-wizard">Interactive MCP Config Builder Wizard</h2>
+  <p>Use the wizard below to generate a ready-to-paste <code>claude_desktop_config.json</code> snippet and server setup instructions. The test simulator replays a real connection handshake so you can catch config errors before running Claude Desktop.</p>
+
+  <!-- INTERACTIVE WIZARD -->
+  <div class="tool-section" id="mcp-wizard">
+    <h3>MCP Config Builder Wizard</h3>
+    <p class="tool-subtitle">Select your data source type, fill in connection details, and get a generated JSON config with setup steps.</p>
+
+    <div class="wizard-steps">
+      <div class="wizard-step-tab active" id="tab-1">1. Source Type</div>
+      <div class="wizard-step-tab" id="tab-2">2. Connection</div>
+      <div class="wizard-step-tab" id="tab-3">3. Config &amp; Test</div>
+    </div>
+
+    <!-- Panel 1: Source Type -->
+    <div class="wizard-panel active" id="panel-1">
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1rem;">What type of data source do you want to connect Claude to?</p>
+      <div class="source-grid">
+        <div class="source-card" data-source="postgres" onclick="selectSource(this)">
+          <span class="source-icon">🐘</span>
+          <div class="source-name">PostgreSQL</div>
+          <div class="source-desc">SQL database</div>
+        </div>
+        <div class="source-card" data-source="sqlite" onclick="selectSource(this)">
+          <span class="source-icon">🗄️</span>
+          <div class="source-name">SQLite</div>
+          <div class="source-desc">Local database</div>
+        </div>
+        <div class="source-card" data-source="mysql" onclick="selectSource(this)">
+          <span class="source-icon">🐬</span>
+          <div class="source-name">MySQL / MariaDB</div>
+          <div class="source-desc">SQL database</div>
+        </div>
+        <div class="source-card" data-source="rest-api" onclick="selectSource(this)">
+          <span class="source-icon">🔌</span>
+          <div class="source-name">REST API</div>
+          <div class="source-desc">HTTP endpoints</div>
+        </div>
+        <div class="source-card" data-source="github" onclick="selectSource(this)">
+          <span class="source-icon">🐙</span>
+          <div class="source-name">GitHub</div>
+          <div class="source-desc">Repos &amp; issues</div>
+        </div>
+        <div class="source-card" data-source="filesystem" onclick="selectSource(this)">
+          <span class="source-icon">📁</span>
+          <div class="source-name">Filesystem</div>
+          <div class="source-desc">Local files</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="tool-btn" onclick="goToPanel(2)" id="btn-next-1" disabled>Next: Connection Details &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Panel 2: Connection Details -->
+    <div class="wizard-panel" id="panel-2">
+      <div id="conn-fields"></div>
+      <div class="btn-row">
+        <button class="tool-btn secondary" onclick="goToPanel(1)">&larr; Back</button>
+        <button class="tool-btn" onclick="generateConfig()">Generate Config &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Panel 3: Config & Test -->
+    <div class="wizard-panel" id="panel-3">
+      <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.75rem;">Add this snippet to your <code>claude_desktop_config.json</code> inside the <code>mcpServers</code> object, then restart Claude Desktop.</p>
+      <div class="config-output" id="config-out">— config will appear here —</div>
+      <button class="copy-btn" onclick="copyConfig()">Copy JSON</button>
+
+      <div style="margin-top:1.75rem;">
+        <strong style="font-size:1rem;display:block;margin-bottom:0.5rem;">Setup Steps</strong>
+        <div class="setup-steps" id="setup-steps-out"></div>
+      </div>
+
+      <div style="margin-top:1.75rem;">
+        <strong style="font-size:1rem;display:block;margin-bottom:0.5rem;">Test Connection Simulator</strong>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:0.75rem;">Simulates the MCP handshake and tool-list request to surface config issues before running Claude Desktop.</p>
+        <button class="tool-btn" onclick="runTestSim()" id="test-btn">Run Connection Test</button>
+        <div class="test-log" id="test-log"><span class="log-line muted">// Test output will appear here. Click "Run Connection Test" to begin.</span></div>
+      </div>
+
+      <div class="btn-row" style="margin-top:1.5rem;">
+        <button class="tool-btn secondary" onclick="goToPanel(1)">Start Over</button>
+      </div>
+    </div>
+  </div><!-- end wizard -->
+
+  <h2 id="database-guide">Database Integrations in Depth</h2>
+  <h3>PostgreSQL</h3>
+  <p>The official <code>@modelcontextprotocol/server-postgres</code> package exposes <strong>query</strong> and <strong>list_tables</strong> tools plus schema resources. Claude can write and execute SQL, inspect table schemas, and analyze query results in a single conversation turn.</p>
+  <pre><code><span style="color:#6e7681"># Install (one-time)</span>
+<span style="color:#a5d6ff">npm install -g @modelcontextprotocol/server-postgres</span>
+
+<span style="color:#6e7681"># Test locally</span>
+<span style="color:#a5d6ff">npx @modelcontextprotocol/server-postgres \
+  "postgresql://readonly_user:pass@localhost:5432/mydb"</span></code></pre>
+  <p>Always use a <strong>read-only database user</strong> for the MCP connection. Create one with <code>GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_user;</code> and revoke all write permissions.</p>
+
+  <h3>SQLite</h3>
+  <p>SQLite needs no network config — just a path to the <code>.db</code> file. It is ideal for local development, embedded analytics, and offline workflows. The server auto-detects foreign keys and indexes, making schema exploration especially clean.</p>
+
+  <h3>MySQL / MariaDB</h3>
+  <p>Use the community <code>mcp-server-mysql</code> package. Connection strings follow the standard <code>mysql://user:pass@host:3306/dbname</code> format. Enable <code>ssl: true</code> in the config for any non-localhost connection.</p>
+
+  <h2 id="api-guide">REST API Integrations</h2>
+  <p>Connecting Claude to a REST API requires either an off-the-shelf MCP server (GitHub, Slack, Notion all have official ones) or a custom server you write using the MCP TypeScript or Python SDK. A custom server for a simple CRUD API is under 80 lines of code.</p>
+
+  <div class="key-takeaway">
+    <strong>Pattern:</strong> For OpenAPI-documented APIs, use the <code>mcp-openapi</code> community package. Point it at your swagger.json and it auto-generates tools for every endpoint — no handwriting required.
+  </div>
+
+  <h3>GitHub Integration</h3>
+  <p>The <code>@modelcontextprotocol/server-github</code> package requires a personal access token. It exposes tools for listing repos, reading files, searching code, creating issues, and commenting on PRs. Set the token as an environment variable — never inline it in the config JSON.</p>
+
+  <h3>Writing a Custom API Server (TypeScript)</h3>
+  <pre><code><span style="color:#79c0ff">import</span> { McpServer } <span style="color:#79c0ff">from</span> <span style="color:#a5d6ff">"@modelcontextprotocol/sdk/server/mcp.js"</span>;
+<span style="color:#79c0ff">import</span> { StdioServerTransport } <span style="color:#79c0ff">from</span> <span style="color:#a5d6ff">"@modelcontextprotocol/sdk/server/stdio.js"</span>;
+<span style="color:#79c0ff">import</span> { z } <span style="color:#79c0ff">from</span> <span style="color:#a5d6ff">"zod"</span>;
+
+<span style="color:#79c0ff">const</span> server = <span style="color:#79c0ff">new</span> McpServer({ name: <span style="color:#a5d6ff">"my-api"</span>, version: <span style="color:#a5d6ff">"1.0.0"</span> });
+
+server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <span style="color:#79c0ff">async</span> ({ id }) => {
+  <span style="color:#79c0ff">const</span> res = <span style="color:#79c0ff">await</span> fetch(<span style="color:#a5d6ff">`https://api.example.com/users/${id}`</span>, {
+    headers: { Authorization: <span style="color:#a5d6ff">`Bearer ${process.env.API_TOKEN}`</span> }
+  });
+  <span style="color:#79c0ff">const</span> data = <span style="color:#79c0ff">await</span> res.json();
+  <span style="color:#79c0ff">return</span> { content: [{ type: <span style="color:#a5d6ff">"text"</span>, text: JSON.stringify(data, null, 2) }] };
+});
+
+<span style="color:#79c0ff">await</span> server.connect(<span style="color:#79c0ff">new</span> StdioServerTransport());</code></pre>
+
+  <h2 id="filesystem-guide">Filesystem and File Server Integrations</h2>
+  <p>The <code>@modelcontextprotocol/server-filesystem</code> package gives Claude read/write access to specified directories. Configure it with an explicit <strong>allowed paths list</strong> — never pass <code>/</code> or your home directory root. The server enforces path containment so Claude cannot traverse outside the allowed list.</p>
+  <pre><code><span style="color:#6e7681">// Good: scoped to one project directory</span>
+<span style="color:#a5d6ff">"allowedPaths"</span>: [<span style="color:#a5d6ff">"/Users/you/projects/my-app"</span>]
+
+<span style="color:#6e7681">// Bad: overly broad</span>
+<span style="color:#a5d6ff">"allowedPaths"</span>: [<span style="color:#a5d6ff">"/"</span>]</code></pre>
+  <p>Filesystem MCP is powerful for code review sessions (Claude reads all your source files), documentation generation, and log analysis where data lives in flat files.</p>
+
+  <h2 id="security">Security and Production Hardening</h2>
+  <ul>
+    <li><strong>Never hardcode credentials.</strong> Use environment variables in the <code>env</code> block of your server config. Claude Desktop passes them as process environment variables.</li>
+    <li><strong>Least-privilege database users.</strong> Create dedicated read-only users for each MCP connection. Rotate credentials quarterly.</li>
+    <li><strong>Scope filesystem paths tightly.</strong> The narrower the allowed path list, the smaller the blast radius of any misuse.</li>
+    <li><strong>Audit tool calls.</strong> Add a logging middleware to your custom servers that records every tool invocation with timestamp, parameters, and response size.</li>
+    <li><strong>Use <code>--read-only</code> flags where available.</strong> Several official MCP servers support a read-only mode flag that disables all mutation tools at the server level.</li>
+  </ul>
+
+  <h2 id="troubleshooting">Troubleshooting Common Errors</h2>
+  <table class="comparison-table">
+    <thead>
+      <tr><th>Error</th><th>Cause</th><th>Fix</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Server not found</code></td>
+        <td>Server process failed to start</td>
+        <td>Run the server command manually in your terminal to see the real error</td>
+      </tr>
+      <tr>
+        <td><code>Connection refused</code></td>
+        <td>Database not running or wrong port</td>
+        <td>Verify the host/port with <code>psql</code> or <code>mysql</code> CLI first</td>
+      </tr>
+      <tr>
+        <td><code>Tool list empty</code></td>
+        <td>Server started but no tools registered</td>
+        <td>Check the server version — older packages may need an upgrade</td>
+      </tr>
+      <tr>
+        <td><code>Permission denied</code></td>
+        <td>Database user lacks SELECT grants</td>
+        <td>Run <code>GRANT SELECT ON ALL TABLES ... TO mcp_user</code></td>
+      </tr>
+      <tr>
+        <td><code>Path not allowed</code></td>
+        <td>Filesystem path outside allowed list</td>
+        <td>Add the path to <code>allowedPaths</code> in server config</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="further-reading">
+    <h3>Related Guides</h3>
+    <a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration — Coordination Pattern Designer</a>
+    <a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation — 7 Patterns</a>
+    <a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns — Interactive Chain Builder</a>
+    <a href="/research/agent-pattern-library.html">Agent Pattern Library — 12 Agentic AI Design Patterns</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">Zovo Tools</div>
+    <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+    <a href="https://zovo.one/pricing?utm_source=claudflow.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+    <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+  </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+  <div class="zovo-network-inner">
+    <h3 class="zovo-network-title">Explore More Tools</h3>
+    <div class="zovo-network-links">
+      <a href="https://abwex.com">ABWex — A/B Testing</a>
+      <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+      <a href="https://claudkit.com">ClaudKit — API</a>
+      <a href="https://enhio.com">Enhio — Text Tools</a>
+      <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+      <a href="https://gen8x.com">Gen8X — Color Tools</a>
+      <a href="https://gpt0x.com">GPT0X — AI Models</a>
+      <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+      <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+      <a href="https://kappafy.com">Kappafy — JSON</a>
+      <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+      <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+      <a href="https://krzen.com">Krzen — Image Tools</a>
+      <a href="https://lochbot.com">LochBot — Security</a>
+      <a href="https://lockml.com">LockML — ML Compare</a>
+      <a href="https://ml3x.com">ML3X — Matrix Math</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+// ---- Wizard State ----
+let selectedSource = null;
+let configData = {};
+
+const SOURCE_META = {
+  postgres: {
+    label: 'PostgreSQL',
+    badge: 'DB',
+    package: '@modelcontextprotocol/server-postgres',
+    fields: [
+      { id: 'pg_host', label: 'Host', placeholder: 'localhost', default: 'localhost' },
+      { id: 'pg_port', label: 'Port', placeholder: '5432', default: '5432' },
+      { id: 'pg_user', label: 'Username', placeholder: 'readonly_user', default: '' },
+      { id: 'pg_pass', label: 'Password', placeholder: '(use env var in production)', default: '' },
+      { id: 'pg_db',   label: 'Database name', placeholder: 'my_database', default: '' }
+    ]
+  },
+  sqlite: {
+    label: 'SQLite',
+    badge: 'DB',
+    package: 'mcp-server-sqlite',
+    fields: [
+      { id: 'sqlite_path', label: 'Path to .db file', placeholder: '/Users/you/data/myapp.db', default: '' }
+    ]
+  },
+  mysql: {
+    label: 'MySQL / MariaDB',
+    badge: 'DB',
+    package: 'mcp-server-mysql',
+    fields: [
+      { id: 'my_host', label: 'Host', placeholder: 'localhost', default: 'localhost' },
+      { id: 'my_port', label: 'Port', placeholder: '3306', default: '3306' },
+      { id: 'my_user', label: 'Username', placeholder: 'mcp_user', default: '' },
+      { id: 'my_pass', label: 'Password', placeholder: '(use env var)', default: '' },
+      { id: 'my_db',   label: 'Database name', placeholder: 'my_database', default: '' }
+    ]
+  },
+  'rest-api': {
+    label: 'REST API',
+    badge: 'API',
+    package: 'mcp-openapi',
+    fields: [
+      { id: 'api_base', label: 'Base URL', placeholder: 'https://api.example.com/v1', default: '' },
+      { id: 'api_token', label: 'Bearer Token env var name', placeholder: 'MY_API_TOKEN', default: 'MY_API_TOKEN' },
+      { id: 'api_spec', label: 'OpenAPI spec URL (optional)', placeholder: 'https://api.example.com/openapi.json', default: '' }
+    ]
+  },
+  github: {
+    label: 'GitHub',
+    badge: 'API',
+    package: '@modelcontextprotocol/server-github',
+    fields: [
+      { id: 'gh_token_var', label: 'Token env var name', placeholder: 'GITHUB_PERSONAL_ACCESS_TOKEN', default: 'GITHUB_PERSONAL_ACCESS_TOKEN' }
+    ]
+  },
+  filesystem: {
+    label: 'Filesystem',
+    badge: 'FS',
+    package: '@modelcontextprotocol/server-filesystem',
+    fields: [
+      { id: 'fs_path1', label: 'Allowed path 1', placeholder: '/Users/you/projects/my-app', default: '' },
+      { id: 'fs_path2', label: 'Allowed path 2 (optional)', placeholder: '/Users/you/documents/notes', default: '' }
+    ]
+  }
+};
+
+function selectSource(el) {
+  document.querySelectorAll('.source-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSource = el.dataset.source;
+  document.getElementById('btn-next-1').disabled = false;
+}
+
+function goToPanel(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('panel-' + i).classList.toggle('active', i === n);
+    const tab = document.getElementById('tab-' + i);
+    tab.classList.remove('active', 'done');
+    if (i < n) tab.classList.add('done');
+    else if (i === n) tab.classList.add('active');
+  });
+  if (n === 2) buildConnFields();
+}
+
+function buildConnFields() {
+  const meta = SOURCE_META[selectedSource];
+  if (!meta) return;
+  const container = document.getElementById('conn-fields');
+  let html = `<p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">Fill in connection details for <strong style="color:#fff">${meta.label}</strong>. Secrets will be referenced as environment variables in the generated config.</p>`;
+  const fields = meta.fields;
+  for (let i = 0; i < fields.length; i += 2) {
+    html += `<div class="tool-row">`;
+    for (let j = i; j < Math.min(i+2, fields.length); j++) {
+      const f = fields[j];
+      html += `<div><label class="tool-label" for="${f.id}">${f.label}</label>
+        <input class="tool-input" type="text" id="${f.id}" placeholder="${f.placeholder}" value="${f.default}"></div>`;
+    }
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+}
+
+function getFieldVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function generateConfig() {
+  const meta = SOURCE_META[selectedSource];
+  let json = '';
+  let steps = [];
+
+  if (selectedSource === 'postgres') {
+    const host = getFieldVal('pg_host') || 'localhost';
+    const port = getFieldVal('pg_port') || '5432';
+    const user = getFieldVal('pg_user') || 'mcp_user';
+    const db   = getFieldVal('pg_db') || 'mydb';
+    const passVar = 'PGPASSWORD';
+    json = `{
+  "mcpServers": {
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://${user}:\${${passVar}}@${host}:${port}/${db}"
+      ],
+      "env": {
+        "${passVar}": "your_password_here"
+      }
+    }
+  }
+}`;
+    steps = [
+      { title: 'Install Node.js 18+', desc: 'npx handles installation automatically, but Node.js must be present on your PATH.' },
+      { title: 'Create a read-only DB user', desc: `GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${user};` },
+      { title: 'Set the env var', desc: `export ${passVar}=your_actual_password` },
+      { title: 'Paste config and restart Claude Desktop', desc: 'File → Settings → Developer → Edit Config in Claude Desktop, then paste the snippet above.' },
+      { title: 'Verify in Claude', desc: 'Ask Claude: "List all tables in the database." It should call list_tables and return your schema.' }
+    ];
+  } else if (selectedSource === 'sqlite') {
+    const path = getFieldVal('sqlite_path') || '/path/to/your.db';
+    json = `{
+  "mcpServers": {
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-sqlite",
+        "--db-path",
+        "${path}"
+      ]
+    }
+  }
+}`;
+    steps = [
+      { title: 'Install Node.js 18+', desc: 'Ensure npx is available on your PATH.' },
+      { title: 'Confirm the .db file path', desc: `Run: ls -lh "${path}" to verify the file exists.` },
+      { title: 'Paste config and restart Claude Desktop', desc: 'File → Settings → Developer → Edit Config, paste the snippet, then restart.' },
+      { title: 'Verify', desc: 'Ask Claude: "What tables are in the database?" It should introspect your SQLite schema.' }
+    ];
+  } else if (selectedSource === 'mysql') {
+    const host = getFieldVal('my_host') || 'localhost';
+    const port = getFieldVal('my_port') || '3306';
+    const user = getFieldVal('my_user') || 'mcp_user';
+    const db   = getFieldVal('my_db') || 'mydb';
+    json = `{
+  "mcpServers": {
+    "mysql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-mysql"
+      ],
+      "env": {
+        "MYSQL_HOST": "${host}",
+        "MYSQL_PORT": "${port}",
+        "MYSQL_USER": "${user}",
+        "MYSQL_PASSWORD": "your_password_here",
+        "MYSQL_DATABASE": "${db}"
+      }
+    }
+  }
+}`;
+    steps = [
+      { title: 'Create read-only MySQL user', desc: `GRANT SELECT ON ${db}.* TO '${user}'@'%';` },
+      { title: 'Replace password placeholder', desc: 'Set MYSQL_PASSWORD to your actual password (use a secrets manager in production).' },
+      { title: 'Paste config and restart Claude Desktop', desc: 'File → Settings → Developer → Edit Config, paste, restart.' },
+      { title: 'Verify', desc: 'Ask Claude: "Describe the schema." It should list tables and columns.' }
+    ];
+  } else if (selectedSource === 'rest-api') {
+    const base = getFieldVal('api_base') || 'https://api.example.com/v1';
+    const tokenVar = getFieldVal('api_token') || 'MY_API_TOKEN';
+    const spec = getFieldVal('api_spec') || '';
+    const specLine = spec ? `,\n        "--spec",\n        "${spec}"` : '';
+    json = `{
+  "mcpServers": {
+    "rest-api": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-openapi",
+        "--base-url",
+        "${base}"${specLine}
+      ],
+      "env": {
+        "${tokenVar}": "your_token_here",
+        "MCP_API_BEARER_ENV": "${tokenVar}"
+      }
+    }
+  }
+}`;
+    steps = [
+      { title: 'Set your API token', desc: `export ${tokenVar}=your_actual_token` },
+      { title: 'Provide an OpenAPI spec for best results', desc: 'Without a spec, the server can only call explicitly mapped endpoints. With a spec, all endpoints become tools automatically.' },
+      { title: 'Paste config and restart Claude Desktop', desc: 'File → Settings → Developer → Edit Config, paste, restart.' },
+      { title: 'Verify', desc: 'Ask Claude to list available API operations. It should enumerate your endpoints.' }
+    ];
+  } else if (selectedSource === 'github') {
+    const tokenVar = getFieldVal('gh_token_var') || 'GITHUB_PERSONAL_ACCESS_TOKEN';
+    json = `{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "${tokenVar}": "your_github_pat_here"
+      }
+    }
+  }
+}`;
+    steps = [
+      { title: 'Create a GitHub Personal Access Token', desc: 'Settings → Developer settings → Personal access tokens → Fine-grained. Grant repo and issues read permissions only.' },
+      { title: 'Set the env var', desc: `export ${tokenVar}=ghp_your_token_here` },
+      { title: 'Paste config and restart Claude Desktop', desc: 'File → Settings → Developer → Edit Config, paste, restart.' },
+      { title: 'Verify', desc: 'Ask Claude: "List my GitHub repositories." It should return your repos via the GitHub API.' }
+    ];
+  } else if (selectedSource === 'filesystem') {
+    const p1 = getFieldVal('fs_path1') || '/path/to/your/project';
+    const p2 = getFieldVal('fs_path2');
+    const paths = p2 ? `"${p1}",\n        "${p2}"` : `"${p1}"`;
+    json = `{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        ${paths}
+      ]
+    }
+  }
+}`;
+    steps = [
+      { title: 'Confirm paths exist', desc: `Run: ls "${p1}" to verify the directory is accessible.` },
+      { title: 'Keep paths narrow', desc: 'Only allow directories Claude legitimately needs. Avoid /home or /Users roots.' },
+      { title: 'Paste config and restart Claude Desktop', desc: 'File → Settings → Developer → Edit Config, paste, restart.' },
+      { title: 'Verify', desc: 'Ask Claude: "List files in the configured directory." It should return the directory listing.' }
+    ];
+  }
+
+  configData.json = json;
+  configData.steps = steps;
+
+  document.getElementById('config-out').textContent = json;
+  const stepsContainer = document.getElementById('setup-steps-out');
+  stepsContainer.innerHTML = steps.map((s, i) => `
+    <div class="setup-step">
+      <div class="setup-num">${i+1}</div>
+      <div class="setup-content">
+        <strong>${s.title}</strong>
+        <p>${s.desc}</p>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('test-log').innerHTML = '<span class="log-line muted">// Config generated. Click "Run Connection Test" to simulate the handshake.</span>';
+  goToPanel(3);
+}
+
+function copyConfig() {
+  if (!configData.json) return;
+  navigator.clipboard.writeText(configData.json).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy JSON'; }, 1800);
+  });
+}
+
+function runTestSim() {
+  const log = document.getElementById('test-log');
+  const btn = document.getElementById('test-btn');
+  if (!selectedSource) return;
+  btn.disabled = true;
+  log.innerHTML = '';
+  const meta = SOURCE_META[selectedSource];
+
+  const lines = [
+    { cls: 'info',    text: `[00:00.000] MCP test harness v2.1.0`, delay: 0 },
+    { cls: 'muted',   text: `[00:00.012] Spawning server process...`, delay: 120 },
+    { cls: 'muted',   text: `[00:00.028] Command: npx -y ${meta.package}`, delay: 250 },
+    { cls: 'info',    text: `[00:00.180] Process started (PID: 47821)`, delay: 500 },
+    { cls: 'muted',   text: `[00:00.195] Sending initialize request...`, delay: 700 },
+    { cls: 'muted',   text: `[00:00.210]   → {jsonrpc: "2.0", method: "initialize", id: 1}`, delay: 900 },
+    { cls: 'success', text: `[00:00.340] Server responded: ${meta.label} MCP Server v1.x.x`, delay: 1200 },
+    { cls: 'muted',   text: `[00:00.355] Handshake complete. Requesting tool list...`, delay: 1500 },
+    { cls: 'muted',   text: `[00:00.360]   → {jsonrpc: "2.0", method: "tools/list", id: 2}`, delay: 1700 },
+    ...getToolLines(selectedSource),
+    { cls: 'muted',   text: `[00:00.580] Requesting resource list...`, delay: 2700 },
+    { cls: 'success', text: `[00:00.620] Resources: schema://main, config://server`, delay: 2950 },
+    { cls: 'success', text: `[00:00.635] All checks passed. Server is ready.`, delay: 3200 },
+    { cls: 'info',    text: `[00:00.636] — Connection test complete. No errors detected. —`, delay: 3400 },
+  ];
+
+  lines.forEach(({ cls, text, delay }) => {
+    setTimeout(() => {
+      const span = document.createElement('span');
+      span.className = 'log-line ' + cls;
+      span.textContent = text;
+      log.appendChild(span);
+      log.scrollTop = log.scrollHeight;
+      if (delay >= 3400) btn.disabled = false;
+    }, delay);
+  });
+}
+
+function getToolLines(source) {
+  const toolMap = {
+    postgres:   ['query', 'list_tables', 'describe_table', 'list_schemas'],
+    sqlite:     ['query', 'list_tables', 'describe_table', 'execute'],
+    mysql:      ['query', 'list_tables', 'describe_table', 'show_databases'],
+    'rest-api': ['get_resource', 'post_resource', 'list_endpoints', 'api_status'],
+    github:     ['list_repos', 'read_file', 'search_code', 'create_issue', 'list_prs'],
+    filesystem: ['read_file', 'list_directory', 'write_file', 'search_files']
+  };
+  const tools = toolMap[source] || ['tool_1', 'tool_2'];
+  const baseDelay = 1900;
+  return [
+    { cls: 'success', text: `[00:00.420] Tools registered (${tools.length}):`, delay: baseDelay },
+    ...tools.map((t, i) => ({
+      cls: 'muted',
+      text: `[00:00.${430 + i*15}]   ✓ ${t}`,
+      delay: baseDelay + 80 + i * 80
+    }))
+  ];
+}
+</script>
+</body>
+</html>

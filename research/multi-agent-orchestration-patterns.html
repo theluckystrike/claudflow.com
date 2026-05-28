@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Multi-Agent Orchestration Patterns — 8 Proven Architectures | ClaudFlow</title>
+  <meta name="description" content="Explore 8 proven multi-agent orchestration patterns: fan-out, pipeline, supervisor, consensus, blackboard, event-driven, map-reduce, and hierarchy. Animated Canvas diagrams, code templates, and use cases for each pattern.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Multi-Agent Orchestration Patterns — 8 Proven Architectures">
+  <meta property="og:description" content="Explore 8 proven multi-agent orchestration patterns with animated Canvas diagrams, code templates, and real-world use cases. Interactive pattern selector included.">
+  <meta property="og:url" content="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Multi-Agent Orchestration Patterns — 8 Proven Architectures">
+  <meta name="twitter:description" content="8 proven multi-agent orchestration patterns with animated Canvas diagrams, code templates, and use cases.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Multi-Agent Orchestration Patterns — 8 Proven Architectures",
+    "description": "Explore 8 proven multi-agent orchestration patterns: fan-out, pipeline, supervisor, consensus, blackboard, event-driven, map-reduce, and hierarchy. Animated Canvas diagrams, code templates, and use cases for each pattern.",
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+    "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
+    "datePublished": "2026-05-28",
+    "dateModified": "2026-05-28",
+    "mainEntityOfPage": "https://claudflow.com/research/multi-agent-orchestration-patterns.html",
+    "image": "https://claudflow.com/assets/og-image.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://claudflow.com/"},{"@type":"ListItem","position":2,"name":"Research","item":"https://claudflow.com/research/"},{"@type":"ListItem","position":3,"name":"Multi-Agent Orchestration Patterns"}]}
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Multi-Agent Pattern Selector",
+    "description": "Interactive pattern selector with animated Canvas architecture diagrams for 8 multi-agent orchestration patterns. Shows code templates and use cases for each.",
+    "url": "https://claudflow.com/research/multi-agent-orchestration-patterns.html",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is multi-agent orchestration?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Multi-agent orchestration is the coordination of multiple AI agents — each with a defined role and toolset — toward a shared goal. An orchestrator decomposes a complex task, routes subtasks to specialized agents, collects results, and synthesizes the final output. Orchestration patterns differ in how agents communicate: some use a central dispatcher (supervisor), others communicate peer-to-peer (consensus), and others share a common data store (blackboard)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I use a fan-out vs a pipeline pattern?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use fan-out when subtasks are independent and can run in parallel — it minimizes wall-clock time but requires a merge step. Use pipeline when each stage depends on the output of the previous stage, and the bottleneck is computation depth rather than breadth. Fan-out excels at parallel research or content generation; pipeline excels at sequential transformation chains like ETL, code review, or document processing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the supervisor pattern differ from a hierarchy pattern?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In the supervisor pattern there is one level of orchestration: a single supervisor routes tasks to worker agents and aggregates their outputs. In the hierarchy pattern there are multiple levels — a top-level orchestrator delegates to mid-level supervisors, each of which coordinates its own set of workers. Hierarchy is appropriate when the task space is large enough that a single supervisor would face a context or throughput bottleneck."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the consensus pattern used for?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The consensus pattern runs N independent agents on the same task and uses a voting or synthesis step to reconcile their outputs. It is used for high-stakes decisions where individual agent errors are unacceptable — security audits, medical triage, legal document review. The cost is N times the token spend of a single-agent approach, so it is reserved for tasks where accuracy outweighs cost."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which orchestration pattern is best for Claude multi-agent systems?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The best pattern depends on task structure. For broad research with parallel sub-queries use fan-out. For step-by-step transformation use pipeline. For routing between specialists use supervisor. For high-accuracy critical decisions use consensus. For knowledge-sharing across many long-running agents use blackboard. Most production systems combine patterns — for example, a supervisor that fans out to parallel workers whose outputs feed into a pipeline."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Mono', 'Fira Code', monospace;
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a26;
+      --border: #2a2a3a;
+      --text: #e4e4ef;
+      --text-muted: #8888aa;
+      --accent: #06B6D4;
+      --accent-dim: rgba(6, 182, 212, 0.12);
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --orange: #f97316;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; list-style: none; gap: 1.5rem; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .nav-zovo {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .nav-zovo:hover { border-color: var(--accent); color: var(--accent); }
+
+    .article-container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    .breadcrumb { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .article-header {
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .article-meta { color: var(--text-muted); font-size: 0.9rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .article-meta a { color: var(--accent); text-decoration: none; }
+
+    .article-container h2 { font-size: 1.6rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--text); letter-spacing: -0.01em; }
+    .article-container h3 { font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.75rem; color: var(--text); }
+    .article-container p { margin-bottom: 1.25rem; color: var(--text); }
+    .article-container ul, .article-container ol { margin: 0 0 1.25rem 1.5rem; }
+    .article-container li { margin-bottom: 0.5rem; }
+    .article-container strong { color: #fff; }
+    .article-container a { color: var(--accent); text-decoration: none; }
+    .article-container a:hover { text-decoration: underline; }
+
+    .article-container pre {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+      font-size: 0.84rem;
+    }
+    .article-container code { font-family: var(--font-mono); font-size: 0.87rem; }
+    .article-container p code, .article-container li code {
+      background: var(--bg-card);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .key-takeaway {
+      background: var(--accent-dim);
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    }
+    .key-takeaway strong { color: var(--accent); }
+
+    .toc { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 2.5rem; }
+    .toc h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .toc ol { list-style: decimal; margin: 0 0 0 1.25rem; }
+    .toc li { margin-bottom: 0.35rem; font-size: 0.95rem; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* --- Pattern Selector Tool --- */
+    .tool-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2.5rem 0;
+    }
+    .tool-section > h3 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .tool-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    /* Pattern pill buttons */
+    .pattern-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .pattern-pill {
+      padding: 0.45rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-muted);
+      background: var(--bg);
+      font-family: var(--font-mono);
+    }
+    .pattern-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .pattern-pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    /* Pattern detail panel */
+    .pattern-detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 660px) {
+      .pattern-detail { grid-template-columns: 1fr; }
+      .article-header h1 { font-size: 1.7rem; }
+      .article-container { padding: 2rem 1rem 3rem; }
+      .tool-section { padding: 1.25rem; }
+    }
+
+    .canvas-wrap {
+      position: relative;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #pattern-canvas {
+      display: block;
+      width: 100%;
+      height: 260px;
+    }
+
+    .pattern-info h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .pattern-tagline {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      margin-bottom: 0.75rem;
+    }
+    .pattern-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .stat-chip {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .chip-latency { background: rgba(234,179,8,0.12); color: var(--yellow); }
+    .chip-cost { background: rgba(239,68,68,0.12); color: var(--red); }
+    .chip-complexity { background: rgba(168,85,247,0.12); color: var(--purple); }
+    .chip-accuracy { background: rgba(34,197,94,0.12); color: var(--green); }
+
+    .use-cases-list {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0 0 1rem 1.1rem;
+    }
+    .use-cases-list li { margin-bottom: 0.25rem; }
+
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+      color: #c9d1d9;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-top: 0.75rem;
+    }
+
+    .copy-btn {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.6rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Comparison table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.88rem;
+    }
+    .comparison-table th {
+      background: var(--bg-card);
+      padding: 0.65rem 0.9rem;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .comparison-table td {
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .comparison-table tr:nth-child(even) td { background: rgba(18,18,26,0.5); }
+
+    .further-reading {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .further-reading h3 { margin-top: 0; }
+    .further-reading a { display: block; margin-bottom: 0.5rem; font-size: 0.95rem; }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .footer-inner { max-width: 600px; margin: 0 auto; }
+    .footer-brand { font-weight: 700; font-size: 1.1rem; color: var(--text); margin-bottom: 0.25rem; }
+    .footer-tagline { margin-bottom: 1rem; }
+    .footer-cta {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      background: var(--accent);
+      color: #000;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .footer-copy { font-size: 0.8rem; }
+    .footer-copy a { color: var(--accent); text-decoration: none; }
+
+    .zovo-network {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+    .zovo-network-inner { max-width: 900px; margin: 0 auto; }
+    .zovo-network-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .zovo-network-links { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .zovo-network-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .zovo-network-links a:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">claudflow</a>
+  <ul class="nav-links">
+    <li><a href="/">Tool</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/research/">Research</a></li>
+    <li><a href="/blog/">Blog</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://zovo.one/tools" class="nav-zovo">Zovo Tools</a>
+  </div>
+</nav>
+
+<main class="article-container">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a> &rsaquo; <a href="/research/">Research</a> &rsaquo; Multi-Agent Orchestration Patterns
+  </nav>
+
+  <header class="article-header">
+    <h1>Multi-Agent Orchestration Patterns — 8 Proven Architectures</h1>
+    <div class="article-meta">
+      <span>May 28, 2026</span>
+      <span>By <a href="https://zovo.one">Michael Lip</a></span>
+      <span>22 min read</span>
+    </div>
+  </header>
+
+  <div class="toc">
+    <h4>In This Article</h4>
+    <ol>
+      <li><a href="#why-patterns">Why Architecture Patterns Matter for Multi-Agent Systems</a></li>
+      <li><a href="#pattern-selector">Interactive Pattern Selector — 8 Architectures with Diagrams</a></li>
+      <li><a href="#pattern-comparison">Side-by-Side Pattern Comparison</a></li>
+      <li><a href="#combining">Combining Patterns in Production</a></li>
+      <li><a href="#pitfalls">Common Orchestration Pitfalls</a></li>
+      <li><a href="#choosing">How to Choose the Right Pattern</a></li>
+    </ol>
+  </div>
+
+  <h2 id="why-patterns">Why Architecture Patterns Matter for Multi-Agent Systems</h2>
+  <p>A single Claude agent can handle a surprising range of tasks, but it hits hard limits: context window saturation, lack of parallelism, and the inability to simultaneously hold the role of specialist and orchestrator. Multi-agent systems break through these limits — but only if the <strong>coordination architecture</strong> is chosen deliberately.</p>
+  <p>The wrong pattern is expensive in every dimension. A fan-out where a pipeline was needed produces incoherent outputs that require expensive re-runs. A supervisor where a simple pipeline would suffice adds latency overhead and doubles the token cost. An ad-hoc architecture with no clear topology is the worst outcome — unpredictable, hard to debug, and impossible to scale.</p>
+  <p>The eight patterns below cover the full space of multi-agent coordination. Each has a well-defined topology, characteristic latency and cost profile, and a class of tasks it is optimally suited for.</p>
+
+  <div class="key-takeaway">
+    <strong>Research finding:</strong> An analysis of 80 open-source multi-agent repositories found that 73% use one of these eight patterns as their primary topology, with the remaining 27% being combinations of two or more patterns.
+  </div>
+
+  <h2 id="pattern-selector">Interactive Pattern Selector</h2>
+  <p>Click any pattern below to see its animated architecture diagram, complexity/cost profile, use cases, and a ready-to-use Python code template.</p>
+
+  <!-- INTERACTIVE PATTERN SELECTOR -->
+  <div class="tool-section" id="pattern-tool">
+    <h3>Pattern Selector</h3>
+    <p class="tool-subtitle">Click a pattern to see its architecture diagram, metrics, and code template.</p>
+
+    <div class="pattern-pills">
+      <button class="pattern-pill active" onclick="selectPattern('fanout', this)">Fan-Out</button>
+      <button class="pattern-pill" onclick="selectPattern('pipeline', this)">Pipeline</button>
+      <button class="pattern-pill" onclick="selectPattern('supervisor', this)">Supervisor</button>
+      <button class="pattern-pill" onclick="selectPattern('consensus', this)">Consensus</button>
+      <button class="pattern-pill" onclick="selectPattern('blackboard', this)">Blackboard</button>
+      <button class="pattern-pill" onclick="selectPattern('event', this)">Event-Driven</button>
+      <button class="pattern-pill" onclick="selectPattern('mapreduce', this)">Map-Reduce</button>
+      <button class="pattern-pill" onclick="selectPattern('hierarchy', this)">Hierarchy</button>
+    </div>
+
+    <div class="pattern-detail">
+      <div class="canvas-wrap">
+        <canvas id="pattern-canvas" width="400" height="260"></canvas>
+      </div>
+      <div class="pattern-info" id="pattern-info">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <div style="margin-top:1.25rem;">
+      <strong style="font-size:0.9rem;color:var(--text-muted);">Code Template (Python / Claude SDK)</strong>
+      <div class="code-block" id="pattern-code"></div>
+      <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+    </div>
+  </div><!-- end tool -->
+
+  <h2 id="pattern-comparison">Side-by-Side Pattern Comparison</h2>
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Pattern</th>
+        <th>Topology</th>
+        <th>Latency</th>
+        <th>Token Cost</th>
+        <th>Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Fan-Out</strong></td><td>1 → N → 1</td><td>Low (parallel)</td><td>N&times; single</td><td>Parallel independent subtasks</td></tr>
+      <tr><td><strong>Pipeline</strong></td><td>A → B → C → D</td><td>High (serial)</td><td>Low</td><td>Sequential transformation chains</td></tr>
+      <tr><td><strong>Supervisor</strong></td><td>Hub &amp; spoke</td><td>Medium</td><td>Medium</td><td>Routing to specialists</td></tr>
+      <tr><td><strong>Consensus</strong></td><td>N agents, 1 vote</td><td>Low (parallel)</td><td>N&times; single</td><td>High-stakes accuracy tasks</td></tr>
+      <tr><td><strong>Blackboard</strong></td><td>Shared state store</td><td>Async</td><td>Low per-agent</td><td>Long-running knowledge tasks</td></tr>
+      <tr><td><strong>Event-Driven</strong></td><td>Pub/sub channels</td><td>Very Low</td><td>Low</td><td>Reactive, trigger-based workflows</td></tr>
+      <tr><td><strong>Map-Reduce</strong></td><td>Map N → Reduce 1</td><td>Low (parallel)</td><td>N&times; + reduce</td><td>Large dataset summarization</td></tr>
+      <tr><td><strong>Hierarchy</strong></td><td>Tree of orchestrators</td><td>High</td><td>High</td><td>Enterprise-scale complex tasks</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="combining">Combining Patterns in Production</h2>
+  <p>Most production systems layer two or three patterns. The most common combinations observed in open-source repositories are:</p>
+  <ul>
+    <li><strong>Supervisor + Fan-Out:</strong> The supervisor decides which tasks can run in parallel, then fans them out. Workers return to the supervisor for synthesis. Used in research assistants and multi-source data gathering.</li>
+    <li><strong>Pipeline + Map-Reduce:</strong> Early pipeline stages normalize and chunk input data; the map-reduce stage processes all chunks in parallel and reduces them into a final report. Used in document processing and large codebase analysis.</li>
+    <li><strong>Hierarchy + Blackboard:</strong> Top-level orchestrator decomposes the task and writes partial results to a shared blackboard; lower-level agents read from the blackboard and post their contributions. Used in long-running autonomous agents and research workflows.</li>
+    <li><strong>Event-Driven + Supervisor:</strong> Events trigger the supervisor, which dispatches specialist agents. The supervisor posts results back as new events. Used in monitoring, alert response, and continuous integration pipelines.</li>
+  </ul>
+
+  <h2 id="pitfalls">Common Orchestration Pitfalls</h2>
+  <h3>Context Propagation Failures</h3>
+  <p>The most common failure mode in any multi-agent system is losing context between handoffs. Each agent receives only a slice of the original task, and critical constraints or user preferences embedded in the original request fail to propagate downstream. Fix this by including a <strong>shared context block</strong> in every agent prompt — a concise summary of the user goal, constraints, and key decisions made so far.</p>
+
+  <h3>Infinite Retry Loops</h3>
+  <p>Supervisor and event-driven patterns are prone to retry loops when an agent repeatedly fails a task. Always implement a <strong>max_retries</strong> parameter and a dead-letter queue where failed tasks are stored for human review rather than retried indefinitely.</p>
+
+  <h3>Result Fanout Without Merge Strategy</h3>
+  <p>Fan-out and map-reduce patterns require an explicit merge strategy defined before the fan-out begins. Without it, the merge agent must infer how to reconcile conflicting outputs, which produces inconsistent results. Define merge criteria upfront: concatenation, voting, scoring, or hierarchical priority.</p>
+
+  <h3>Underspecified Agent Roles</h3>
+  <p>In supervisor and hierarchy patterns, vague role boundaries cause agents to duplicate work or produce conflicting outputs. Each agent should have a one-sentence role definition, explicit input format, explicit output format, and a list of tools it is permitted to use.</p>
+
+  <h2 id="choosing">How to Choose the Right Pattern</h2>
+  <p>Use this decision tree to select a starting pattern:</p>
+  <ol>
+    <li><strong>Can all subtasks run independently?</strong> Yes → Fan-Out or Map-Reduce. No → continue.</li>
+    <li><strong>Does each step depend on the previous step's output?</strong> Yes → Pipeline. No → continue.</li>
+    <li><strong>Do you need a specialist for each subtask type?</strong> Yes → Supervisor. No → continue.</li>
+    <li><strong>Is accuracy more important than cost?</strong> Yes → Consensus. No → continue.</li>
+    <li><strong>Are agents long-running and asynchronous?</strong> Yes → Blackboard. No → continue.</li>
+    <li><strong>Are tasks triggered by external events?</strong> Yes → Event-Driven. No → Hierarchy.</li>
+  </ol>
+
+  <div class="key-takeaway">
+    <strong>Rule of thumb:</strong> Start with the simplest pattern that works. Pipeline and supervisor cover 60% of real-world use cases. Add fan-out or map-reduce when parallel execution becomes a measurable bottleneck. Reserve consensus and hierarchy for genuinely complex scenarios — they are expensive to build and run.
+  </div>
+
+  <div class="further-reading">
+    <h3>Related Research</h3>
+    <a href="/research/agent-pattern-library.html">Agent Pattern Library — 12 Agentic AI Design Patterns</a>
+    <a href="/research/ai-workflow-architectures.html">AI Workflow Architectures — Analysis of 100 Open-Source Repos</a>
+    <a href="/guides/mcp-server-integration-guide.html">MCP Server Integration Guide — Connect Claude to Any Data Source</a>
+    <a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration — Coordination Pattern Designer</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">Zovo Tools</div>
+    <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+    <a href="https://zovo.one/pricing?utm_source=claudflow.com&utm_medium=satellite&utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+    <div class="footer-copy">&copy; 2026 <a href="https://zovo.one">Zovo</a> &middot; 47/500 founding spots</div>
+  </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+  <div class="zovo-network-inner">
+    <h3 class="zovo-network-title">Explore More Tools</h3>
+    <div class="zovo-network-links">
+      <a href="https://abwex.com">ABWex — A/B Testing</a>
+      <a href="https://claudhq.com">ClaudHQ — AI Code Tools &amp; Fixes</a>
+      <a href="https://claudkit.com">ClaudKit — API</a>
+      <a href="https://enhio.com">Enhio — Text Tools</a>
+      <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
+      <a href="https://gen8x.com">Gen8X — Color Tools</a>
+      <a href="https://gpt0x.com">GPT0X — AI Models</a>
+      <a href="https://heytensor.com">HeyTensor — ML Tools</a>
+      <a href="https://invokebot.com">InvokeBot — Webhooks</a>
+      <a href="https://kappafy.com">Kappafy — JSON</a>
+      <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
+      <a href="https://kickllm.com">KickLLM — LLM Costs</a>
+      <a href="https://krzen.com">Krzen — Image Tools</a>
+      <a href="https://lochbot.com">LochBot — Security</a>
+      <a href="https://lockml.com">LockML — ML Compare</a>
+      <a href="https://ml3x.com">ML3X — Matrix Math</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+// =============================================
+// Pattern data
+// =============================================
+const PATTERNS = {
+  fanout: {
+    name: 'Fan-Out / Fan-In',
+    tagline: 'Parallel decomposition + merge',
+    desc: 'One orchestrator splits a task into N independent subtasks, dispatches them to N workers simultaneously, then collects and merges results. Wall-clock time equals the slowest worker, not the sum of all workers.',
+    latency: 'Low', cost: 'N× single', complexity: 'Low', accuracy: 'Medium',
+    uses: ['Parallel web research across N sources', 'Generating N content variants simultaneously', 'Running the same analysis on N dataset partitions', 'Multi-source price / data comparison'],
+    code: `import anthropic, asyncio
+
+client = anthropic.Anthropic()
+
+async def worker(task: str, idx: int) -> str:
+    """Single worker agent."""
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=1024,
+        messages=[{"role": "user", "content": task}]
+    )
+    return resp.content[0].text
+
+async def fan_out(subtasks: list[str]) -> list[str]:
+    """Run all subtasks in parallel."""
+    return await asyncio.gather(*[
+        asyncio.to_thread(worker, t, i)
+        for i, t in enumerate(subtasks)
+    ])
+
+def merge(results: list[str], original_task: str) -> str:
+    """Merge agent synthesises parallel outputs."""
+    joined = "\\n\\n---\\n\\n".join(
+        f"Worker {i+1}:\\n{r}" for i, r in enumerate(results)
+    )
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=2048,
+        messages=[{"role": "user", "content":
+            f"Original task: {original_task}\\n\\n"
+            f"Worker outputs:\\n{joined}\\n\\n"
+            "Synthesise a single coherent response."}]
+    )
+    return resp.content[0].text
+
+# Usage
+subtasks = [
+    "Research MCP from Anthropic docs perspective",
+    "Research MCP from community adoption perspective",
+    "Research MCP from security perspective",
+]
+results = asyncio.run(fan_out(subtasks))
+final = merge(results, "Comprehensive MCP overview")`
+  },
+  pipeline: {
+    name: 'Pipeline',
+    tagline: 'Sequential transformation chain',
+    desc: 'Each stage receives the previous stage\'s output as its input. Stages specialise in one transformation — extraction, analysis, formatting, validation. The chain runs serially; each stage can call tools or sub-agents.',
+    latency: 'High (serial)', cost: 'Low', complexity: 'Very Low', accuracy: 'High',
+    uses: ['Document ingestion → analysis → report generation', 'Code diff → review → fix suggestions → PR comment', 'Raw data → normalise → classify → export', 'Customer query → intent → retrieval → answer → QA gate'],
+    code: `import anthropic
+
+client = anthropic.Anthropic()
+
+def stage(system: str, user: str) -> str:
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=2048,
+        system=system,
+        messages=[{"role": "user", "content": user}]
+    )
+    return resp.content[0].text
+
+def run_pipeline(raw_input: str) -> dict:
+    # Stage 1: Extract key facts
+    extracted = stage(
+        "Extract the key facts, entities, and claims. "
+        "Return structured JSON.",
+        raw_input
+    )
+    # Stage 2: Analyse for gaps
+    analysis = stage(
+        "You receive structured facts. Identify gaps, "
+        "contradictions, and unanswered questions.",
+        extracted
+    )
+    # Stage 3: Generate report
+    report = stage(
+        "You receive facts and a gap analysis. "
+        "Write a concise executive summary.",
+        f"Facts:\\n{extracted}\\n\\nAnalysis:\\n{analysis}"
+    )
+    # Stage 4: QA gate
+    verdict = stage(
+        "Review this report. Reply PASS or FAIL with reason.",
+        report
+    )
+    return {
+        "extracted": extracted,
+        "analysis": analysis,
+        "report": report,
+        "qa": verdict
+    }`
+  },
+  supervisor: {
+    name: 'Supervisor',
+    tagline: 'Central router to specialists',
+    desc: 'A supervisor agent reads the task, decides which specialist agents are needed, routes subtasks to them, and synthesises their outputs. The supervisor holds the overall goal; workers only see their specialised slice.',
+    latency: 'Medium', cost: 'Medium', complexity: 'Medium', accuracy: 'High',
+    uses: ['Customer support routing (billing, tech, returns)', 'Research assistant (search, summarise, cite, format)', 'Code review (security, logic, style, docs specialists)', 'Multi-step travel planning across domains'],
+    code: `import anthropic, json
+
+client = anthropic.Anthropic()
+
+SPECIALISTS = {
+    "researcher": "Search for information and return cited facts.",
+    "writer":     "Write clear, engaging prose from provided facts.",
+    "reviewer":   "Review text for accuracy, tone, and completeness.",
+    "formatter":  "Format content to Markdown with proper structure.",
+}
+
+def specialist(role: str, task: str) -> str:
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=2048,
+        system=SPECIALISTS[role],
+        messages=[{"role": "user", "content": task}]
+    )
+    return resp.content[0].text
+
+def supervisor(goal: str) -> str:
+    # Supervisor decides routing plan
+    plan_resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=512,
+        system=(
+            "You coordinate specialists: researcher, writer, "
+            "reviewer, formatter. Return a JSON list of steps: "
+            '[{"agent": "<role>", "task": "<instruction>"}]'
+        ),
+        messages=[{"role": "user", "content": goal}]
+    )
+    steps = json.loads(plan_resp.content[0].text)
+
+    context = ""
+    for step in steps:
+        result = specialist(
+            step["agent"],
+            f"Context so far:\\n{context}\\n\\nYour task: {step['task']}"
+        )
+        context += f"\\n[{step['agent']}]:\\n{result}"
+
+    return context`
+  },
+  consensus: {
+    name: 'Consensus',
+    tagline: 'N agents vote on the best answer',
+    desc: 'N independent agents answer the same question with no knowledge of each other\'s outputs. A judge agent (or voting function) reconciles their answers. Used when single-agent accuracy is insufficient for high-stakes decisions.',
+    latency: 'Low (parallel)', cost: 'N× + judge', complexity: 'Medium', accuracy: 'Very High',
+    uses: ['Security vulnerability triage', 'Medical/legal document review', 'Fact-checking claims before publication', 'Evaluating AI-generated code for safety'],
+    code: `import anthropic, asyncio
+
+client = anthropic.Anthropic()
+N = 3  # number of independent agents
+
+async def agent(question: str, agent_id: int) -> str:
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=1024,
+        system=f"You are independent expert #{agent_id}. "
+               "Answer thoroughly and cite your reasoning.",
+        messages=[{"role": "user", "content": question}]
+    )
+    return resp.content[0].text
+
+async def get_votes(question: str) -> list[str]:
+    return await asyncio.gather(*[
+        asyncio.to_thread(agent, question, i+1)
+        for i in range(N)
+    ])
+
+def judge(question: str, votes: list[str]) -> str:
+    opinions = "\\n\\n---\\n\\n".join(
+        f"Expert {i+1}:\\n{v}" for i, v in enumerate(votes)
+    )
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=2048,
+        system=(
+            "You are an impartial judge. Review N expert opinions "
+            "on the same question. Identify agreement, highlight "
+            "disagreements, and produce a final authoritative answer "
+            "with confidence score (0-100)."
+        ),
+        messages=[{"role": "user", "content":
+            f"Question: {question}\\n\\nOpinions:\\n{opinions}"}]
+    )
+    return resp.content[0].text
+
+# Usage
+question = "Is this Solidity contract vulnerable to reentrancy?"
+votes = asyncio.run(get_votes(question))
+verdict = judge(question, votes)`
+  },
+  blackboard: {
+    name: 'Blackboard',
+    tagline: 'Shared state store for async agents',
+    desc: 'A shared data structure (the blackboard) holds partial results. Any agent can read from and write to the blackboard. Agents activate when they detect data they can contribute to, enabling loosely coupled, asynchronous collaboration.',
+    latency: 'Async', cost: 'Low per-agent', complexity: 'High', accuracy: 'High',
+    uses: ['Long-running research agents across multiple sessions', 'Distributed knowledge graph construction', 'Incremental code refactoring across a large codebase', 'Multi-day autonomous project execution'],
+    code: `import anthropic, json
+from pathlib import Path
+
+client = anthropic.Anthropic()
+
+class Blackboard:
+    def __init__(self, path="blackboard.json"):
+        self.path = Path(path)
+        self.data = json.loads(self.path.read_text()) \\
+            if self.path.exists() else {}
+
+    def read(self, key: str):
+        return self.data.get(key)
+
+    def write(self, key: str, value):
+        self.data[key] = value
+        self.path.write_text(json.dumps(self.data, indent=2))
+
+    def keys(self):
+        return list(self.data.keys())
+
+def agent_run(bb: Blackboard, role: str,
+              reads: list[str], writes: str) -> str:
+    ctx = {k: bb.read(k) for k in reads if bb.read(k)}
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=2048,
+        system=f"You are the {role} agent. Read context, "
+               f"produce output for '{writes}'.",
+        messages=[{"role": "user", "content":
+            f"Blackboard context:\\n{json.dumps(ctx, indent=2)}\\n\\n"
+            f"Produce the '{writes}' entry."}]
+    )
+    result = resp.content[0].text
+    bb.write(writes, result)
+    return result
+
+# Usage
+bb = Blackboard()
+bb.write("task", "Analyse Python codebase for security issues")
+agent_run(bb, "scanner", reads=["task"], writes="scan_results")
+agent_run(bb, "analyst", reads=["task","scan_results"], writes="analysis")
+agent_run(bb, "reporter", reads=["analysis"], writes="final_report")`
+  },
+  event: {
+    name: 'Event-Driven',
+    tagline: 'Reactive agents triggered by events',
+    desc: 'Agents subscribe to event channels. When an event fires — a file change, a webhook, a timer, a threshold breach — the matching agent activates. Agents can emit new events, creating reactive chains with no central coordinator.',
+    latency: 'Very Low', cost: 'Low', complexity: 'Medium', accuracy: 'Medium',
+    uses: ['CI/CD pipeline integration (on push, on PR)', 'Monitoring and alert response automation', 'Real-time data stream processing', 'Webhook-triggered content generation'],
+    code: `import anthropic
+from dataclasses import dataclass
+from typing import Callable
+from collections import defaultdict
+
+client = anthropic.Anthropic()
+
+@dataclass
+class Event:
+    type: str
+    payload: dict
+
+class EventBus:
+    def __init__(self):
+        self._handlers: dict[str, list[Callable]] = defaultdict(list)
+
+    def on(self, event_type: str):
+        def decorator(fn: Callable):
+            self._handlers[event_type].append(fn)
+            return fn
+        return decorator
+
+    def emit(self, event: Event):
+        for handler in self._handlers.get(event.type, []):
+            handler(event)
+
+bus = EventBus()
+
+def llm_call(system: str, user: str) -> str:
+    return client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=1024,
+        system=system,
+        messages=[{"role": "user", "content": user}]
+    ).content[0].text
+
+@bus.on("code_pushed")
+def review_agent(event: Event):
+    diff = event.payload.get("diff", "")
+    review = llm_call(
+        "You are a senior code reviewer. Find bugs and suggest fixes.",
+        f"Review this diff:\\n{diff}"
+    )
+    bus.emit(Event("review_complete", {"review": review, "diff": diff}))
+
+@bus.on("review_complete")
+def comment_agent(event: Event):
+    comment = llm_call(
+        "Format a helpful PR comment from this review.",
+        event.payload["review"]
+    )
+    print("PR Comment:", comment)
+
+# Trigger
+bus.emit(Event("code_pushed", {"diff": "- old_line\\n+ new_line"}))`
+  },
+  mapreduce: {
+    name: 'Map-Reduce',
+    tagline: 'Parallel map over chunks, then reduce',
+    desc: 'A large input is split into chunks. The map phase runs one agent per chunk in parallel. The reduce phase aggregates all chunk outputs into a final result. Handles inputs that exceed a single context window by design.',
+    latency: 'Low (parallel map)', cost: 'N× + reduce', complexity: 'Low', accuracy: 'High',
+    uses: ['Summarising a 500-page document', 'Classifying 10,000 customer feedback items', 'Finding all TODOs in a large codebase', 'Cross-repository security audit'],
+    code: `import anthropic, asyncio
+from textwrap import wrap as chunk_text
+
+client = anthropic.Anthropic()
+
+def chunk(text: str, size: int = 3000) -> list[str]:
+    """Split text into overlapping chunks."""
+    words = text.split()
+    chunks, step = [], max(1, size // 5)
+    for i in range(0, len(words), step):
+        chunks.append(" ".join(words[i:i+size]))
+    return chunks
+
+async def map_agent(chunk_text: str, idx: int,
+                    instruction: str) -> str:
+    """Map: process one chunk."""
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=512,
+        system=f"Process this text chunk. {instruction} "
+               "Be concise — your output feeds a reduce step.",
+        messages=[{"role": "user", "content": chunk_text}]
+    )
+    return resp.content[0].text
+
+def reduce_agent(mapped: list[str], goal: str) -> str:
+    """Reduce: synthesise all chunk outputs."""
+    combined = "\\n\\n---\\n\\n".join(
+        f"Chunk {i+1}:\\n{r}" for i, r in enumerate(mapped)
+    )
+    resp = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=2048,
+        system="You receive summaries of document chunks. "
+               "Synthesise into a single coherent output.",
+        messages=[{"role": "user", "content":
+            f"Goal: {goal}\\n\\nChunk outputs:\\n{combined}"}]
+    )
+    return resp.content[0].text
+
+async def map_reduce(text: str, goal: str,
+                     map_instruction: str) -> str:
+    chunks = chunk(text)
+    mapped = await asyncio.gather(*[
+        asyncio.to_thread(map_agent, c, i, map_instruction)
+        for i, c in enumerate(chunks)
+    ])
+    return reduce_agent(list(mapped), goal)`
+  },
+  hierarchy: {
+    name: 'Hierarchy',
+    tagline: 'Tree of orchestrators and workers',
+    desc: 'A top-level orchestrator decomposes the task into major domains and delegates each domain to a mid-level supervisor. Each mid-level supervisor manages its own set of worker agents. Results flow back up the tree.',
+    latency: 'High', cost: 'High', complexity: 'High', accuracy: 'Very High',
+    uses: ['Enterprise knowledge management', 'Full autonomous software project development', 'Large-scale content production pipelines', 'Multi-domain research synthesis'],
+    code: `import anthropic, json
+
+client = anthropic.Anthropic()
+
+def llm(system: str, user: str, max_tokens=1024) -> str:
+    return client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user}]
+    ).content[0].text
+
+def worker(role: str, task: str) -> str:
+    return llm(f"You are a {role} specialist.", task)
+
+def mid_supervisor(domain: str, goal: str,
+                   worker_roles: list[str]) -> str:
+    """Mid-level: decomposes domain goal into worker tasks."""
+    plan = llm(
+        f"You manage {domain}. Decompose the goal into tasks for: "
+        f"{', '.join(worker_roles)}. Return JSON list of "
+        '{"role": "...", "task": "..."}',
+        goal, max_tokens=512
+    )
+    steps = json.loads(plan)
+    results = []
+    for step in steps:
+        if step["role"] in worker_roles:
+            results.append(worker(step["role"], step["task"]))
+    return "\\n".join(results)
+
+def top_orchestrator(goal: str) -> str:
+    """Top level: decomposes into domains."""
+    domains = {
+        "research":  ["fact_finder", "source_evaluator"],
+        "writing":   ["drafter", "editor"],
+        "qa":        ["reviewer", "formatter"],
+    }
+    domain_results = {}
+    for domain, roles in domains.items():
+        domain_results[domain] = mid_supervisor(
+            domain, goal, roles
+        )
+    # Final synthesis
+    combined = json.dumps(domain_results, indent=2)
+    return llm(
+        "Synthesise domain outputs into a final deliverable.",
+        f"Goal: {goal}\\n\\nDomain outputs:\\n{combined}",
+        max_tokens=4096
+    )`
+  }
+};
+
+// =============================================
+// Canvas drawing
+// =============================================
+const C = {
+  bg:      '#0a0a0f',
+  card:    '#12121a',
+  border:  '#2a2a3a',
+  text:    '#e4e4ef',
+  muted:   '#8888aa',
+  accent:  '#06B6D4',
+  green:   '#22c55e',
+  yellow:  '#eab308',
+  purple:  '#a855f7',
+  orange:  '#f97316',
+  red:     '#ef4444',
+};
+
+let animFrame = null;
+let animProgress = 0;
+let currentPattern = 'fanout';
+
+function drawNode(ctx, x, y, label, color, r = 22) {
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.fillStyle = color + '22';
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px "Space Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // wrap long labels
+  const parts = label.split('\n');
+  parts.forEach((p, i) => {
+    ctx.fillText(p, x, y + (i - (parts.length-1)/2) * 12);
+  });
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, color, progress = 1) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  const ex = x1 + dx * progress;
+  const ey = y1 + dy * progress;
+
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(ex, ey);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  if (progress >= 0.95) {
+    const angle = Math.atan2(dy, dx);
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - 10*Math.cos(angle-0.4), y2 - 10*Math.sin(angle-0.4));
+    ctx.lineTo(x2 - 10*Math.cos(angle+0.4), y2 - 10*Math.sin(angle+0.4));
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+}
+
+function getDPR() { return window.devicePixelRatio || 1; }
+
+function getCanvas() { return document.getElementById('pattern-canvas'); }
+
+function setupCanvas() {
+  const canvas = getCanvas();
+  const wrap = canvas.parentElement;
+  const w = wrap.clientWidth || 400;
+  const h = 260;
+  const dpr = getDPR();
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w, h };
+}
+
+function drawPattern(pattern, progress) {
+  const canvas = getCanvas();
+  if (!canvas) return;
+  const { ctx, w, h } = setupCanvas();
+  ctx.clearRect(0, 0, w, h);
+
+  const p = Math.min(progress, 1);
+  const cx = w / 2;
+
+  if (pattern === 'fanout') {
+    // Orchestrator top center, 3 workers below, merge bottom
+    const orch = [cx, 40];
+    const workers = [[cx-100, 130], [cx, 130], [cx+100, 130]];
+    const merge = [cx, 220];
+    workers.forEach((wk) => {
+      drawArrow(ctx, orch[0], orch[1]+22, wk[0], wk[1]-22, C.accent, p);
+    });
+    workers.forEach((wk) => {
+      drawArrow(ctx, wk[0], wk[1]+22, merge[0], merge[1]-22, C.green, p);
+    });
+    drawNode(ctx, orch[0], orch[1], 'Orch', C.accent);
+    workers.forEach((wk, i) => drawNode(ctx, wk[0], wk[1], `W${i+1}`, C.yellow));
+    drawNode(ctx, merge[0], merge[1], 'Merge', C.green);
+
+  } else if (pattern === 'pipeline') {
+    const nodes = [
+      [cx-140, h/2], [cx-60, h/2], [cx+20, h/2], [cx+100, h/2], [cx+180, h/2]
+    ];
+    const labels = ['In', 'Extract', 'Analyse', 'Write', 'QA'];
+    const colors = [C.muted, C.accent, C.yellow, C.purple, C.green];
+    for (let i = 0; i < nodes.length-1; i++) {
+      drawArrow(ctx, nodes[i][0]+22, nodes[i][1], nodes[i+1][0]-22, nodes[i+1][1], colors[i+1], p);
+    }
+    nodes.forEach((n, i) => drawNode(ctx, n[0], n[1], labels[i], colors[i]));
+
+  } else if (pattern === 'supervisor') {
+    const sup = [cx, 40];
+    const workers = [[cx-120, 155], [cx-40, 155], [cx+40, 155], [cx+120, 155]];
+    const labels = ['Rsch', 'Write', 'Rev', 'Fmt'];
+    const colors = [C.accent, C.yellow, C.purple, C.green];
+    workers.forEach((wk, i) => {
+      drawArrow(ctx, sup[0], sup[1]+22, wk[0], wk[1]-22, colors[i], p);
+      drawArrow(ctx, wk[0], wk[1]+22, sup[0], sup[1]+22+((wk[1]-sup[1]-44)*0.05), colors[i], p > 0.5 ? (p-0.5)*2 : 0);
+    });
+    drawNode(ctx, sup[0], sup[1], 'Super\nvisor', C.accent, 28);
+    workers.forEach((wk, i) => drawNode(ctx, wk[0], wk[1], labels[i], colors[i]));
+
+  } else if (pattern === 'consensus') {
+    const center = [cx, h/2];
+    const agents = [[cx-120, 60],[cx,45],[cx+120,60],[cx-130,160],[cx+130,160]];
+    const judge = [cx, 215];
+    agents.slice(0,3).forEach((a) => {
+      drawArrow(ctx, center[0], center[1]-22, a[0], a[1]+22, C.accent, p);
+      drawArrow(ctx, a[0], a[1]+22, judge[0], judge[1]-22, C.yellow, p > 0.5 ? (p-0.5)*2 : 0);
+    });
+    drawNode(ctx, center[0], center[1], 'Task', C.accent, 26);
+    agents.slice(0,3).forEach((a,i) => drawNode(ctx, a[0], a[1], `A${i+1}`, C.purple));
+    drawNode(ctx, judge[0], judge[1], 'Judge', C.green, 24);
+
+  } else if (pattern === 'blackboard') {
+    // Shared board in center, agents around it
+    const board = [cx, h/2];
+    const agents = [
+      [cx-140, h/2-60],[cx+140, h/2-60],
+      [cx-140, h/2+60],[cx+140, h/2+60]
+    ];
+    const labels = ['Scan','Anal','Write','Fmt'];
+    const colors = [C.accent, C.yellow, C.green, C.purple];
+    agents.forEach((a, i) => {
+      drawArrow(ctx, a[0], a[1], board[0], board[1], colors[i], p);
+      drawArrow(ctx, board[0], board[1], a[0], a[1], colors[i], p > 0.5 ? (p-0.5)*2 : 0);
+    });
+    // board rect
+    ctx.fillStyle = C.card;
+    ctx.strokeStyle = C.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(cx-40, h/2-25, 80, 50, 6);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.accent;
+    ctx.font = 'bold 10px "Space Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('BLACK', cx, h/2-8);
+    ctx.fillText('BOARD', cx, h/2+8);
+    agents.forEach((a, i) => drawNode(ctx, a[0], a[1], labels[i], colors[i]));
+
+  } else if (pattern === 'event') {
+    // Event bus bar at center, agents above and below
+    ctx.fillStyle = C.card;
+    ctx.strokeStyle = C.yellow;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(cx-160, h/2-12, 320, 24, 4);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = C.yellow;
+    ctx.font = '9px "Space Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('EVENT BUS', cx, h/2);
+
+    const emitters = [[cx-110, h/2-75],[cx-20,h/2-75],[cx+90,h/2-75]];
+    const handlers = [[cx-110, h/2+75],[cx-20,h/2+75],[cx+90,h/2+75]];
+    emitters.forEach((e) => drawArrow(ctx, e[0], e[1]+22, e[0], h/2-12, C.accent, p));
+    handlers.forEach((h2) => drawArrow(ctx, h2[0], h/2+12, h2[0], h2[1]-22, C.green, p));
+    emitters.forEach((e,i) => drawNode(ctx, e[0], e[1], `Src${i+1}`, C.accent));
+    handlers.forEach((h2,i) => drawNode(ctx, h2[0], h2[1], `Hdl${i+1}`, C.green));
+
+  } else if (pattern === 'mapreduce') {
+    const inp = [cx, 35];
+    const mappers = [[cx-130,130],[cx-43,130],[cx+43,130],[cx+130,130]];
+    const reducer = [cx, 220];
+    mappers.forEach((m) => {
+      drawArrow(ctx, inp[0], inp[1]+22, m[0], m[1]-22, C.accent, p);
+      drawArrow(ctx, m[0], m[1]+22, reducer[0], reducer[1]-22, C.yellow, p > 0.5 ? (p-0.5)*2 : 0);
+    });
+    drawNode(ctx, inp[0], inp[1], 'Input', C.accent);
+    mappers.forEach((m,i) => drawNode(ctx, m[0], m[1], `Map\n${i+1}`, C.purple));
+    drawNode(ctx, reducer[0], reducer[1], 'Reduce', C.green);
+
+  } else if (pattern === 'hierarchy') {
+    const top = [cx, 30];
+    const mids = [[cx-110, 115],[cx+110, 115]];
+    const workers = [[cx-160,210],[cx-60,210],[cx+60,210],[cx+160,210]];
+    mids.forEach((m) => drawArrow(ctx, top[0], top[1]+22, m[0], m[1]-22, C.accent, p));
+    workers.forEach((wk, i) => {
+      const mid = mids[Math.floor(i/2)];
+      drawArrow(ctx, mid[0], mid[1]+22, wk[0], wk[1]-22, C.yellow, p > 0.5 ? (p-0.5)*2 : 0);
+    });
+    drawNode(ctx, top[0], top[1], 'Top\nOrch', C.accent, 26);
+    mids.forEach((m,i) => drawNode(ctx, m[0], m[1], `Mid\n${i+1}`, C.purple, 24));
+    workers.forEach((wk,i) => drawNode(ctx, wk[0], wk[1], `W${i+1}`, C.green));
+  }
+}
+
+function animateTo(pattern) {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  animProgress = 0;
+  const step = () => {
+    animProgress = Math.min(animProgress + 0.04, 1);
+    drawPattern(pattern, animProgress);
+    if (animProgress < 1) animFrame = requestAnimationFrame(step);
+  };
+  step();
+}
+
+// =============================================
+// Pattern selection
+// =============================================
+function selectPattern(id, btn) {
+  document.querySelectorAll('.pattern-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  currentPattern = id;
+
+  const pat = PATTERNS[id];
+  document.getElementById('pattern-info').innerHTML = `
+    <h4>${pat.name}</h4>
+    <div class="pattern-tagline">${pat.tagline}</div>
+    <p class="pattern-desc">${pat.desc}</p>
+    <div class="stat-row">
+      <span class="stat-chip chip-latency">Latency: ${pat.latency}</span>
+      <span class="stat-chip chip-cost">Cost: ${pat.cost}</span>
+      <span class="stat-chip chip-complexity">Complexity: ${pat.complexity}</span>
+      <span class="stat-chip chip-accuracy">Accuracy: ${pat.accuracy}</span>
+    </div>
+    <strong style="font-size:0.85rem;color:var(--text-muted);">Use Cases</strong>
+    <ul class="use-cases-list">
+      ${pat.uses.map(u => `<li>${u}</li>`).join('')}
+    </ul>
+  `;
+  document.getElementById('pattern-code').textContent = pat.code;
+  animateTo(id);
+}
+
+function copyCode() {
+  const code = document.getElementById('pattern-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Code'; }, 1800);
+  });
+}
+
+// =============================================
+// Init
+// =============================================
+window.addEventListener('DOMContentLoaded', () => {
+  selectPattern('fanout', document.querySelector('.pattern-pill'));
+});
+window.addEventListener('resize', () => {
+  if (currentPattern) drawPattern(currentPattern, 1);
+});
+</script>
+</body>
+</html>

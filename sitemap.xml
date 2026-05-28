@@ -155,6 +155,19 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <!-- Sprint 8 -->
+  <url>
+    <loc>https://claudflow.com/guides/mcp-server-integration-guide.html</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://claudflow.com/research/multi-agent-orchestration-patterns.html</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
   <!-- Sprint 7 Auto-Added -->
   <url>
     <loc>https://claudflow.com/tools/system-prompt-tester.html</loc>
