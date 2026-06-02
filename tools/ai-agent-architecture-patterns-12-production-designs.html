@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Architecture Patterns — 12 Production Designs</title>
+  <meta name="description" content="Interactive reference: 12 production-grade AI agent patterns with diagrams, pseudocode, pros/cons, filters & side-by-side comparison.">
+  <link rel="canonical" href="https://claudflow.com/agent-architecture-patterns">
+  <!-- Structured data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "AI Agent Architecture Patterns — 12 Production Designs",
+    "description": "Interactive reference showing 12 agent architecture patterns: ReAct, Plan-and-Execute, Tool-Use, Multi-Agent, Supervisor, Hierarchical, Debate, Reflection, Memory-Augmented, RAG Agent, Code Agent, Research Agent.",
+    "author": {
+      "@type": "Organization",
+      "name": "Claudflow"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Claudflow"
+    },
+    "datePublished": "2025-03-01",
+    "mainEntityOfPage": "https://claudflow.com/agent-architecture-patterns"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com" },
+      { "@type": "ListItem", "position": 2, "name": "AI Agent Architecture Patterns", "item": "https://claudflow.com/agent-architecture-patterns" }
+    ]
+  }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0b0f1a;
+      color: #e5e7eb;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      padding: 2rem 1.5rem;
+    }
+    .container { max-width: 1440px; margin: 0 auto; }
+    h1 { font-size: 2.4rem; font-weight: 600; letter-spacing: -0.02em; color: #f97316; margin-bottom: 0.25rem; }
+    .subhead { color: #9ca3af; margin-bottom: 2rem; border-left: 4px solid #f97316; padding-left: 1rem; }
+    .breadcrumb { display: flex; gap: 0.5rem; font-size: 0.9rem; color: #9ca3af; margin-bottom: 1.5rem; }
+    .breadcrumb a { color: #f97316; text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    /* controls */
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 1rem 2rem;
+      background: #131a2a; padding: 1rem 1.5rem; border-radius: 1rem;
+      margin-bottom: 2rem; align-items: center;
+    }
+    .filter-group { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .filter-group label { font-weight: 500; color: #d1d5db; }
+    .filter-btn {
+      background: #1f2a3f; border: 1px solid #2d3a52; color: #e5e7eb;
+      padding: 0.3rem 1rem; border-radius: 2rem; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+    }
+    .filter-btn.active { background: #f97316; border-color: #f97316; color: #0b0f1a; font-weight: 500; }
+    .filter-btn:hover { background: #f97316; border-color: #f97316; color: #0b0f1a; }
+    .compare-area {
+      display: flex; align-items: center; gap: 0.8rem; margin-left: auto;
+    }
+    .compare-area select {
+      background: #1f2a3f; border: 1px solid #2d3a52; color: #e5e7eb;
+      padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.85rem; cursor: pointer;
+    }
+    .compare-btn {
+      background: #f97316; border: none; color: #0b0f1a; font-weight: 600;
+      padding: 0.4rem 1.2rem; border-radius: 2rem; font-size: 0.85rem; cursor: pointer;
+    }
+    .compare-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* pattern grid */
+    .pattern-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.8rem; margin-bottom: 2.5rem;
+    }
+    .pattern-card {
+      background: #131a2a; border-radius: 1.2rem; padding: 1.5rem;
+      border: 1px solid #1f2a3f; transition: 0.2s; display: flex; flex-direction: column;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    .pattern-card:hover { border-color: #f97316; transform: translateY(-3px); }
+    .pattern-card.hidden { display: none; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+    .card-header h2 { font-size: 1.3rem; font-weight: 600; color: #f97316; }
+    .complexity-badge {
+      font-size: 0.7rem; background: #1f2a3f; padding: 0.2rem 0.7rem; border-radius: 1rem;
+      color: #9ca3af; text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .complexity-badge.beginner { border-left: 3px solid #34d399; }
+    .complexity-badge.intermediate { border-left: 3px solid #fbbf24; }
+    .complexity-badge.advanced { border-left: 3px solid #f87171; }
+
+    /* diagram (SVG/CSS) */
+    .diagram-box {
+      background: #0b0f1a; border-radius: 0.8rem; padding: 1rem; margin: 0.8rem 0;
+      display: flex; justify-content: center; min-height: 100px;
+    }
+    .diagram-box svg { width: 100%; max-width: 240px; height: auto; }
+    .desc { color: #d1d5db; font-size: 0.9rem; margin: 0.6rem 0; }
+    .when-use { background: #1a2338; padding: 0.4rem 0.8rem; border-radius: 0.6rem; font-size: 0.85rem; margin: 0.4rem 0; }
+    .pros-cons { display: flex; gap: 1rem; font-size: 0.85rem; margin: 0.6rem 0; }
+    .pros { color: #34d399; flex: 1; }
+    .cons { color: #f87171; flex: 1; }
+    .pseudo { background: #0b0f1a; padding: 0.6rem 0.8rem; border-radius: 0.6rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #e5e7eb; overflow-x: auto; white-space: pre-wrap; word-break: break-word; margin: 0.6rem 0; border-left: 2px solid #f97316; }
+    .realworld { font-size: 0.85rem; color: #9ca3af; margin-top: 0.4rem; }
+    .realworld strong { color: #e5e7eb; }
+
+    /* comparison modal (simple overlay) */
+    .compare-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100;
+      justify-content: center; align-items: center;
+    }
+    .compare-modal.open { display: flex; }
+    .compare-panel {
+      background: #131a2a; border-radius: 1.5rem; padding: 2rem; max-width: 800px; width: 90%;
+      border: 1px solid #f97316; max-height: 90vh; overflow-y: auto;
+    }
+    .compare-panel h3 { color: #f97316; font-size: 1.6rem; margin-bottom: 1rem; }
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .compare-col { background: #0b0f1a; padding: 1rem; border-radius: 1rem; }
+    .compare-col h4 { color: #f97316; border-bottom: 1px solid #2d3a52; padding-bottom: 0.3rem; margin-bottom: 0.6rem; }
+    .close-modal {
+      background: #f97316; border: none; color: #0b0f1a; font-weight: bold;
+      padding: 0.5rem 1.5rem; border-radius: 2rem; margin-top: 1.2rem; cursor: pointer; float: right;
+    }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 1.8rem; }
+      .pattern-grid { grid-template-columns: 1fr; }
+      .compare-area { margin-left: 0; margin-top: 0.8rem; flex-wrap: wrap; }
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Breadcrumb (visible) -->
+  <div class="breadcrumb">
+    <a href="https://claudflow.com">Home</a> <span>/</span>
+    <span>AI Agent Architecture Patterns</span>
+  </div>
+
+  <h1>🧠 AI Agent Architecture Patterns — 12 Production Designs</h1>
+  <div class="subhead">Interactive reference · Filter by complexity · Compare any two patterns</div>
+
+  <!-- Filter + compare controls -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Complexity:</label>
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="beginner">Beginner</button>
+      <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+      <button class="filter-btn" data-filter="advanced">Advanced</button>
+    </div>
+    <div class="compare-area">
+      <label>Compare</label>
+      <select id="compareSelect1">
+        <option value="0">ReAct</option><option value="1">Plan‑and‑Execute</option><option value="2">Tool‑Use</option>
+        <option value="3">Multi‑Agent</option><option value="4">Supervisor</option><option value="5">Hierarchical</option>
+        <option value="6">Debate</option><option value="7">Reflection</option><option value="8">Memory‑Augmented</option>
+        <option value="9">RAG Agent</option><option value="10">Code Agent</option><option value="11">Research Agent</option>
+      </select>
+      <span style="color:#9ca3af;">vs</span>
+      <select id="compareSelect2">
+        <option value="1">Plan‑and‑Execute</option><option value="0">ReAct</option><option value="2">Tool‑Use</option>
+        <option value="3">Multi‑Agent</option><option value="4">Supervisor</option><option value="5">Hierarchical</option>
+        <option value="6">Debate</option><option value="7">Reflection</option><option value="8">Memory‑Augmented</option>
+        <option value="9">RAG Agent</option><option value="10">Code Agent</option><option value="11">Research Agent</option>
+      </select>
+      <button class="compare-btn" id="compareBtn">Compare</button>
+    </div>
+  </div>
+
+  <!-- Pattern grid injected by JS -->
+  <div class="pattern-grid" id="patternGrid"></div>
+
+  <!-- Comparison modal -->
+  <div class="compare-modal" id="compareModal">
+    <div class="compare-panel">
+      <h3>⚖️ Pattern Comparison</h3>
+      <div class="compare-grid" id="compareContent"></div>
+      <button class="close-modal" id="closeModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- Pattern data (12) -----
+    const patterns = [
+      { name: "ReAct", complexity: "intermediate", desc: "Reasoning + Acting loop: interleaves chain-of-thought with tool calls.", when: "When you need dynamic reasoning with external tool use.", pros: "Interpretable, flexible, strong on tasks requiring search.", cons: "Can be token-inefficient, needs careful prompt design.", pseudo: `def react_agent(query):\n  while not solved:\n    thought = llm.think(query, context)\n    action = llm.select_action(thought)\n    result = execute_tool(action)\n    context += result\n  return answer`, real: "WebGPT, AutoGPT, LangChain ReAct" },
+      { name: "Plan-and-Execute", complexity: "intermediate", desc: "Decomposes task into a plan, then executes steps (often with a replanner).", when: "Multi-step tasks requiring structured decomposition.", pros: "Reliable for long-horizon tasks, plan can be inspected.", cons: "Rigid if environment changes; replanning overhead.", pseudo: `def plan_and_execute(task):\n  plan = llm.decompose(task)\n  for step in plan:\n    output = execute(step)\n    if need_replan:\n      plan = llm.replan(plan, output)\n  return final`, real: "BabyAGI, HuggingGPT, Microsoft JARVIS" },
+      { name: "Tool-Use", complexity: "beginner", desc: "Agent augmented with tools (APIs, calculators, search).", when: "When LLM needs access to external capabilities.", pros: "Simple, easy to extend, wide applicability.", cons: "Tool selection may be naive; security concerns.", pseudo: `def tool_use_agent(prompt):\n  tool = llm.choose_tool(prompt)\n  args = llm.extract_args(prompt, tool)\n  result = call_tool(tool, args)\n  return llm.respond(prompt, result)`, real: "ChatGPT plugins, Claude tools, OpenAI function calling" },
+      { name: "Multi-Agent", complexity: "advanced", desc: "Multiple agents collaborate (specialist roles).", when: "Complex tasks requiring diverse expertise.", pros: "Scalable, robust, role specialization.", cons: "Coordination overhead, message passing cost.", pseudo: `class MultiAgent:\n  agents = [Researcher(), Writer(), Critic()]\n  def run(task):\n    for a in agents:\n      a.process(task)\n    return aggregate()`, real: "ChatDev, AutoGen, MetaGPT" },
+      { name: "Supervisor", complexity: "intermediate", desc: "A supervisor agent delegates to sub‑agents and aggregates.", when: "Need controlled delegation with oversight.", pros: "Centralized control, error recovery.", cons: "Single point of failure, supervisor bottleneck.", pseudo: `def supervisor(task):\n  subtasks = llm.delegate(task)\n  results = [worker.run(st) for st in subtasks]\n  return llm.synthesize(results)`, real: "LangGraph supervisor, CrewAI" },
+      { name: "Hierarchical", complexity: "advanced", desc: "Layered agents: high‑level planner, mid‑level managers, low‑level workers.", when: "Very large tasks with subtask decomposition.", pros: "Scalable, clear abstraction levels.", cons: "Latency, complex to implement.", pseudo: `class Hierarchical:\n  top = Planner()\n  mid = Manager()\n  low = Worker()\n  def execute(task):\n    plan = top.plan(task)\n    return mid.execute(plan, low)`, real: "Robotics HTN, many production multi‑agent stacks" },
+      { name: "Debate", complexity: "advanced", desc: "Multiple agents debate to reach consensus.", when: "Factual verification, decision making under uncertainty.", pros: "Reduces hallucination, diverse perspectives.", cons: "Expensive, can stall in disagreement.", pseudo: `def debate(question):\n  agents = [AgentA(), AgentB()]\n  for round in range(N):\n    args = [a.argue(question) for a in agents]\n  return llm.judge(args)`, real: "Duplex debate, Society of Mind" },
+      { name: "Reflection", complexity: "beginner", desc: "Agent critiques its own output and refines.", when: "When output quality is critical (code, writing).", pros: "Improves quality, simple to add.", cons: "Doubles token cost, may over‑critique.", pseudo: `def reflection_agent(task):\n  draft = llm.generate(task)\n  critique = llm.criticize(draft)\n  revised = llm.revise(draft, critique)\n  return revised`, real: "Self‑Refine, Reflexion (Shinn et al.)" },
+      { name: "Memory-Augmented", complexity: "intermediate", desc: "Agent with external memory (vector store, episodic).", when: "Long‑running tasks, personalization.", pros: "Long‑term context, state persistence.", cons: "Memory retrieval complexity, storage cost.", pseudo: `class MemoryAgent:\n  memory = VectorStore()\n  def run(input):\n    context = memory.query(input)\n    output = llm.generate(input, context)\n    memory.store(input, output)`, real: "MemGPT, Chat with RTX, personal AI assistants" },
+      { name: "RAG Agent", complexity: "beginner", desc: "Retrieval‑augmented generation agent with search.", when: "Knowledge‑intensive QA, enterprise docs.", pros: "Grounds answers, reduces hallucination.", cons: "Retrieval quality is critical, latency.", pseudo: `def rag_agent(query):\n  docs = vector_db.search(query)\n  context = \"\\n\".join(docs)\n  return llm.answer(query, context)`, real: "Claude + RAG, ChatGPT retrieval, LlamaIndex" },
+      { name: "Code Agent", complexity: "intermediate", desc: "Agent specialized in writing, executing, and debugging code.", when: "Automation, data analysis, software dev.", pros: "Powerful for coding tasks, iterative execution.", cons: "Security risk, environment dependency.", pseudo: `def code_agent(task):\n  code = llm.write_code(task)\n  result = run_sandbox(code)\n  if error: code = llm.debug(code, error)\n  return result`, real: "Code Interpreter, GPT‑Engineer, Sweep" },
+      { name: "Research Agent", complexity: "advanced", desc: "Autonomous deep research: search, synthesize, cite.", when: "Literature review, competitive analysis.", pros: "Thorough, multi‑source synthesis.", cons: "Slow, expensive, may produce shallow summary.", pseudo: `def research_agent(topic):\n  queries = llm.generate_queries(topic)\n  docs = [search(q) for q in queries]\n  return llm.synthesize(docs)`, real: "AutoGPT research mode, Gemini Deep Research" }
+    ];
+
+    // ----- Render cards -----
+    const grid = document.getElementById('patternGrid');
+    function renderCards(filter = 'all') {
+      grid.innerHTML = '';
+      patterns.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'pattern-card' + (filter !== 'all' && p.complexity !== filter ? ' hidden' : '');
+        card.dataset.index = idx;
+        card.dataset.complexity = p.complexity;
+
+        // SVG diagram (simplified abstract)
+        const svg = generateDiagram(p.name);
+
+        card.innerHTML = `
+          <div class="card-header">
+            <h2>${p.name}</h2>
+            <span class="complexity-badge ${p.complexity}">${p.complexity}</span>
+          </div>
+          <div class="diagram-box">${svg}</div>
+          <div class="desc">${p.desc}</div>
+          <div class="when-use"><strong>🔄 When to use:</strong> ${p.when}</div>
+          <div class="pros-cons"><div class="pros">✅ ${p.pros}</div><div class="cons">❌ ${p.cons}</div></div>
+          <div class="pseudo">${p.pseudo}</div>
+          <div class="realworld"><strong>🌍 Real‑world:</strong> ${p.real}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+    renderCards();
+
+    // Generate simple SVG per pattern
+    function generateDiagram(name) {
+      const color = '#f97316';
+      const bg = '#1f2a3f';
+      let shapes = '';
+      if (name === 'ReAct') shapes = `<rect x="20" y="20" width="60" height="30" fill="${color}" rx="6"/><text x="50" y="40" fill="#0b0f1a" font-size="10" text-anchor="middle" font-weight="bold">Reason</text><path d="M80 35 L100 35" stroke="${color}" stroke-width="2"/><rect x="100" y="20" width="60" height="30" fill="#34d399" rx="6"/><text x="130" y="40" fill="#0b0f1a" font-size="10" text-anchor="middle">Act</text><path d="M130 50 L130 70 L50 70 L50 50" stroke="${color}" fill="none" stroke-width="1.5"/>`;
+      else if (name === 'Plan-and-Execute') shapes = `<rect x="10" y="10" width="80" height="30" fill="${color}" rx="6"/><text x="50" y="30" fill="#0b0f1a" font-size="9" text-anchor="middle">Plan</text><path d="M90 25 L110 25" stroke="#34d399" stroke-width="2"/><rect x="110" y="10" width="80" height="30" fill="#34d399" rx="6"/><text x="150" y="30" fill="#0b0f1a" font-size="9" text-anchor="middle">Execute</text>`;
+      else if (name === 'Tool-Use') shapes = `<circle cx="50" cy="40" r="20" fill="${color}"/><text x="50" y="45" fill="#0b0f1a" font-size="10" text-anchor="middle">LLM</text><rect x="90" y="20" width="50" height="20" fill="#3b82f6" rx="4"/><text x="115" y="34" fill="#fff" font-size="8" text-anchor="middle">Tool</text><line x1="70" y1="35" x2="90" y2="30" stroke="#f97316" stroke-width="2"/>`;
+      else if (name === 'Multi-Agent') shapes = `<circle cx="40" cy="25" r="15" fill="${color}"/><text x="40" y="30" fill="#0b0f1a" font-size="8" text-anchor="middle">A1</text><circle cx="100" cy="25" r="15" fill="#34d399"/><text x="100" y="30" fill="#0b0f1a" font-size="8" text-anchor="middle">A2</text><circle cx="70" cy="60" r="15" fill="#fbbf24"/><text x="70" y="65" fill="#0b0f1a" font-size="8" text-anchor="middle">A3</text><line x1="50" y1="35" x2="60" y2="50" stroke="#f97316"/><line x1="85" y1="35" x2="80" y2="50" stroke="#f97316"/>`;
+      else if (name === 'Supervisor') shapes = `<rect x="30" y="5" width="80" height="25" fill="${color}" rx="4"/><text x="70" y="22" fill="#0b0f1a" font-size="9" text-anchor="middle">Supervisor</text><circle cx="30" cy="65" r="12" fill="#34d399"/><text x="30" y="69" fill="#0b0f1a" font-size="7" text-anchor="middle">W1</text><circle cx="70" cy="65" r="12" fill="#34d399"/><text x="70" y="69" fill="#0b0f1a" font-size="7" text-anchor="middle">W2</text><circle cx="110" cy="65" r="12" fill="#34d399"/><text x="110" y="69" fill="#0b0f1a" font-size="7" text-anchor="middle">W3</text><line x1="55" y1="30" x2="30" y2="53" stroke="#f97316"/><line x1="70" y1="30" x2="70" y2="53" stroke="#f97316"/><line x1="85" y1="30" x2="110" y2="53" stroke="#f97316"/>`;
+      else if (name === 'Hierarchical') shapes = `<rect x="40" y="5" width="60" height="20" fill="${color}" rx="3"/><text x="70" y="19" fill="#0b0f1a" font-size="8" text-anchor="middle">Top</text><rect x="20" y="40" width="40" height="18" fill="#fbbf24" rx="3"/><text x="40" y="53" fill="#0b0f1a" font-size="7" text-anchor="middle">Mid</text><rect x="80" y="40" width="40" height="18" fill="#fbbf24" rx="3"/><text x="100" y="53" fill="#0b0f1a" font-size="7" text-anchor="middle">Mid</text><rect x="10" y="75" width="30" height="15" fill="#34d399" rx="3"/><rect x="50" y="75" width="30" height="15" fill="#34d399" rx="3"/><rect x="90" y="75" width="30" height="15" fill="#34d399" rx="3"/><line x1="60" y1="25" x2="40" y2="38"/><line x1="80" y1="25" x2="90" y2="38"/><line x1="30" y1="58" x2="20" y2="73"/><line x1="50" y1="58" x2="60" y2="73"/><line x1="100" y1="58" x2="105" y2="73"/>`;
+      else if (name === 'Debate') shapes = `<circle cx="40" cy="30" r="16" fill="${color}"/><text x="40" y="35" fill="#0b0f1a" font-size="8" text-anchor="middle">A</text><circle cx="100" cy="30" r="16" fill="#34d399"/><text x="100" y="35" fill="#0b0f1a" font-size="8" text-anchor="middle">B</text><path d="M56 25 Q70 10 84 25" stroke="#f97316" fill="none"/><path d="M84 35 Q70 50 56 35" stroke="#f97316" fill="none"/><rect x="55" y="60" width="30" height="15" fill="#fbbf24" rx="4"/><text x="70" y="71" fill="#0b0f1a" font-size="7" text-anchor="middle">Judge</text>`;
+      else if (name === 'Reflection') shapes = `<rect x="20" y="10" width="60" height="25" fill="${color}" rx="4"/><text x="50" y="27" fill="#0b0f1a" font-size="9" text-anchor="middle">Generate</text><path d="M80 22 L100 22" stroke="#f97316"/><rect x="100" y="10" width="60" height="25" fill="#fbbf24" rx="4"/><text x="130" y="27" fill="#0b0f1a" font-size="9" text-anchor="middle">Critique</text><path d="M130 35 L130 55 L50 55 L50 35" stroke="#34d399" fill="none"/>`;
+      else if (name === 'Memory-Augmented') shapes = `<rect x="10" y="15" width="60" height="25" fill="${color}" rx="4"/><text x="40" y="32" fill="#0b0f1a" font-size="9" text-anchor="middle">Agent</text><rect x="90" y="10" width="50" height="35" fill="#3b82f6" rx="4"/><text x="115" y="32" fill="#fff" font-size="8" text-anchor="middle">Memory</text><path d="M70 27 L90 27" stroke="#f97316" stroke-width="2"/><path d="M90 40 L70 40" stroke="#34d399" stroke-width="2"/>`;
+      else if (name === 'RAG Agent') shapes = `<circle cx="35" cy="35" r="18" fill="${color}"/><text x="35" y="40" fill="#0b0f1a" font-size="8" text-anchor="middle">LLM</text><rect x="80" y="15" width="55" height="20" fill="#3b82f6" rx="4"/><text x="107" y="29" fill="#fff" font-size="8" text-anchor="middle">Retrieve</text><rect x="80" y="45" width="55" height="20" fill="#34d399" rx="4"/><text x="107" y="59" fill="#0b0f1a" font-size="8" text-anchor="middle">Docs</text><line x1="53" y1="30" x2="80" y2="25" stroke="#f97316"/><line x1="53" y1="40" x2="80" y2="50" stroke="#f97316"/>`;
+      else if (name === 'Code Agent') shapes = `<rect x="15" y="10" width="70" height="25" fill="${color}" rx="4"/><text x="50" y="27" fill="#0b0f1a" font-size="9" text-anchor="middle">Write code</text><rect x="100" y="10" width="60" height="25" fill="#34d399" rx="4"/><text x="130" y="27" fill="#0b0f1a" font-size="8" text-anchor="middle">Execute</text><path d="M85 22 L100 22" stroke="#f97316"/><path d="M130 35 L130 55 L50 55 L50 35" stroke="#fbbf24" fill="none"/>`;
+      else if (name === 'Research Agent') shapes = `<circle cx="40" cy="30" r="18" fill="${color}"/><text x="40" y="35" fill="#0b0f1a" font-size="8" text-anchor="middle">Res</text><rect x="80" y="10" width="50" height="20" fill="#3b82f6" rx="4"/><text x="105" y="24" fill="#fff" font-size="7" text-anchor="middle">Search</text><rect x="80" y="40" width="50" height="20" fill="#34d399" rx="4"/><text x="105" y="54" fill="#0b0f1a" font-size="7" text-anchor="middle">Synthesize</text><line x1="58" y1="25" x2="80" y2="20"/><line x1="58" y1="38" x2="80" y2="45"/>`;
+      return `<svg viewBox="0 0 150 90" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`;
+    }
+
+    // ----- Filter -----
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.pattern-card').forEach(card => {
+          if (filter === 'all') card.classList.remove('hidden');
+          else card.classList.toggle('hidden', card.dataset.complexity !== filter);
+        });
+      });
+    });
+
+    // ----- Compare (modal) -----
+    const modal = document.getElementById('compareModal');
+    const compareContent = document.getElementById('compareContent');
+    const closeModal = document.getElementById('closeModal');
+    const compareBtn = document.getElementById('compareBtn');
+    const sel1 = document.getElementById('compareSelect1');
+    const sel2 = document.getElementById('compareSelect2');
+
+    function openCompare(idx1, idx2) {
+      const p1 = patterns[idx1];
+      const p2 = patterns[idx2];
+      if (!p1 || !p2) return;
+      compareContent.innerHTML = `
+        <div class="compare-col">
+          <h4>${p1.name} <span style="font-weight:normal;font-size:0.8rem;color:#9ca3af;">(${p1.complexity})</span></h4>
+          <p style="margin-bottom:0.5rem;">${p1.desc}</p>
+          <div class="pros-cons"><div class="pros
