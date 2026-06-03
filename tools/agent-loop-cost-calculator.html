@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Agent Loop Cost Calculator — Estimate Multi-Turn Agent Expenses | claudflow.com</title>
+  <meta name="description" content="Calculate total tokens, cumulative cost, and optimal iteration limit for multi-turn AI agent loops. Supports Claude Opus, Sonnet, Haiku, GPT-4, GPT-4o-mini.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/agent-loop-cost-calculator">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does the agent loop cost calculator work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It simulates multi-turn agent interactions where context accumulates each iteration. You provide tools per loop, tokens per tool call, loop count, model pricing, and system prompt size. The calculator computes total tokens, cumulative cost, per-iteration cost, and suggests an optimal iteration limit based on cost/value ratio."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which models are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude Opus, Claude Sonnet, Claude Haiku, GPT-4, and GPT-4o-mini. Each has distinct input/output token pricing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the optimal iteration limit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The limit is where the marginal cost per additional iteration exceeds 20% of the total cost so far, indicating diminishing returns."
+        }
+      }
+    ]
+  }
+  </script>
+  <!-- Chart.js CDN (lightweight) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    header p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+      border: 1px solid #334155;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2rem;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .input-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      letter-spacing: 0.01em;
+    }
+    .input-group input, .input-group select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 0.7rem 1rem;
+      color: #f1f5f9;
+      font-size: 1rem;
+      transition: 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .input-group input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .input-group input[type="number"]::-webkit-outer-spin-button,
+    .input-group input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.8rem 1.2rem;
+      margin-top: 1.8rem;
+      background: #0f172a;
+      padding: 1.2rem 1.5rem;
+      border-radius: 20px;
+      border: 1px solid #2d3a4e;
+    }
+    .stat-item {
+      flex: 1 0 120px;
+    }
+    .stat-item .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+    .stat-item .value {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-top: 0.1rem;
+    }
+    .stat-item .value small {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-left: 4px;
+    }
+    .chart-wrapper {
+      margin-top: 1.8rem;
+      background: #0f172a;
+      padding: 1rem 0.5rem 0.5rem 0.5rem;
+      border-radius: 20px;
+      border: 1px solid #2d3a4e;
+      position: relative;
+      height: 240px;
+    }
+    #costChart {
+      max-height: 210px;
+      width: 100% !important;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.5rem;
+    }
+    .badge {
+      background: #1e3a5f;
+      color: #7dd3fc;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      header h1 {
+        font-size: 1.5rem;
+      }
+      .card {
+        padding: 1.2rem 1rem;
+      }
+      .stat-row {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .stat-item .value {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔄 Agent Loop Cost Calculator</h1>
+    <p>Multi-turn expense estimator · accumulating context</p>
+  </header>
+
+  <div class="card">
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="toolsPerLoop">🔧 Tools/actions per iteration</label>
+        <input type="number" id="toolsPerLoop" min="1" max="50" value="3" step="1">
+      </div>
+      <div class="input-group">
+        <label for="tokensPerTool">📝 Avg tokens per tool call (input+output)</label>
+        <input type="number" id="tokensPerTool" min="10" max="50000" value="800" step="10">
+      </div>
+      <div class="input-group">
+        <label for="loopIterations">🔁 Expected loop iterations (1–50)</label>
+        <input type="number" id="loopIterations" min="1" max="50" value="10" step="1">
+      </div>
+      <div class="input-group">
+        <label for="modelSelect">🧠 Model</label>
+        <select id="modelSelect">
+          <option value="opus" data-input="15" data-output="75">Claude Opus ($15/$75)</option>
+          <option value="sonnet" data-input="3" data-output="15" selected>Claude Sonnet ($3/$15)</option>
+          <option value="haiku" data-input="0.25" data-output="1.25">Claude Haiku ($0.25/$1.25)</option>
+          <option value="gpt4" data-input="30" data-output="60">GPT-4 ($30/$60)</option>
+          <option value="gpt4omini" data-input="0.15" data-output="0.6">GPT-4o-mini ($0.15/$0.6)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="systemPrompt">📄 System prompt size (tokens)</label>
+        <input type="number" id="systemPrompt" min="0" max="100000" value="500" step="10">
+      </div>
+    </div>
+
+    <!-- aggregated stats -->
+    <div class="stat-row" id="statsPanel">
+      <div class="stat-item"><span class="label">Total tokens</span><div class="value" id="totalTokens">—</div></div>
+      <div class="stat-item"><span class="label">Total cost (USD)</span><div class="value" id="totalCost">—</div></div>
+      <div class="stat-item"><span class="label">Cost / iteration</span><div class="value" id="costPerIteration">—</div></div>
+      <div class="stat-item"><span class="label">Optimal iteration limit</span><div class="value" id="optimalLimit">—</div></div>
+    </div>
+
+    <!-- chart -->
+    <div class="chart-wrapper">
+      <canvas id="costChart"></canvas>
+    </div>
+    <p style="font-size:0.7rem; color:#64748b; margin-top:0.5rem; text-align:center;">Cumulative cost per iteration (USD, log scale if wide range)</p>
+  </div>
+
+  <div class="footer">
+    © 2025 claudflow.com
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- DOM refs -----
+    const toolsPerLoop = document.getElementById('toolsPerLoop');
+    const tokensPerTool = document.getElementById('tokensPerTool');
+    const loopIterations = document.getElementById('loopIterations');
+    const modelSelect = document.getElementById('modelSelect');
+    const systemPrompt = document.getElementById('systemPrompt');
+
+    const totalTokensEl = document.getElementById('totalTokens');
+    const totalCostEl = document.getElementById('totalCost');
+    const costPerIterationEl = document.getElementById('costPerIteration');
+    const optimalLimitEl = document.getElementById('optimalLimit');
+
+    // chart
+    const ctx = document.getElementById('costChart').getContext('2d');
+    let chart;
+
+    // ----- helpers -----
+    function getModelPrices() {
+      const opt = modelSelect.options[modelSelect.selectedIndex];
+      return {
+        inputPrice: parseFloat(opt.dataset.input) || 0,
+        outputPrice: parseFloat(opt.dataset.output) || 0,
+        name: opt.text.split('(')[0].trim()
+      };
+    }
+
+    function calc() {
+      const tools = parseInt(toolsPerLoop.value, 10) || 1;
+      const tokPerTool = parseInt(tokensPerTool.value, 10) || 100;
+      const iterations = parseInt(loopIterations.value, 10) || 1;
+      const sysTokens = parseInt(systemPrompt.value, 10) || 0;
+      const { inputPrice, outputPrice } = getModelPrices();
+
+      // Clamp iterations 1-50
+      const n = Math.min(50, Math.max(1, iterations));
+
+      // Simulate accumulating context:
+      // iteration i (1-indexed): system prompt + (i * tools * tokPerTool)  (accumulated tool calls)
+      // We assume each iteration adds tools*tokPerTool new tokens (both input & output)
+      // For cost: we treat total tokens as input tokens (since context is sent each turn)
+      // but also output tokens per iteration = tools * tokPerTool * 0.4 (approx output fraction)
+      // Realistic: input = system + accumulated history, output = tools * tokPerTool * outputRatio
+      const outputRatio = 0.4; // 40% of tool tokens are output (generated)
+      const inputRatio = 0.6;  // 60% input (prompt)
+
+      let cumulativeTokens = 0;
+      let cumulativeCost = 0;
+      let perIterCosts = [];
+      let iterTokens = [];
+
+      for (let i = 1; i <= n; i++) {
+        // accumulated context before this iteration: system + (i-1)*tools*tokPerTool (previous turns)
+        const prevContextTokens = sysTokens + (i - 1) * tools * tokPerTool;
+        // new input for this turn: previous context + new tool calls (input portion)
+        const newInputTokens = prevContextTokens + tools * tokPerTool * inputRatio;
+        // output tokens for this turn
+        const newOutputTokens = tools * tokPerTool * outputRatio;
+        const totalThisIter = newInputTokens + newOutputTokens;
+
+        // cost: input tokens * inputPrice/1M + output tokens * outputPrice/1M
+        const iterCost = (newInputTokens * inputPrice / 1_000_000) + (newOutputTokens * outputPrice / 1_000_000);
+        cumulativeTokens += totalThisIter;
+        cumulativeCost += iterCost;
+        perIterCosts.push(iterCost);
+        iterTokens.push(totalThisIter);
+      }
+
+      // total tokens (all iterations)
+      const totalTok = cumulativeTokens;
+      const totalCost = cumulativeCost;
+
+      // cost per iteration (average)
+      const avgCost = totalCost / n;
+
+      // ---- optimal iteration limit: where marginal cost / avg cost > 0.2 (degradation) ----
+      let optimalLimit = n;
+      if (n > 1) {
+        // compute marginal cost per additional iteration (starting from iteration 2)
+        for (let i = 1; i < n; i++) {
+          const marginal = perIterCosts[i] - perIterCosts[i-1];
+          // if marginal > 20% of total cost so far (cumulative up to i)
+          const cumSoFar = perIterCosts.slice(0, i+1).reduce((a,b)=>a+b, 0);
+          if (marginal > 0.2 * cumSoFar && i >= 2) {
+            optimalLimit = i; // degradation point
+            break;
+          }
+        }
+      }
+
+      // ---- update DOM ----
+      totalTokensEl.textContent = totalTok.toLocaleString('en-US', {maximumFractionDigits:0});
+      totalCostEl.textContent = `$${totalCost.toFixed(4)}`;
+      costPerIterationEl.textContent = `$${avgCost.toFixed(4)}`;
+      optimalLimitEl.textContent = optimalLimit;
+
+      // ---- update chart (cumulative cost) ----
+      let cumulativeArr = [];
+      let sum = 0;
+      for (let i = 0; i < n; i++) {
+        sum += perIterCosts[i];
+        cumulativeArr.push(sum);
+      }
+
+      if (chart) {
+        chart.data.labels = Array.from({length: n}, (_, i) => `#${i+1}`);
+        chart.data.datasets[0].data = cumulativeArr;
+        chart.update();
+      } else {
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: Array.from({length: n}, (_, i) => `#${i+1}`),
+            datasets: [{
+              label: 'Cumulative cost (USD)',
+              data: cumulativeArr,
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.1)',
+              fill: true,
+              tension: 0.2,
+              pointBackgroundColor: '#38bdf8',
+              pointRadius: 3,
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => `$${ctx.parsed.y.toFixed(4)}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#94a3b8', maxTicksLimit: 15 },
+                grid: { color: '#1e293b' }
+              },
+              y: {
+                ticks: { color: '#94a3b8', callback: (val) => '$' + val.toFixed(2) },
+                grid: { color: '#1e293b' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // ----- input event listeners -----
+    const inputs = [toolsPerLoop, tokensPerTool, loopIterations, modelSelect, systemPrompt];
+    inputs.forEach(el => el.addEventListener('input', calc));
+    inputs.forEach(el => el.addEventListener('change', calc));
+
+    // initial calculation
+    calc();
+
+    // fix for select change
+    modelSelect.addEventListener('change', calc);
+
+  })();
+</script>
+</body>
+</html>

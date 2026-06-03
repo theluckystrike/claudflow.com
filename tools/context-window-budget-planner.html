@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Context Window Budget Planner — Allocate Tokens Wisely | claudflow</title>
+  <meta name="description" content="Interactive planner to allocate LLM context window tokens. Real-time pie chart, cost estimation, use-case presets for chatbot, RAG, code generation, data extraction.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/context-window-budget-planner">
+  <!-- JSON-LD Schema: FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does the Context Window Budget Planner work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Select a model context window size, then adjust sliders for each budget section. The pie chart updates in real time, and warnings appear if any section exceeds 50% of the total budget. Use presets to auto-allocate tokens for common use cases."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the preset allocations for chatbot, RAG, code generation, and data extraction?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Chatbot: 15% system, 5% tools, 10% RAG, 50% history, 10% examples, 10% output. RAG: 10% system, 5% tools, 50% RAG, 20% history, 5% examples, 10% output. Code generation: 20% system, 10% tools, 10% RAG, 25% history, 20% examples, 15% output. Data extraction: 25% system, 15% tools, 30% RAG, 10% history, 10% examples, 10% output."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is cost per request calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cost per request assumes $0.01 per 1K tokens for the full context window. Trimming reduces token usage proportionally, and cost savings are shown as a percentage and dollar amount."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+    .planner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 800px) {
+      .planner-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.8rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      border: 1px solid #334155;
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card h2 i {
+      color: #38bdf8;
+    }
+    .model-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.8rem;
+      margin-bottom: 1.8rem;
+    }
+    .model-btn {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .model-btn.active {
+      background: #38bdf8;
+      border-color: #38bdf8;
+      color: #0f172a;
+      box-shadow: 0 0 12px rgba(56,189,248,0.3);
+    }
+    .model-btn:hover {
+      border-color: #38bdf8;
+    }
+    .slider-group {
+      margin-bottom: 1.2rem;
+    }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+    .slider-label span:first-child {
+      color: #e2e8f0;
+    }
+    .slider-label span:last-child {
+      font-weight: 500;
+      color: #38bdf8;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 10px;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #38bdf8;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px #38bdf8;
+      border: 2px solid #0f172a;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #38bdf8;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #0f172a;
+    }
+    .warning-badge {
+      background: #f43f5e20;
+      border-left: 4px solid #f43f5e;
+      padding: 0.3rem 0.8rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.8rem;
+      color: #fca5a5;
+      margin-top: 0.2rem;
+      display: none;
+    }
+    .warning-badge.show {
+      display: inline-block;
+    }
+    .preset-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+    .preset-btn {
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 0.4rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .preset-btn:hover {
+      background: #38bdf8;
+      color: #0f172a;
+    }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      background: #0f172a;
+      padding: 1rem 1.2rem;
+      border-radius: 1rem;
+      margin-top: 1.5rem;
+      border: 1px solid #2d3a52;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-item .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+    .stat-item .value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .stat-item .value.green {
+      color: #4ade80;
+    }
+    .stat-item .value.orange {
+      color: #fb923c;
+    }
+    .chart-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 260px;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+      background: transparent;
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 3rem;
+      color: #64748b;
+      font-size: 0.9rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 2rem;
+    }
+    .inline-icon {
+      margin-right: 0.3rem;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .total-tokens {
+      font-size: 1rem;
+      background: #0f172a;
+      padding: 0.3rem 1rem;
+      border-radius: 2rem;
+      border: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🧠 Context Window Budget Planner</h1>
+    <div class="subhead">Allocate tokens wisely — optimize cost & performance</div>
+  </header>
+
+  <div class="planner-grid">
+    <!-- LEFT: Controls -->
+    <div class="card">
+      <h2><span>⚙️</span> Budget allocation</h2>
+      <div class="model-selector" id="modelSelector">
+        <button class="model-btn" data-tokens="4096">4K</button>
+        <button class="model-btn" data-tokens="8192">8K</button>
+        <button class="model-btn active" data-tokens="16384">16K</button>
+        <button class="model-btn" data-tokens="32768">32K</button>
+        <button class="model-btn" data-tokens="131072">128K</button>
+        <button class="model-btn" data-tokens="204800">200K</button>
+      </div>
+      <div id="slidersContainer">
+        <!-- 6 sliders generated by JS -->
+      </div>
+
+      <div class="preset-area">
+        <span style="color:#94a3b8; font-size:0.85rem; width:100%; margin-bottom:0.2rem;">📌 Use case presets</span>
+        <button class="preset-btn" data-preset="chatbot">💬 Chatbot</button>
+        <button class="preset-btn" data-preset="rag">📚 RAG</button>
+        <button class="preset-btn" data-preset="codegen">🧑‍💻 Code generation</button>
+        <button class="preset-btn" data-preset="extraction">📊 Data extraction</button>
+      </div>
+
+      <div class="stats" id="statsPanel">
+        <div class="stat-item"><span class="label">Total allocated</span><span class="value" id="totalAllocated">0</span></div>
+        <div class="stat-item"><span class="label">Cost / req (full)</span><span class="value" id="costFull">$0.00</span></div>
+        <div class="stat-item"><span class="label">Cost / req (trim)</span><span class="value green" id="costTrim">$0.00</span></div>
+        <div class="stat-item"><span class="label">Savings</span><span class="value orange" id="savingsPct">0%</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chart -->
+    <div class="card">
+      <h2><span>📊</span> Allocation pie</h2>
+      <div class="chart-wrapper">
+        <canvas id="pieChart" width="300" height="300"></canvas>
+      </div>
+      <div style="margin-top: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; justify-content:center; font-size:0.8rem; color:#b9c7db;" id="legendContainer"></div>
+    </div>
+  </div>
+  <div class="footer-note">© 2025 claudflow.com</div>
+</div>
+
+<script>
+  (function() {
+    // ----- DATA -----
+    const sectionKeys = ['systemPrompt', 'toolsFunctions', 'ragContext', 'conversationHistory', 'fewShotExamples', 'outputReservation'];
+    const sectionLabels = {
+      systemPrompt: 'System prompt',
+      toolsFunctions: 'Tools/functions',
+      ragContext: 'RAG context',
+      conversationHistory: 'Conversation history',
+      fewShotExamples: 'Few-shot examples',
+      outputReservation: 'Output reservation'
+    };
+    const presetAllocations = {
+      chatbot:       [15, 5, 10, 50, 10, 10],
+      rag:           [10, 5, 50, 20, 5, 10],
+      codegen:       [20, 10, 10, 25, 20, 15],
+      extraction:    [25, 15, 30, 10, 10, 10]
+    };
+    // default 16K, balanced
+    let currentModelTokens = 16384;
+    let sliderValues = [20, 10, 20, 25, 10, 15]; // must sum <=100
+
+    // DOM refs
+    const slidersContainer = document.getElementById('slidersContainer');
+    const pieCanvas = document.getElementById('pieChart');
+    const ctx = pieCanvas.getContext('2d');
+    const legendContainer = document.getElementById('legendContainer');
+    const totalAllocatedSpan = document.getElementById('totalAllocated');
+    const costFullSpan = document.getElementById('costFull');
+    const costTrimSpan = document.getElementById('costTrim');
+    const savingsPctSpan = document.getElementById('savingsPct');
+
+    // ----- RENDER SLIDERS -----
+    function renderSliders() {
+      let html = '';
+      for (let i = 0; i < sectionKeys.length; i++) {
+        const key = sectionKeys[i];
+        const label = sectionLabels[key];
+        const val = sliderValues[i];
+        const warnId = `warn_${key}`;
+        html += `<div class="slider-group">
+          <div class="slider-label">
+            <span>${label}</span>
+            <span><span id="val_${key}">${val}</span>%</span>
+          </div>
+          <input type="range" min="0" max="100" value="${val}" data-index="${i}" class="budget-slider" id="sl_${key}">
+          <div class="warning-badge" id="${warnId}">⚠️ Over 50% of budget</div>
+        </div>`;
+      }
+      slidersContainer.innerHTML = html;
+      // attach events
+      document.querySelectorAll('.budget-slider').forEach(slider => {
+        slider.addEventListener('input', function() {
+          const idx = parseInt(this.dataset.index);
+          sliderValues[idx] = parseInt(this.value);
+          document.getElementById(`val_${sectionKeys[idx]}`).textContent = this.value;
+          updateWarnings();
+          updateChartAndStats();
+        });
+      });
+      updateWarnings();
+    }
+
+    // ----- WARNINGS -----
+    function updateWarnings() {
+      for (let i = 0; i < sectionKeys.length; i++) {
+        const key = sectionKeys[i];
+        const val = sliderValues[i];
+        const warnEl = document.getElementById(`warn_${key}`);
+        if (val > 50) {
+          warnEl.classList.add('show');
+        } else {
+          warnEl.classList.remove('show');
+        }
+      }
+    }
+
+    // ----- CHART & STATS -----
+    function updateChartAndStats() {
+      const totalPct = sliderValues.reduce((a,b) => a+b, 0);
+      const totalTokens = Math.round(currentModelTokens * (totalPct / 100));
+      totalAllocatedSpan.textContent = totalTokens.toLocaleString() + ' tok';
+
+      // cost: $0.01 per 1K tokens
+      const fullCost = (currentModelTokens / 1000) * 0.01;
+      const trimCost = (totalTokens / 1000) * 0.01;
+      costFullSpan.textContent = `$${fullCost.toFixed(4)}`;
+      costTrimSpan.textContent = `$${trimCost.toFixed(4)}`;
+      let savingsPct = 0;
+      if (fullCost > 0) {
+        savingsPct = ((fullCost - trimCost) / fullCost) * 100;
+      }
+      savingsPctSpan.textContent = savingsPct.toFixed(1) + '%';
+
+      // draw pie
+      drawPieChart(sliderValues);
+      // legend
+      buildLegend(sliderValues);
+    }
+
+    // ----- PIE CHART (canvas) -----
+    function drawPieChart(data) {
+      const total = data.reduce((a,b) => a+b, 0) || 1;
+      const width = pieCanvas.width;
+      const height = pieCanvas.height;
+      ctx.clearRect(0, 0, width, height);
+      if (total === 0) {
+        ctx.fillStyle = '#334155';
+        ctx.font = '14px system-ui';
+        ctx.fillText('No allocation', width/2-40, height/2);
+        return;
+      }
+
+      const colors = ['#38bdf8', '#f472b6', '#a78bfa', '#34d399', '#fb923c', '#facc15'];
+      const cx = width/2, cy = height/2, radius = Math.min(width, height)/2 - 10;
+      let startAngle = -Math.PI/2;
+
+      for (let i = 0; i < data.length; i++) {
+        const sliceAngle = (data[i] / total) * 2 * Math.PI;
+        if (sliceAngle === 0) continue;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        // subtle border
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        startAngle += sliceAngle;
+      }
+      // center hole (donut)
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 0.45, 0, 2*Math.PI);
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // text in center
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const totalPct = data.reduce((a,b) => a+b, 0);
+      ctx.fillText(totalPct + '%', cx, cy-6);
+      ctx.font = '10px system-ui';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('used', cx, cy+14);
+    }
+
+    function buildLegend(data) {
+      const labels = ['System', 'Tools', 'RAG', 'History', 'Examples', 'Output'];
+      const colors = ['#38bdf8', '#f472b6', '#a78bfa', '#34d399', '#fb923c', '#facc15'];
+      let html = '';
+      for (let i = 0; i < data.length; i++) {
+        html += `<span><span style="display:inline-block;width:10px;height:10px;background:${colors[i]};border-radius:2px;margin-right:4px;"></span> ${labels[i]} ${data[i]}%</span>`;
+      }
+      legendContainer.innerHTML = html;
+    }
+
+    // ----- MODEL SELECTION -----
+    function initModelButtons() {
+      const buttons = document.querySelectorAll('.model-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          buttons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentModelTokens = parseInt(this.dataset.tokens);
+          updateChartAndStats();
+        });
+      });
+    }
+
+    // ----- PRESETS -----
+    function applyPreset(name) {
+      const alloc = presetAllocations[name];
+      if (!alloc) return;
+      for (let i = 0; i < sliderValues.length; i++) {
+        sliderValues[i] = alloc[i];
+        // update slider UI
+        const slider = document.getElementById(`sl_${sectionKeys[i]}`);
+        if (slider) {
+          slider.value = alloc[i];
+          document.getElementById(`val_${sectionKeys[i]}`).textContent = alloc[i];
+        }
+      }
+      updateWarnings();
+      updateChartAndStats();
+    }
+
+    function initPresetButtons() {
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const preset = this.dataset.preset;
+          applyPreset(preset);
+        });
+      });
+    }
+
+    // ----- INIT -----
+    renderSliders();
+    initModelButtons();
+    initPresetButtons();
+    // set default active model (16K)
+    document.querySelector('.model-btn[data-tokens="16384"]')?.classList.add('active');
+    // initial chart
+    updateChartAndStats();
+    // apply default balanced? already set.
+  })();
+</script>
+</body>
+</html>
