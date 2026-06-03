@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Prompt Chain Builder — Design Sequential Prompt</title>
+  <meta name="description" content="Build, visualize, and estimate sequential prompt chains with variable passing, conditional branches, token & cost estimation. Interactive tool by...">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/prompt-chain-builder">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I add a chain step?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Click 'Add Step' and fill in step name, prompt template with {{variable}} placeholders, and choose a model."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do variables pass between steps?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Define variables in each step's output mapping. The output of step N becomes input for step N+1 if variable names match."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I add conditional branches?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, each step can have conditions: if output contains specific text, you can redirect to a target step."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the example chains?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Two built-in examples: 'Summarize → Translate → Format' and 'Extract entities → Classify → Generate report'."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1400px;
+      width: 100%;
+    }
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    .subhead {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      border: 1px solid #334155;
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .step-item {
+      background: #0f172a;
+      border-radius: 1rem;
+      padding: 1rem;
+      border-left: 4px solid #38bdf8;
+    }
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .step-name {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .step-model {
+      background: #334155;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #b9d1f0;
+    }
+    .step-prompt {
+      background: #0b1120;
+      padding: 0.6rem;
+      border-radius: 10px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      margin: 0.5rem 0;
+      color: #cbd5e1;
+      word-break: break-word;
+    }
+    .step-vars, .step-cond {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .badge {
+      background: #1e3a5f;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      color: #b1d4fc;
+    }
+    .btn {
+      background: #334155;
+      border: none;
+      color: #e2e8f0;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+      border: 1px solid #475569;
+    }
+    .btn-primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-sm {
+      padding: 0.3rem 0.9rem;
+      font-size: 0.75rem;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #475569;
+    }
+    .btn-outline:hover {
+      background: #1e293b;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+    .mt-2 {
+      margin-top: 1rem;
+    }
+    .mb-1 {
+      margin-bottom: 0.6rem;
+    }
+    .example-badge {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 30px;
+      padding: 0.3rem 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.8rem;
+    }
+    .example-badge:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+    }
+    .config-box {
+      background: #0b1120;
+      padding: 1rem;
+      border-radius: 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      max-height: 200px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #a5b4d0;
+      border: 1px solid #2a3a54;
+    }
+    .preview-box {
+      background: #0b1120;
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid #2a3a54;
+      margin-top: 1rem;
+    }
+    .preview-step {
+      padding: 0.4rem 0;
+      border-bottom: 1px dashed #2a3a54;
+      display: flex;
+      justify-content: space-between;
+    }
+    .token-estimate {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      background: #0f172a;
+      padding: 0.8rem 1rem;
+      border-radius: 40px;
+      margin: 0.5rem 0;
+    }
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.5rem;
+    }
+    @media (max-width: 800px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+      h1 { font-size: 1.8rem; }
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal-card {
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 2rem;
+      max-width: 500px;
+      width: 90%;
+      border: 1px solid #334155;
+    }
+    .modal-card h3 { margin-bottom: 1rem; color: #38bdf8; }
+    .modal-card input, .modal-card textarea, .modal-card select {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 0.6rem 1rem;
+      border-radius: 30px;
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+    }
+    .modal-card textarea { min-height: 80px; resize: vertical; }
+    .modal-card .btn { margin-right: 0.5rem; }
+  </style>
+
+    <meta property="og:title" content="Prompt Chain Builder — Design Sequential Prompt">
+    <meta property="og:description" content="Build, visualize, and estimate sequential prompt chains with variable passing, conditional branches, token & cost estimation. Interactive tool by...">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://claudflow.com/tools/prompt-chain-builder">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⛓️ Prompt Chain Builder</h1>
+    <div class="subhead">Design sequential workflows · variables · conditionals · token & cost estimation</div>
+  </header>
+
+  <!-- Toolbar: examples + add step -->
+  <div class="flex-row mb-1">
+    <button class="btn btn-primary" id="addStepBtn">➕ Add Step</button>
+    <span style="color:#94a3b8; margin:0 0.5rem;">|</span>
+    <span style="color:#94a3b8; font-size:0.9rem;">Load example:</span>
+    <span class="example-badge" data-example="summarize">Summarize → Translate → Format</span>
+    <span class="example-badge" data-example="extract">Extract entities → Classify → Report</span>
+  </div>
+
+  <!-- Main grid: left steps, right config+preview -->
+  <div class="grid-2col">
+    <!-- Left: Steps panel -->
+    <div class="card">
+      <h2>📋 Chain Steps</h2>
+      <div id="stepsContainer" class="step-list">
+        <!-- dynamic steps -->
+      </div>
+      <div style="font-size:0.8rem; color:#94a3b8; margin-top:0.5rem;">
+        <span>💡 Use <code>{{variable}}</code> in prompt templates. Define output variables below each step.</span>
+      </div>
+    </div>
+
+    <!-- Right: Config + Preview + Estimates -->
+    <div>
+      <div class="card" style="margin-bottom:1.5rem;">
+        <h2>⚙️ Chain Config (JSON)</h2>
+        <div id="configDisplay" class="config-box">{ "steps": [] }</div>
+        <div class="token-estimate">
+          <span>🔤 Total tokens: <strong id="tokenEstimate">0</strong></span>
+          <span>💰 Cost (est): <strong id="costEstimate">$0.0000</strong></span>
+        </div>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" id="refreshConfigBtn">⟳ Refresh config</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>▶️ Execution preview (sample data)</h2>
+        <div id="previewContainer" class="preview-box">
+          <div style="color:#94a3b8;">Add steps and click refresh to simulate</div>
+        </div>
+        <button class="btn btn-sm btn-outline mt-2" id="runPreviewBtn">▶️ Run preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">© 2025 claudflow.com</div>
+</div>
+
+<!-- Modal for add/edit step -->
+<div id="stepModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 id="modalTitle">✏️ Add Step</h3>
+    <input type="text" id="stepNameInput" placeholder="Step name (e.g. Summarize)">
+    <textarea id="promptInput" placeholder="Prompt template with {{variable}} ...">{{input}}</textarea>
+    <select id="modelSelect">
+      <option value="gpt-4o">GPT-4o</option>
+      <option value="gpt-4o-mini">GPT-4o-mini</option>
+      <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+      <option value="claude-3-haiku">Claude 3 Haiku</option>
+    </select>
+    <input type="text" id="outputVarsInput" placeholder="Output variables (comma separated, e.g. summary, translation)">
+    <input type="text" id="conditionInput" placeholder="Condition: if output contains ... (optional)">
+    <input type="number" id="conditionTargetInput" placeholder="Condition: go to step # (1-based)" min="1" step="1">
+    <div class="flex-row">
+      <button class="btn btn-primary" id="saveStepBtn">💾 Save step</button>
+      <button class="btn btn-outline" id="cancelModalBtn">Cancel</button>
+    </div>
+    <p style="color:#94a3b8; font-size:0.7rem; margin-top:0.8rem;">Leave condition empty for no branch.</p>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- state ----------
+    let steps = [];           // array of step objects
+    let editingIndex = -1;
+
+    // DOM refs
+    const stepsContainer = document.getElementById('stepsContainer');
+    const configDisplay = document.getElementById('configDisplay');
+    const tokenEstimate = document.getElementById('tokenEstimate');
+    const costEstimate = document.getElementById('costEstimate');
+    const previewContainer = document.getElementById('previewContainer');
+
+    const modal = document.getElementById('stepModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const stepNameInput = document.getElementById('stepNameInput');
+    const promptInput = document.getElementById('promptInput');
+    const modelSelect = document.getElementById('modelSelect');
+    const outputVarsInput = document.getElementById('outputVarsInput');
+    const conditionInput = document.getElementById('conditionInput');
+    const conditionTargetInput = document.getElementById('conditionTargetInput');
+    const saveStepBtn = document.getElementById('saveStepBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const addStepBtn = document.getElementById('addStepBtn');
+    const refreshConfigBtn = document.getElementById('refreshConfigBtn');
+    const runPreviewBtn = document.getElementById('runPreviewBtn');
+
+    // ---------- helpers ----------
+    function generateId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 6); }
+
+    function defaultStep(name = 'New step') {
+      return {
+        id: generateId(),
+        name: name,
+        prompt: '{{input}}',
+        model: 'gpt-4o',
+        outputVars: [],
+        condition: '',
+        conditionTarget: null
+      };
+    }
+
+    // load examples
+    function loadExample(type) {
+      if (type === 'summarize') {
+        steps = [
+          { id: generateId(), name: 'Summarize', prompt: 'Summarize the following text concisely:\n{{input}}', model: 'gpt-4o', outputVars: ['summary'], condition: '', conditionTarget: null },
+          { id: generateId(), name: 'Translate', prompt: 'Translate the following to French:\n{{summary}}', model: 'claude-3.5-sonnet', outputVars: ['translation'], condition: '', conditionTarget: null },
+          { id: generateId(), name: 'Format', prompt: 'Format the translation as a bullet list:\n{{translation}}', model: 'gpt-4o-mini', outputVars: ['formatted'], condition: '', conditionTarget: null }
+        ];
+      } else if (type === 'extract') {
+        steps = [
+          { id: generateId(), name: 'Extract entities', prompt: 'Extract all entities (person, place, org) from:\n{{input}}', model: 'gpt-4o', outputVars: ['entities'], condition: '', conditionTarget: null },
+          { id: generateId(), name: 'Classify', prompt: 'Classify the following entities into categories:\n{{entities}}', model: 'claude-3-haiku', outputVars: ['classification'], condition: '', conditionTarget: null },
+          { id: generateId(), name: 'Generate report', prompt: 'Generate a short report based on classification:\n{{classification}}', model: 'gpt-4o-mini', outputVars: ['report'], condition: '', conditionTarget: null }
+        ];
+      }
+      renderAll();
+    }
+
+    // render steps list
+    function renderSteps() {
+      if (!steps.length) {
+        stepsContainer.innerHTML = `<div style="color:#64748b; padding:1rem;">No steps yet. Click "Add Step" or load an example.</div>`;
+        return;
+      }
+      let html = '';
+      steps.forEach((s, idx) => {
+        const vars = s.outputVars.length ? s.outputVars.join(', ') : '—';
+        const cond = s.condition ? `if "${s.condition}" → step ${s.conditionTarget}` : 'none';
+        html += `
+          <div class="step-item">
+            <div class="step-header">
+              <span class="step-name">#${idx+1} · ${s.name}</span>
+              <span class="step-model">${s.model}</span>
+            </div>
+            <div class="step-prompt">${escapeHtml(s.prompt)}</div>
+            <div class="step-vars"><span class="badge">📤 out: ${escapeHtml(vars)}</span></div>
+            <div class="step-cond">🔀 condition: ${escapeHtml(cond)}</div>
+            <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+              <button class="btn btn-sm btn-outline edit-step-btn" data-index="${idx}">✎ Edit</button>
+              <button class="btn btn-sm btn-outline delete-step-btn" data-index="${idx}" style="color:#f87171;">✕ Delete</button>
+            </div>
+          </div>
+        `;
+      });
+      stepsContainer.innerHTML = html;
+      // attach events
+      document.querySelectorAll('.edit-step-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          openEditModal(idx);
+        });
+      });
+      document.querySelectorAll('.delete-step-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          steps.splice(idx, 1);
+          renderAll();
+        });
+      });
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/[&<>"']/g, function(m) {
+        if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;'; return '&#039;';
+      });
+    }
+
+    // compute config JSON, tokens, cost
+    function updateConfigAndEstimates() {
+      const config = { chain: steps.map(s => ({
+        name: s.name,
+        prompt: s.prompt,
+        model: s.model,
+        outputVars: s.outputVars,
+        condition: s.condition || undefined,
+        conditionTarget: s.condition ? s.conditionTarget : undefined
+      }))};
+      configDisplay.textContent = JSON.stringify(config, null, 2);
+
+      // token estimate: count words * 1.3 + 4 per step overhead
+      let totalTokens = 0;
+      steps.forEach(s => {
+        const wordCount = (s.prompt || '').split(/\s+/).filter(w => w.length).length;
+        totalTokens += Math.ceil(wordCount * 1.3) + 10;
+        if (s.outputVars.length) totalTokens += 8;
+      });
+      tokenEstimate.textContent = totalTokens;
+      // cost: approximate $0.01 per 1K tokens (blended)
+      const cost = (totalTokens / 1000) * 0.01;
+      costEstimate.textContent = `$${cost.toFixed(4)}`;
+    }
+
+    // preview execution with sample data
+    function runPreview() {
+      if (!steps.length) {
+        previewContainer.innerHTML = `<div style="color:#94a3b8;">No steps to preview.</div>`;
+        return;
+      }
+      let sampleData = { input: 'Claudflow is an advanced AI platform for prompt engineering. It supports chaining and variables.' };
+      let outputHtml = '';
+      let stepOutputs = {};
+      let i = 0;
+      const maxSteps = 20;
+      let visited = new Set();
+      while (i < steps.length && i < maxSteps) {
+        const s = steps[i];
+        if (visited.has(i)) { outputHtml += `<div style="color:#f87171;">⚠️ Loop detected at step #${i+1}, break.</div>`; break; }
+        visited.add(i);
+        // fill prompt with variables
+        let filledPrompt = s.prompt;
+        // replace known variables
+        for (const key of Object.keys(stepOutputs)) {
+          const val = String(stepOutputs[key] || '');
+          filledPrompt = filledPrompt.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), val);
+        }
+        // also replace {{input}}
+        filledPrompt = filledPrompt.replace(/\{\{input\}\}/g, sampleData.input);
+        // simulate output
+        const simulatedOutput = `[output of ${s.name}] processed: "${filledPrompt.substring(0, 60)}..."`;
+        stepOutputs['output'] = simulatedOutput;
+        // set output vars
+        if (s.outputVars && s.outputVars.length) {
+          s.outputVars.forEach(v => { stepOutputs[v] = `sim_${v}_data`; });
+        }
+        outputHtml += `<div class="preview-step"><span>#${i+1} ${s.name} (${s.model})</span><span style="color:#a5b4d0;">✔️ done</span></div>`;
+        // condition check
+        if (s.condition && s.conditionTarget) {
+          const contains = simulatedOutput.includes(s.condition);
+          if (contains) {
+            const targetIdx = Math.min(s.conditionTarget - 1, steps.length-1);
+            if (targetIdx >= 0 && targetIdx !== i) {
+              outputHtml += `<div style="font-size:0.75rem; color:#fbbf24; padding-left:1rem;">🔀 condition met → go to step #${targetIdx+1}</div>`;
+              i = targetIdx;
+              continue;
+            }
+          }
+        }
+        i++;
+      }
+      previewContainer.innerHTML = outputHtml || `<div style="color:#94a3b8;">Execution finished.</div>`;
+    }
+
+    // render all
+    function renderAll() {
+      renderSteps();
+      updateConfigAndEstimates();
+      runPreview();
+    }
+
+    // modal logic
+    function openAddModal() {
+      editingIndex = -1;
+      modalTitle.textContent = '➕ Add Step';
+      stepNameInput.value = '';
+      promptInput.value = '{{input}}';
+      modelSelect.value = 'gpt-4o';
+      outputVarsInput.value = '';
+      conditionInput.value = '';
+      conditionTargetInput.value = '';
+      modal.style.display = 'flex';
+    }
+
+    function openEditModal(idx) {
+      const s = steps[idx];
+      if (!s) return;
+      editingIndex = idx;
+      modalTitle.textContent = `✏️ Edit Step #${idx+1}`;
+      stepNameInput.value = s.name;
+      promptInput.value = s.prompt;
+      modelSelect.value = s.model;
+      outputVarsInput.value = (s.outputVars || []).join(', ');
+      conditionInput.value = s.condition || '';
+      conditionTargetInput.value = s.conditionTarget || '';
+      modal.style.display = 'flex';
+    }
+
+    function saveStep() {
+      const name = stepNameInput.value.trim() || 'Unnamed';
+      const prompt = promptInput.value.trim() || '{{input}}';
+      const model = modelSelect.value;
+      const outputVars = outputVarsInput.value.split(',').map(v => v.trim()).filter(v => v.length > 0);
+      const condition = conditionInput.value.trim();
+      const conditionTarget = condition ? parseInt(conditionTargetInput.value) || null : null;
+
+      const stepObj = {
+        id: editingIndex >= 0 ? steps[editingIndex].id : generateId(),
+        name,
+        prompt,
+        model,
+        outputVars,
+        condition,
+        conditionTarget
+      };
+
+      if (editingIndex >= 0) {
+        steps[editingIndex] = stepObj;
+      } else {
+        steps.push(stepObj);
+      }
+      modal.style.display = 'none';
+      renderAll();
+    }
+
+    // event binding
+    addStepBtn.addEventListener('click', openAddModal);
+    cancelModalBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+    saveStepBtn.addEventListener('click', saveStep);
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    document.querySelectorAll('.example-badge').forEach(el => {
+      el.addEventListener('click', () => {
+        const type = el.dataset.example;
+        loadExample(type);
+      });
+    });
+
+    refreshConfigBtn.addEventListener('click', renderAll);
+    runPreviewBtn.addEventListener('click', runPreview);
+
+    // initial default example
+    loadExample('summarize');
+
+    // extra: close modal on escape
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.style.display = 'none'; });
+  })();
+</script>
+</body>
+</html>

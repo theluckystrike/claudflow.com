@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Multi-Agent Pipeline Designer — Visual Workflow Builder</title>
+  <meta name="description" content="Design multi-agent pipelines visually: add agents, connect with arrows, define schemas, set execution order. Generate config JSON, cost & time...">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/multi-agent-pipeline-designer">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type": "Question","name": "How do I add an agent?","acceptedAnswer": {"@type": "Answer","text": "Click 'Add Agent' button or use preset templates. Each agent has name, role, model, and I/O schemas."}},
+      {"@type": "Question","name": "How are connections defined?","acceptedAnswer": {"@type": "Answer","text": "Select source and target agents from dropdowns, then choose connection type: sequential, parallel, or conditional."}},
+      {"@type": "Question","name": "How is cost estimated?","acceptedAnswer": {"@type": "Answer","text": "Cost per run = sum of (input tokens + output tokens) * model rate. Default rates: GPT-4 $0.03/1K, Claude $0.015/1K, Gemini $0.01/1K."}},
+      {"@type": "Question","name": "Can I export the pipeline?","acceptedAnswer": {"@type": "Answer","text": "Yes, the pipeline config JSON is generated automatically and can be copied or downloaded."}}
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 1400px;
+      width: 100%;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      gap: 0.75rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    button, .btn-like {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+    button:hover {
+      background: #334155;
+      border-color: #38bdf8;
+    }
+    button.accent {
+      background: #0f172a;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+    }
+    button.accent:hover {
+      background: #1e3a5f;
+    }
+    .preset-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .preset-group button {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.9rem;
+      background: #1e293b;
+      border-color: #2d3a4e;
+    }
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .pipeline-canvas {
+      flex: 3;
+      min-width: 500px;
+      background: #0b1120;
+      border-radius: 24px;
+      padding: 1.2rem;
+      border: 1px solid #1e293b;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+    .sidebar {
+      flex: 1.2;
+      min-width: 260px;
+      background: #0b1120;
+      border-radius: 24px;
+      padding: 1.2rem;
+      border: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+    .agent-node {
+      background: #1a2332;
+      border: 1px solid #2d3a4e;
+      border-radius: 20px;
+      padding: 0.9rem 1rem;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .agent-node:hover {
+      border-color: #38bdf8;
+    }
+    .agent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .agent-name {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .agent-role {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      background: #0f172a;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+    }
+    .agent-meta {
+      display: flex;
+      gap: 0.8rem;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-top: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .connection-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-left: 1.5rem;
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+    .connection-line .arrow {
+      color: #38bdf8;
+      font-size: 1.2rem;
+    }
+    .connection-line .type-badge {
+      background: #1e293b;
+      padding: 0.1rem 0.6rem;
+      border-radius: 30px;
+      border: 1px solid #2d3a4e;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #64748b;
+    }
+    .panel-section {
+      background: #0f172a;
+      border-radius: 16px;
+      padding: 0.9rem;
+      border: 1px solid #1e293b;
+    }
+    .panel-section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.3px;
+    }
+    .config-json {
+      background: #0a0f1a;
+      padding: 0.6rem;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .stat-item {
+      background: #1a2332;
+      padding: 0.5rem 0.7rem;
+      border-radius: 14px;
+      border: 1px solid #2d3a4e;
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      color: #94a3b8;
+    }
+    .stat-value {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #e2e8f0;
+    }
+    .footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: #475569;
+      font-size: 0.8rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.5rem;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 28px;
+      padding: 1.5rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+    .modal h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .modal label {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+    .modal input, .modal select, .modal textarea {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 40px;
+      padding: 0.5rem 1rem;
+      color: #e2e8f0;
+      margin: 0.3rem 0 0.8rem 0;
+      font-size: 0.85rem;
+    }
+    .modal textarea {
+      border-radius: 16px;
+      resize: vertical;
+    }
+    .modal .actions {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+    }
+    @media (max-width: 700px) {
+      .pipeline-canvas { min-width: 100%; }
+      .main-layout { flex-direction: column; }
+      h1 { font-size: 1.3rem; }
+    }
+  </style>
+
+    <meta property="og:title" content="Multi-Agent Pipeline Designer — Visual Workflow Builder">
+    <meta property="og:description" content="Design multi-agent pipelines visually: add agents, connect with arrows, define schemas, set execution order. Generate config JSON, cost & time...">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://claudflow.com/tools/multi-agent-pipeline-designer">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚙️ Multi-Agent Pipeline Designer</h1>
+    <div class="toolbar">
+      <div class="preset-group">
+        <button data-preset="research">📋 Research → Analyze → Summarize</button>
+        <button data-preset="generate">✍️ Generate → Review → Refine</button>
+        <button data-preset="etl">🗂️ Extract → Transform → Load</button>
+      </div>
+      <button id="addAgentBtn" class="accent">➕ Add Agent</button>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- Canvas -->
+    <div class="pipeline-canvas">
+      <div id="flowchartContainer" class="flowchart">
+        <div class="empty-state" id="emptyState">✨ No agents yet. Click "Add Agent" or use a preset template.</div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="panel-section">
+        <h3>🔗 Add Connection</h3>
+        <div style="display:flex; flex-direction: column; gap:0.4rem;">
+          <select id="sourceSelect" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;"><option value="">— source —</option></select>
+          <select id="targetSelect" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;"><option value="">— target —</option></select>
+          <select id="connectionType" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;">
+            <option value="sequential">Sequential</option>
+            <option value="parallel">Parallel</option>
+            <option value="conditional">Conditional</option>
+          </select>
+          <button id="addConnectionBtn" style="margin-top:0.3rem;">➕ Add Connection</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>📊 Stats & Estimates</h3>
+        <div class="stats-grid">
+          <div class="stat-item"><div class="stat-label">Total agents</div><div class="stat-value" id="agentCount">0</div></div>
+          <div class="stat-item"><div class="stat-label">Connections</div><div class="stat-value" id="connectionCount">0</div></div>
+          <div class="stat-item"><div class="stat-label">Est. cost/run</div><div class="stat-value" id="estCost">$0.00</div></div>
+          <div class="stat-item"><div class="stat-label">Exec. time</div><div class="stat-value" id="estTime">0s</div></div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>📄 Pipeline Config JSON</h3>
+        <div class="config-json" id="configJson">{} </div>
+        <button id="copyJsonBtn" style="margin-top:0.4rem; width:100%;">📋 Copy JSON</button>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">© 2025 claudflow.com</footer>
+</div>
+
+<!-- Modal for add/edit agent -->
+<div class="modal-overlay" id="agentModal">
+  <div class="modal">
+    <h2 id="modalTitle">Add Agent</h2>
+    <label>Agent Name</label>
+    <input type="text" id="agentNameInput" placeholder="e.g. Researcher" value="">
+    <label>Role / Description</label>
+    <input type="text" id="agentRoleInput" placeholder="e.g. Gathers data">
+    <label>Model</label>
+    <select id="agentModelInput">
+      <option value="gpt-4">GPT-4 ($0.03/1K tokens)</option>
+      <option value="claude">Claude ($0.015/1K)</option>
+      <option value="gemini">Gemini ($0.01/1K)</option>
+    </select>
+    <label>Input schema (comma separated fields)</label>
+    <input type="text" id="agentInputSchema" placeholder="query, context">
+    <label>Output schema (comma separated fields)</label>
+    <input type="text" id="agentOutputSchema" placeholder="summary, insights">
+    <div class="actions">
+      <button id="cancelModalBtn">Cancel</button>
+      <button id="saveAgentBtn" class="accent">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- STATE -----
+    let agents = [];            // { id, name, role, model, inputSchema, outputSchema }
+    let connections = [];       // { sourceId, targetId, type }
+    let nextId = 100;
+    let editingId = null;       // null = add new
+
+    // DOM refs
+    const container = document.getElementById('flowchartContainer');
+    const emptyState = document.getElementById('emptyState');
+    const agentCountEl = document.getElementById('agentCount');
+    const connectionCountEl = document.getElementById('connectionCount');
+    const estCostEl = document.getElementById('estCost');
+    const estTimeEl = document.getElementById('estTime');
+    const configJsonEl = document.getElementById('configJson');
+    const sourceSelect = document.getElementById('sourceSelect');
+    const targetSelect = document.getElementById('targetSelect');
+    const addConnectionBtn = document.getElementById('addConnectionBtn');
+    const addAgentBtn = document.getElementById('addAgentBtn');
+    const modal = document.getElementById('agentModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const agentNameInput = document.getElementById('agentNameInput');
+    const agentRoleInput = document.getElementById('agentRoleInput');
+    const agentModelInput = document.getElementById('agentModelInput');
+    const agentInputSchema = document.getElementById('agentInputSchema');
+    const agentOutputSchema = document.getElementById('agentOutputSchema');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const saveAgentBtn = document.getElementById('saveAgentBtn');
+    const copyJsonBtn = document.getElementById('copyJsonBtn');
+
+    // preset buttons
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const preset = this.dataset.preset;
+        loadPreset(preset);
+      });
+    });
+
+    // ----- HELPERS -----
+    function generateId() { return 'agent_' + (nextId++); }
+
+    function getAgentById(id) { return agents.find(a => a.id === id); }
+
+    // model cost per 1K tokens
+    function modelRate(model) {
+      if (model === 'gpt-4') return 0.03;
+      if (model === 'claude') return 0.015;
+      if (model === 'gemini') return 0.01;
+      return 0.02;
+    }
+
+    // estimate cost per agent (assume 500 input + 300 output tokens)
+    function estimateCost(agent) {
+      const rate = modelRate(agent.model);
+      const tokens = 500 + 300; // input + output
+      return (tokens / 1000) * rate;
+    }
+
+    // estimate time: base 2s + 0.5s per connection fan-in
+    function estimateTime() {
+      if (agents.length === 0) return 0;
+      let total = agents.length * 1.2; // base per agent
+      connections.forEach(c => { total += 0.3; });
+      return Math.round(total * 10) / 10;
+    }
+
+    // ----- RENDER FLOWCHART -----
+    function render() {
+      // Update selects
+      const agentOptions = agents.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+      sourceSelect.innerHTML = '<option value="">— source —</option>' + agentOptions;
+      targetSelect.innerHTML = '<option value="">— target —</option>' + agentOptions;
+
+      // Build flowchart
+      let html = '';
+      if (agents.length === 0) {
+        html = `<div class="empty-state">✨ No agents yet. Click "Add Agent" or use a preset template.</div>`;
+      } else {
+        agents.forEach((agent, idx) => {
+          html += `<div class="agent-node" data-agent-id="${agent.id}">
+            <div class="agent-header">
+              <span class="agent-name">🧠 ${agent.name}</span>
+              <span class="agent-role">${agent.role || '—'}</span>
+            </div>
+            <div class="agent-meta">
+              <span>⚡ ${agent.model}</span>
+              <span>📥 ${agent.inputSchema || '*'}</span>
+              <span>📤 ${agent.outputSchema || '*'}</span>
+              <span style="color:#38bdf8;">💰 $${estimateCost(agent).toFixed(3)}</span>
+            </div>
+          </div>`;
+
+          // connections from this agent
+          const outConns = connections.filter(c => c.sourceId === agent.id);
+          outConns.forEach(conn => {
+            const target = getAgentById(conn.targetId);
+            if (!target) return;
+            html += `<div class="connection-line">
+              <span class="arrow">⬇️</span>
+              <span class="type-badge">${conn.type}</span>
+              <span>→ ${target.name}</span>
+            </div>`;
+          });
+        });
+      }
+      container.innerHTML = html;
+
+      // Update stats
+      agentCountEl.textContent = agents.length;
+      connectionCountEl.textContent = connections.length;
+      let totalCost = agents.reduce((sum, a) => sum + estimateCost(a), 0);
+      estCostEl.textContent = `$${totalCost.toFixed(3)}`;
+      estTimeEl.textContent = estimateTime() + 's';
+
+      // Update JSON
+      const pipeline = {
+        agents: agents.map(a => ({ id: a.id, name: a.name, role: a.role, model: a.model, inputSchema: a.inputSchema, outputSchema: a.outputSchema })),
+        connections: connections.map(c => ({ sourceId: c.sourceId, targetId: c.targetId, type: c.type })),
+        metadata: { estimatedCostPerRun: totalCost, estimatedTimeSec: estimateTime() }
+      };
+      configJsonEl.textContent = JSON.stringify(pipeline, null, 2);
+    }
+
+    // ----- MODAL -----
+    function openModal(agentId = null) {
+      editingId = agentId;
+      modal.style.display = 'flex';
+      if (agentId) {
+        const agent = getAgentById(agentId);
+        if (!agent) return;
+        modalTitle.textContent = 'Edit Agent';
+        agentNameInput.value = agent.name;
+        agentRoleInput.value = agent.role;
+        agentModelInput.value = agent.model;
+        agentInputSchema.value = agent.inputSchema || '';
+        agentOutputSchema.value = agent.outputSchema || '';
+      } else {
+        modalTitle.textContent = 'Add Agent';
+        agentNameInput.value = '';
+        agentRoleInput.value = '';
+        agentModelInput.value = 'gpt-4';
+        agentInputSchema.value = '';
+        agentOutputSchema.value = '';
+      }
+    }
+
+    function closeModal() { modal.style.display = 'none'; editingId = null; }
+
+    function saveAgentFromModal() {
+      const name = agentNameInput.value.trim();
+      const role = agentRoleInput.value.trim();
+      const model = agentModelInput.value;
+      const inputSchema = agentInputSchema.value.trim();
+      const outputSchema = agentOutputSchema.value.trim();
+      if (!name) { alert('Agent name is required.'); return; }
+
+      if (editingId) {
+        const agent = getAgentById(editingId);
+        if (agent) {
+          agent.name = name;
+          agent.role = role;
+          agent.model = model;
+          agent.inputSchema = inputSchema;
+          agent.outputSchema = outputSchema;
+        }
+      } else {
+        const newAgent = {
+          id: generateId(),
+          name: name,
+          role: role,
+          model: model,
+          inputSchema: inputSchema,
+          outputSchema: outputSchema
+        };
+        agents.push(newAgent);
+      }
+      closeModal();
+      render();
+    }
+
+    // ----- CONNECTIONS -----
+    function addConnection() {
+      const src = sourceSelect.value;
+      const tgt = targetSelect.value;
+      const type = document.getElementById('connectionType').value;
+      if (!src || !tgt) { alert('Select both source and target agents.'); return; }
+      if (src === tgt) { alert('Cannot connect agent to itself.'); return; }
+      // avoid duplicate
+      if (connections.some(c => c.sourceId === src && c.targetId === tgt)) {
+        alert('Connection already exists.'); return;
+      }
+      connections.push({ sourceId: src, targetId: tgt, type });
+      render();
+    }
+
+    // ----- PRESETS -----
+    function loadPreset(name) {
+      agents = [];
+      connections = [];
+      if (name === 'research') {
+        agents.push({ id: generateId(), name: 'Researcher', role: 'Gather data & sources', model: 'gpt-4', inputSchema: 'topic, depth', outputSchema: 'raw_data, citations' });
+        agents.push({ id: generateId(), name: 'Analyst', role: 'Analyze & extract insights', model: 'claude', inputSchema: 'raw_data', outputSchema: 'insights, patterns' });
+        agents.push({ id: generateId(), name: 'Summarizer', role: 'Generate final summary', model: 'gemini', inputSchema: 'insights', outputSchema: 'summary, key_points' });
+        connections.push({ sourceId: agents[0].id, targetId: agents[1].id, type: 'sequential' });
+        connections.push({ sourceId: agents[1].id, targetId: agents[2].id, type: 'sequential' });
+      } else if (name === 'generate') {
+        agents.push({ id: generateId(), name: 'Generator', role: 'Create draft content', model: 'gpt-4', inputSchema: 'brief, style', outputSchema: 'draft' });
+        agents.push({ id: generateId(), name: 'Reviewer', role: 'Check quality & facts', model: 'claude', inputSchema: 'draft', outputSchema: 'feedback, issues' });
+        agents.push({ id: generateId(), name: 'Refiner', role: 'Polish final output', model: 'gemini', inputSchema: 'draft, feedback', outputSchema: 'final_text' });
+        connections.push({ sourceId: agents[0].id, targetId: agents[1].id, type: 'sequential' });
+        connections.push({ sourceId: agents[1].id, targetId: agents[2].id, type: 'conditional' });
+      } else if (name === 'etl') {
+        agents.push({ id: generateId(), name: 'Extractor', role: 'Extract raw data', model: 'gpt-4', inputSchema: 'source, query', outputSchema: 'raw_records' });
+        agents.push({ id: generateId(), name: 'Transformer', role: 'Clean & transform', model: 'claude', inputSchema: 'raw_records', outputSchema: 'transformed_data' });
+        agents.push({ id: generateId(), name: 'Loader', role: 'Load to destination', model: 'gemini', inputSchema: 'transformed_data', outputSchema: 'load_status' });
+        connections.push({ sourceId: agents[0].id, targetId: agents[1].id, type: 'sequential' });
+        connections.push({ sourceId: agents[1].id, targetId: agents[2].id, type: 'parallel' });
+      }
+      render();
+    }
+
+    // ----- EVENT BINDINGS -----
+    addAgentBtn.addEventListener('click', () => openModal(null));
+    cancelModalBtn.addEventListener('click', closeModal);
+    saveAgentBtn.addEventListener('click', saveAgentFromModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    addConnectionBtn.addEventListener('click', addConnection);
+
+    // double click on agent node to edit
+    container.addEventListener('dblclick', (e) => {
+      const node = e.target.closest('.agent-node');
+      if (node) {
+        const id = node.dataset.agentId;
+        if (id) openModal(id);
+      }
+    });
+
+    // copy JSON
+    copyJsonBtn.addEventListener('click', () => {
+      const text = configJsonEl.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Config JSON copied!');
+      }).catch(() => alert('Could not copy.'));
+    });
+
+    // initial render
+    render();
+  })();
+</script>
+</body>
+</html>
