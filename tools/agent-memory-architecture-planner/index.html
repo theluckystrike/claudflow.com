@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Agent Memory Architecture Planner · claudflow</title>
+  <meta name="description" content="Interactive planner for AI agent memory tiers: working, episodic, semantic, procedural. Estimate costs, scaling, and architecture recommendations.">
+  <link rel="canonical" href="https://claudflow.com/tools/agent-memory-architecture-planner">
+  <!-- JSON-LD: WebApplication + FAQPage + BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Agent Memory Architecture Planner",
+        "url": "https://claudflow.com/tools/agent-memory-architecture-planner",
+        "applicationCategory": "DesignTool",
+        "operatingSystem": "All",
+        "description": "Plan and estimate costs for AI agent memory tiers: working, episodic, semantic, procedural."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "When should I add episodic memory?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When sessions per day exceed 50 or retention needs exceed 7 days, vector storage becomes essential for recall."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is procedural memory cost?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Procedural memory adds ~50 tokens per tool per request. For 5 tools and 10K requests/month, that's ~$0.075/month at GPT-4o pricing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is semantic memory estimated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Based on agent type: support ~20 docs, coding ~40, research ~60, personal ~10, automation ~15. Each doc ~10KB."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "claudflow", "item": "https://claudflow.com" },
+          { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools" },
+          { "@type": "ListItem", "position": 3, "name": "Agent Memory Architecture Planner", "item": "https://claudflow.com/tools/agent-memory-architecture-planner" }
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: #0b0f1a;
+      color: #e2e8f0;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1280px;
+      width: 100%;
+    }
+    /* orange accent #f97316 */
+    .accent {
+      color: #f97316;
+    }
+    .accent-bg {
+      background: #f97316;
+      color: #0b0f1a;
+    }
+    .accent-border {
+      border-color: #f97316;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    h1 {
+      font-size: 2.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    h1 small {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.7;
+      margin-left: 0.5rem;
+    }
+    .card {
+      background: #131a2b;
+      border-radius: 24px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border: 1px solid #1f2a3f;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: #b0c4de;
+    }
+    select, input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: #1a2338;
+      border: 1px solid #2d3a52;
+      border-radius: 40px;
+      color: #f1f7fe;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+    }
+    .stat-box {
+      background: #0f1729;
+      border-radius: 20px;
+      padding: 1rem 1.2rem;
+      border-left: 4px solid #f97316;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f97316;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.6rem 0.4rem;
+      color: #f97316;
+      border-bottom: 1px solid #2d3a52;
+    }
+    td {
+      padding: 0.6rem 0.4rem;
+      border-bottom: 1px solid #1f2a3f;
+    }
+    .badge {
+      background: #1f2a3f;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge.orange {
+      background: #f97316;
+      color: #0b0f1a;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 260px;
+      background: #0b0f1a;
+      border-radius: 20px;
+      display: block;
+      margin-top: 0.5rem;
+    }
+    svg {
+      max-width: 100%;
+      height: auto;
+      background: #0b0f1a;
+      border-radius: 20px;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #5a6f8c;
+      font-size: 0.85rem;
+      border-top: 1px solid #1f2a3f;
+      padding-top: 2rem;
+    }
+    @media (max-width: 760px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+    .inline-orange {
+      color: #f97316;
+      font-weight: 600;
+    }
+    .flowchart svg text {
+      fill: #e2e8f0;
+      font-size: 13px;
+    }
+  </style>
+
+<meta property="og:title" content="Agent Memory Architecture Planner · claudflow">
+<meta property="og:description" content="Interactive planner for AI agent memory tiers: working, episodic, semantic, procedural. Estimate costs, scaling, and architecture recommendations.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://claudflow.com/tools/agent-memory-architecture-planner">
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="flex-between" style="margin-bottom: 0.5rem;">
+    <h1>🧠 Agent Memory <span class="accent">Architecture Planner</span> <small>claudflow</small></h1>
+    <span class="badge orange">v2.0</span>
+  </div>
+  <p style="color:#94a3b8; margin-bottom: 1.5rem;">Design memory tiers for your AI agent — working, episodic, semantic, procedural.</p>
+
+  <!-- Inputs -->
+  <div class="card">
+    <div class="grid-2">
+      <div class="form-group">
+        <label>🤖 Agent type</label>
+        <select id="agentType">
+          <option value="customer-support">Customer support</option>
+          <option value="coding-assistant">Coding assistant</option>
+          <option value="research-agent">Research agent</option>
+          <option value="personal-assistant">Personal assistant</option>
+          <option value="task-automation">Task automation</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>🔄 Avg session turns</label>
+        <input type="number" id="sessionTurns" value="12" min="1" max="200" step="1">
+      </div>
+      <div class="form-group">
+        <label>📅 Sessions per day</label>
+        <input type="number" id="sessionsPerDay" value="80" min="1" max="50000" step="1">
+      </div>
+      <div class="form-group">
+        <label>👥 Unique users</label>
+        <input type="number" id="uniqueUsers" value="500" min="1" max="1000000" step="1">
+      </div>
+      <div class="form-group">
+        <label>📆 Data retention (days)</label>
+        <input type="number" id="retentionDays" value="30" min="1" max="365" step="1">
+      </div>
+      <div class="form-group" style="display: flex; align-items: flex-end;">
+        <button id="recalcBtn" class="accent-bg" style="border: none; padding: 0.8rem 2rem; border-radius: 40px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(249,115,22,0.3);">⟳ Update plan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 memory tiers + recommended architecture -->
+  <div class="grid-2" style="margin-top: 0.5rem;">
+    <div class="card">
+      <h3 style="display: flex; gap: 0.8rem; flex-wrap: wrap;">📊 Memory tiers</h3>
+      <div id="tierStats" style="margin-top: 0.8rem;">
+        <!-- filled by JS -->
+      </div>
+    </div>
+    <div class="card">
+      <h3>📋 Recommended architecture by agent</h3>
+      <div id="archTable"></div>
+    </div>
+  </div>
+
+  <!-- Monthly cost breakdown + scaling chart -->
+  <div class="grid-2">
+    <div class="card">
+      <h3>💰 Monthly storage cost breakdown</h3>
+      <div id="costBreakdown" style="margin-top: 0.5rem;"></div>
+    </div>
+    <div class="card">
+      <h3>📈 Scaling: monthly cost vs users</h3>
+      <canvas id="costChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Decision flowchart SVG -->
+  <div class="card">
+    <h3>🧭 Decision flowchart: when to add each memory tier</h3>
+    <div class="flowchart" style="margin-top: 0.8rem; text-align: center;">
+      <svg viewBox="0 0 600 280" style="width:100%; max-width:600px;">
+        <rect x="10" y="10" width="130" height="40" rx="20" fill="#1f2a3f" stroke="#f97316" stroke-width="2"/>
+        <text x="75" y="35" text-anchor="middle" fill="#f97316" font-weight="bold">Start</text>
+        <line x1="140" y1="30" x2="200" y2="30" stroke="#f97316" stroke-width="2"/>
+        <polygon points="200,25 210,30 200,35" fill="#f97316"/>
+
+        <rect x="210" y="10" width="150" height="40" rx="20" fill="#1f2a3f" stroke="#e2e8f0"/>
+        <text x="285" y="35" text-anchor="middle" fill="#e2e8f0" font-size="12">Working memory</text>
+        <line x1="360" y1="30" x2="410" y2="30" stroke="#e2e8f0" stroke-width="2"/>
+        <polygon points="410,25 420,30 410,35" fill="#e2e8f0"/>
+
+        <rect x="420" y="10" width="160" height="40" rx="20" fill="#1f2a3f" stroke="#f97316"/>
+        <text x="500" y="35" text-anchor="middle" fill="#f97316" font-size="12">Episodic (vector)</text>
+
+        <!-- down arrow -->
+        <line x1="500" y1="50" x2="500" y2="80" stroke="#f97316" stroke-width="2"/>
+        <polygon points="495,80 500,90 505,80" fill="#f97316"/>
+
+        <rect x="420" y="90" width="160" height="40" rx="20" fill="#1f2a3f" stroke="#e2e8f0"/>
+        <text x="500" y="115" text-anchor="middle" fill="#e2e8f0" font-size="12">Semantic (KB)</text>
+
+        <line x1="500" y1="130" x2="500" y2="160" stroke="#e2e8f0" stroke-width="2"/>
+        <polygon points="495,160 500,170 505,160" fill="#e2e8f0"/>
+
+        <rect x="420" y="170" width="160" height="40" rx="20" fill="#1f2a3f" stroke="#f97316"/>
+        <text x="500" y="195" text-anchor="middle" fill="#f97316" font-size="12">Procedural (tools)</text>
+
+        <!-- left side condition -->
+        <rect x="30" y="80" width="160" height="50" rx="12" fill="#0f1729" stroke="#f97316" stroke-dasharray="4"/>
+        <text x="110" y="100" text-anchor="middle" fill="#f97316" font-size="11">sessions &gt; 50/day?</text>
+        <text x="110" y="118" text-anchor="middle" fill="#94a3b8" font-size="10">or retention &gt; 7d</text>
+        <line x1="110" y1="80" x2="110" y2="60" stroke="#f97316" stroke-width="1.5" stroke-dasharray="3"/>
+        <line x1="110" y1="60" x2="210" y2="30" stroke="#f97316" stroke-width="1.5" stroke-dasharray="3"/>
+
+        <rect x="30" y="160" width="160" height="50" rx="12" fill="#0f1729" stroke="#e2e8f0" stroke-dasharray="4"/>
+        <text x="110" y="180" text-anchor="middle" fill="#e2e8f0" font-size="11">unique users &gt; 200?</text>
+        <text x="110" y="198" text-anchor="middle" fill="#94a3b8" font-size="10">or complex domain</text>
+        <line x1="110" y1="160" x2="110" y2="140" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3"/>
+        <line x1="110" y1="140" x2="285" y2="115" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3"/>
+
+        <text x="300" y="210" fill="#5a6f8c" font-size="10">* thresholds are advisory</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    © 2025 claudflow.com — Agent Memory Architecture Planner. All estimates indicative.
+  </div>
+</div>
+
+<script>
+  (function() {
+    const agentSelect = document.getElementById('agentType');
+    const sessionTurns = document.getElementById('sessionTurns');
+    const sessionsPerDay = document.getElementById('sessionsPerDay');
+    const uniqueUsers = document.getElementById('uniqueUsers');
+    const retentionDays = document.getElementById('retentionDays');
+    const recalcBtn = document.getElementById('recalcBtn');
+
+    const tierStatsDiv = document.getElementById('tierStats');
+    const archTableDiv = document.getElementById('archTable');
+    const costBreakdownDiv = document.getElementById('costBreakdown');
+    const canvas = document.getElementById('costChart');
+    const ctx = canvas.getContext('2d');
+
+    // model constants
+    const MODEL_PRICE_PER_1K = 0.0025;  // gpt-4o-mini ~$0.0025/1K tokens
+    const CONTEXT_WINDOW = 128000;      // tokens
+    const EMBEDDING_COST_PER_1K = 0.0001; // text-embedding-3-small
+    const BYTES_PER_FLOAT = 4;
+    const DIMENSION = 1536;
+    const TOOLS_MAP = {
+      'customer-support': 8,
+      'coding-assistant': 12,
+      'research-agent': 15,
+      'personal-assistant': 6,
+      'task-automation': 10
+    };
+    const DOC_COUNT_MAP = {
+      'customer-support': 20,
+      'coding-assistant': 40,
+      'research-agent': 60,
+      'personal-assistant': 10,
+      'task-automation': 15
+    };
+    const AVG_DOC_SIZE_KB = 10; // per doc
+
+    function compute() {
+      const agent = agentSelect.value;
+      const turns = Math.max(1, parseInt(sessionTurns.value, 10) || 12);
+      const sessions = Math.max(1, parseInt(sessionsPerDay.value, 10) || 80);
+      const users = Math.max(1, parseInt(uniqueUsers.value, 10) || 500);
+      const retention = Math.max(1, parseInt(retentionDays.value, 10) || 30);
+
+      // --- Working memory (A) ---
+      const systemPromptTokens = 800; // typical
+      const currentTurnTokens = 400;  // per turn estimate
+      const workingTokens = currentTurnTokens + systemPromptTokens;
+      const workingCostPerRequest = (workingTokens / 1000) * MODEL_PRICE_PER_1K;
+      const maxCapacity = CONTEXT_WINDOW;
+
+      // --- Episodic memory (B) ---
+      const avgSessionTokens = turns * 300; // rough
+      const totalTokensDaily = sessions * avgSessionTokens;
+      const totalTokensRetention = totalTokensDaily * retention;
+      // storage_MB = sessions_per_day * retention_days * avg_session_tokens * 4 bytes * 1536_dim / (1M * 4_bytes_per_float)
+      // simplified: (sessions * retention * avgSessionTokens * 4 * 1536) / (1e6 * 4) = (sessions * retention * avgSessionTokens * 1536) / 1e6
+      const storageMB = (sessions * retention * avgSessionTokens * DIMENSION) / 1e6;
+      const embeddingCostTotal = (totalTokensRetention / 1000) * EMBEDDING_COST_PER_1K;
+
+      // --- Semantic memory (C) ---
+      const docCount = DOC_COUNT_MAP[agent] || 20;
+      const semanticStorageKB = docCount * AVG_DOC_SIZE_KB;
+
+      // --- Procedural memory (D) ---
+      const toolCount = TOOLS_MAP[agent] || 8;
+      const procTokensPerRequest = toolCount * 50;
+      const procCostPerRequest = (procTokensPerRequest / 1000) * MODEL_PRICE_PER_1K;
+
+      // monthly costs (30 days)
+      const monthlyRequests = sessions * 30; // approximate
+      const workingMonthly = workingCostPerRequest * monthlyRequests;
+      const episodicMonthly = embeddingCostTotal / (retention > 0 ? retention/30 : 1); // amortized? show as monthly amortized embedding cost over retention period? simpler: embeddingCostTotal / (retention/30) if retention>0
+      const episodicMonthlyAdjusted = retention > 0 ? embeddingCostTotal / (retention / 30) : embeddingCostTotal;
+      const semanticMonthly = 0.5; // static small hosting cost
+      const proceduralMonthly = procCostPerRequest * monthlyRequests;
+
+      // totals
+      const totalMonthly = workingMonthly + episodicMonthlyAdjusted + semanticMonthly + proceduralMonthly;
+
+      // --- Render tier stats ---
+      tierStatsDiv.innerHTML = `
+        <div class="grid-3" style="margin-top:0;">
+          <div class="stat-box"><span class="stat-label">🧠 Working (in-context)</span><div class="stat-value">${workingTokens.toFixed(0)} tok</div><small style="color:#94a3b8;">max ${maxCapacity/1000}k · $${workingCostPerRequest.toFixed(5)}/req</small></div>
+          <div class="stat-box"><span class="stat-label">📦 Episodic (vector)</span><div class="stat-value">${storageMB.toFixed(1)} MB</div><small style="color:#94a3b8;">embed $${embeddingCostTotal.toFixed(3)} total</small></div>
+          <div class="stat-box"><span class="stat-label">📚 Semantic (KB)</span><div class="stat-value">${semanticStorageKB.toFixed(0)} KB</div><small style="color:#94a3b8;">${docCount} docs</small></div>
+          <div class="stat-box"><span class="stat-label">⚙️ Procedural (tools)</span><div class="stat-value">${procTokensPerRequest} tok/req</div><small style="color:#94a3b8;">${toolCount} tools</small></div>
+          <div class="stat-box" style="border-left-color:#38bdf8;"><span class="stat-label">📆 Monthly requests</span><div class="stat-value">${monthlyRequests.toLocaleString()}</div><small style="color:#94a3b8;">est.</small></div>
+          <div class="stat-box" style="border-left-color:#f97316;"><span class="stat-label">💰 Total monthly cost</span><div class="stat-value">$${totalMonthly.toFixed(2)}</div><small style="color:#94a3b8;">all tiers</small></div>
+        </div>
+      `;
+
+      // --- Recommended architecture table ---
+      const archData = {
+        'customer-support': { working: '32K context', episodic: 'Recommended >50 sess/d', semantic: '20 docs (FAQ)', procedural: '8 tools' },
+        'coding-assistant': { working: '64K context', episodic: 'High recall needed', semantic: '40 docs (API)', procedural: '12 tools' },
+        'research-agent': { working: '128K context', episodic: 'Essential', semantic: '60 docs (papers)', procedural: '15 tools' },
+        'personal-assistant': { working: '16K context', episodic: 'Optional', semantic: '10 docs (prefs)', procedural: '6 tools' },
+        'task-automation': { working: '32K context', episodic: 'If multi-step', semantic: '15 docs (workflows)', procedural: '10 tools' }
+      };
+      const rec = archData[agent] || archData['customer-support'];
+      archTableDiv.innerHTML = `
+        <table>
+          <tr><th>Tier</th><th>Recommendation</th></tr>
+          <tr><td>Working</td><td>${rec.working}</td></tr>
+          <tr><td>Episodic</td><td>${rec.episodic}</td></tr>
+          <tr><td>Semantic</td><td>${rec.semantic}</td></tr>
+          <tr><td>Procedural</td><td>${rec.procedural}</td></tr>
+        </table>
+        <p style="margin-top:0.6rem; font-size:0.8rem; color:#94a3b8;">Based on agent type: <strong>${agent.replace('-',' ')}</strong></p>
+      `;
+
+      // --- Monthly cost breakdown ---
+      costBreakdownDiv.innerHTML = `
+        <table>
+          <tr><th>Memory tier</th><th>Monthly cost</th><th>%</th></tr>
+          <tr><td>Working (inference)</td><td>$${workingMonthly.toFixed(2)}</td><td>${totalMonthly>0?((workingMonthly/totalMonthly)*100).toFixed(1):0}%</td></tr>
+          <tr><td>Episodic (embedding amort.)</td><td>$${episodicMonthlyAdjusted.toFixed(2)}</td><td>${totalMonthly>0?((episodicMonthlyAdjusted/totalMonthly)*100).toFixed(1):0}%</td></tr>
+          <tr><td>Semantic (storage)</td><td>$${semanticMonthly.toFixed(2)}</td><td>${totalMonthly>0?((semanticMonthly/totalMonthly)*100).toFixed(1):0}%</td></tr>
+          <tr><td>Procedural (tool tokens)</td><td>$${proceduralMonthly.toFixed(2)}</td><td>${totalMonthly>0?((proceduralMonthly/totalMonthly)*100).toFixed(1):0}%</td></tr>
+          <tr style="border-top:2px solid #f97316;"><td><strong>Total</strong></td><td><strong>$${totalMonthly.toFixed(2)}</strong></td><td>100%</td></tr>
+        </table>
+      `;
+
+      // --- Scaling chart (cost vs user count) ---
+      drawChart(users, sessions, retention, turns, agent);
+    }
+
+    function drawChart(baseUsers, sessions, retention, turns, agent) {
+      const points = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000];
+      const costs = points.map(u => {
+        const monthlyReq = sessions * 30;
+        const working = ((400+800)/1000)*MODEL_PRICE_PER_1K * monthlyReq;
+        const avgTok = turns*300;
+        const storageMB = (sessions * retention * avgTok * DIMENSION) / 1e6;
+        const embedTotal = (sessions * retention * avgTok / 1000) * EMBEDDING_COST_PER_1K;
+        const episodic = retention > 0 ? embedTotal / (retention/30) : embedTotal;
+        const semantic = 0.5;
+        const toolCount = TOOLS_MAP[agent] || 8;
+        const proc = (toolCount*50/1000)*MODEL_PRICE_PER_1K * monthlyReq;
+        return working + episodic + semantic + proc;
+      });
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width, h = canvas.height;
+      const pad = 30;
+      const maxX = points.length-1;
+      const maxY = Math.max(...costs)*1.2 || 10;
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 2;
+      ctx.fillStyle = '#f97316';
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('users →', w-50, h-5);
+      ctx.fillText('cost $', 5, 15);
+      // grid lines
+      for (let i=0; i<5; i++) {
+        const y = pad + (h-pad*2) * (1 - i/4);
+        ctx.strokeStyle = '#1f2a3f';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(w-pad, y);
+        ctx.stroke();
+        ctx.fillStyle = '#5a6f8c';
+        ctx.fillText((maxY*i/4).toFixed(1), 2, y+3);
+      }
+      // plot
+      ctx.beginPath();
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 2.5;
+      for (let i=0; i<points.length; i++) {
+        const x = pad + (i / maxX) * (w - pad*2);
+        const y = pad + (h - pad*2) * (1 - costs[i]/maxY);
+        if (i===0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      // dots
+      for (let i=0; i<points.length; i++) {
+        const x = pad + (i / maxX) * (w - pad*2);
+        const y = pad + (h - pad*2) * (1 - costs[i]/maxY);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2*Math.PI);
+        ctx.fillStyle = '#f97316';
+        ctx.fill();
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '8px sans-serif';
+        ctx.fillText(points[i], x-6, y-8);
+      }
+    }
+
+    // initial
+    compute();
+
+    recalcBtn.addEventListener('click', compute);
+    // also recalc on change
+    [agentSelect, sessionTurns, sessionsPerDay, uniqueUsers, retentionDays].forEach(el => el.addEventListener('change', compute));
+    // input realtime? use 'input' but debounce? we use change for simplicity
+    // also add input for number fields
+    [sessionTurns, sessionsPerDay, uniqueUsers, retentionDays].forEach(el => el.addEventListener('input', function() {
+      // simple debounce
+      clearTimeout(window._inpTimer);
+      window._inpTimer = setTimeout(compute, 300);
+    }));
+  })();
+</script>
+</body>
+</html>

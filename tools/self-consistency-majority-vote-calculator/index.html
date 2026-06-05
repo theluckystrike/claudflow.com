@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Self-Consistency Majority Vote Calculator | claudflow.com</title>
+  <meta name="description" content="Interactive tool for self-consistency prompting: compute majority vote accuracy, optimal N, cost-accuracy trade-off, and break-even analysis. Dark theme...">
+  <meta name="keywords" content="self-consistency, majority vote, binomial, chain-of-thought, accuracy, cost, calculator">
+  <link rel="canonical" href="https://claudflow.com/tools/self-consistency-majority-vote-calculator">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Self-Consistency Majority Vote Calculator",
+      "url": "https://claudflow.com/tools/self-consistency-majority-vote-calculator",
+      "description": "Calculate majority vote accuracy from single-sample accuracy p, number of samples N, cost per sample, and target thresholds.",
+      "applicationCategory": "AI Tool",
+      "operatingSystem": "All",
+      "browserRequirements": "JavaScript enabled"
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question","name": "What is self-consistency majority vote?","acceptedAnswer": {"@type": "Answer","text": "A technique that generates multiple reasoning paths (samples) and selects the most common answer, improving accuracy over single-sample chain-of-thought."}},
+        {"@type": "Question","name": "How is majority vote accuracy computed?","acceptedAnswer": {"@type": "Answer","text": "Using binomial probability: sum_{k=ceil(N/2)}^{N} C(N,k) * p^k * (1-p)^(N-k), where p is single-sample accuracy and N is number of samples."}},
+        {"@type": "Question","name": "How do I find the optimal number of samples?","acceptedAnswer": {"@type": "Answer","text": "Increase N until the marginal accuracy gain per additional sample drops below 0.5% (or your threshold). The tool computes this automatically."}}
+      ]
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem","position": 1,"name": "claudflow.com","item": "https://claudflow.com"},
+        {"@type": "ListItem","position": 2,"name": "Tools","item": "https://claudflow.com/tools"},
+        {"@type": "ListItem","position": 3,"name": "Self-Consistency Majority Vote Calculator","item": "https://claudflow.com/tools/self-consistency-majority-vote-calculator"}
+      ]
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f0f12;
+      color: #e8e8ed;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1, h2, h3 { color: #f97316; font-weight: 500; letter-spacing: -0.01em; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .subhead { color: #a0a0b0; margin-bottom: 1.5rem; }
+    .card {
+      background: #1a1a24;
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border: 1px solid #2a2a38;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+    .slider-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.9rem; color: #c0c0d0; margin-bottom: 0.3rem; }
+    input[type="range"] { width: 100%; accent-color: #f97316; background: #2a2a38; height: 6px; border-radius: 10px; }
+    input[type="number"], input[type="text"] { background: #12121c; border: 1px solid #3a3a4a; color: #f0f0f5; padding: 0.5rem 0.75rem; border-radius: 12px; width: 100%; font-size: 1rem; }
+    .value-badge { background: #2a2a38; padding: 0.2rem 0.8rem; border-radius: 40px; font-size: 0.9rem; color: #f97316; font-weight: 500; display: inline-block; margin-left: 0.5rem; }
+    .stat { font-size: 1.2rem; font-weight: 500; }
+    .stat span { color: #f97316; }
+    .table-wrap { overflow-x: auto; margin-top: 0.8rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: #2a2a38; color: #f97316; padding: 0.5rem; text-align: left; }
+    td { padding: 0.4rem 0.5rem; border-bottom: 1px solid #2a2a38; }
+    .green { color: #2ecc71; font-weight: 500; }
+    .yellow { color: #f1c40f; }
+    .red { color: #e74c3c; }
+    .badge { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 40px; font-size: 0.75rem; font-weight: 600; }
+    .badge-green { background: #1e3a2a; color: #2ecc71; }
+    .badge-yellow { background: #3a3520; color: #f1c40f; }
+    .badge-red { background: #3a2020; color: #e74c3c; }
+    canvas { width: 100%; height: auto; background: #12121c; border-radius: 16px; display: block; margin-top: 0.5rem; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .footer { text-align: center; margin-top: 2rem; color: #6a6a7a; font-size: 0.85rem; border-top: 1px solid #2a2a38; padding-top: 1.5rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } }
+    .highlight { background: #1f1f2e; padding: 0.8rem 1rem; border-radius: 16px; border-left: 4px solid #f97316; }
+    .btn { background: #f97316; border: none; color: #0f0f12; font-weight: 600; padding: 0.4rem 1.2rem; border-radius: 40px; cursor: default; }
+  </style>
+
+<meta property="og:title" content="Self-Consistency Majority Vote Calculator | claudflow.com">
+<meta property="og:description" content="Interactive tool for self-consistency prompting: compute majority vote accuracy, optimal N, cost-accuracy trade-off, and break-even analysis. Dark theme...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://claudflow.com/tools/self-consistency-majority-vote-calculator">
+</head>
+<body>
+<div class="container">
+  <h1>🧠 Self-Consistency Majority Vote</h1>
+  <div class="subhead">Interactive calculator · binomial majority vote · cost‑accuracy optimization</div>
+
+  <!-- inputs -->
+  <div class="card">
+    <div class="grid-3">
+      <div class="slider-group">
+        <label>Single‑sample accuracy <strong>p</strong> <span id="pVal" class="value-badge">0.70</span></label>
+        <input type="range" id="pSlider" min="0.30" max="0.99" step="0.01" value="0.70">
+      </div>
+      <div class="slider-group">
+        <label>Number of samples <strong>N</strong> (odd) <span id="nVal" class="value-badge">11</span></label>
+        <input type="range" id="nSlider" min="1" max="51" step="2" value="11">
+      </div>
+      <div class="slider-group">
+        <label>Cost per sample ($) <span id="costVal" class="value-badge">0.10</span></label>
+        <input type="range" id="costSlider" min="0.01" max="2.00" step="0.01" value="0.10">
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top: 0.5rem;">
+      <div><label>Target accuracy (%)</label><input type="number" id="targetAcc" value="90" min="50" max="100" step="0.5"></div>
+      <div><label>Target 2 (%)</label><input type="number" id="targetAcc2" value="95" min="50" max="100" step="0.5"></div>
+      <div><label>Target 3 (%)</label><input type="number" id="targetAcc3" value="99" min="50" max="100" step="0.5"></div>
+    </div>
+  </div>
+
+  <!-- main results -->
+  <div class="grid-2">
+    <div class="card">
+      <h2>📈 Majority accuracy (current N)</h2>
+      <div class="stat" id="majorityDisplay">0.0000</div>
+      <div style="margin-top: 0.5rem; font-size:0.9rem; color:#aaa;">P(majority correct) = <span id="binomDetail"></span></div>
+      <canvas id="accChart" height="200"></canvas>
+      <p style="font-size:0.75rem; color:#777;">Accuracy vs N for baseline p=0.5, 0.7, 0.8 (your p: <span id="pRefChart">0.70</span>)</p>
+    </div>
+    <div class="card">
+      <h2>🎯 Required N for targets</h2>
+      <div id="requiredNList">
+        <div>90%: <span id="req90">—</span></div>
+        <div>95%: <span id="req95">—</span></div>
+        <div>99%: <span id="req99">—</span></div>
+      </div>
+      <div class="highlight" style="margin-top:1rem;">
+        <strong>⚡ Optimal N</strong> (marginal gain < 0.5%): <span id="optimalN">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- cost table + comparison -->
+  <div class="grid-2">
+    <div class="card">
+      <h2>💰 Cost‑accuracy table</h2>
+      <div class="table-wrap"><table id="costTable"><thead><tr><th>N</th><th>Accuracy</th><th>Total cost</th><th>Cost / add. acc. pt</th></tr></thead><tbody id="costTableBody"></tbody></table></div>
+    </div>
+    <div class="card">
+      <h2>⚖️ Comparison & break‑even</h2>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <div><span class="badge badge-green">SC N=10 p=0.7</span> acc: <span id="sc10acc">—</span></div>
+        <div><span class="badge badge-yellow">CoT N=1 p=0.85</span> acc: <span id="cot1acc">—</span></div>
+      </div>
+      <div style="margin-top:0.8rem;"><strong>Break‑even N</strong> (cost‑adjusted): <span id="breakEvenN">—</span> <span style="font-size:0.8rem; color:#aaa;">(when SC accuracy ≥ CoT accuracy given cost)</span></div>
+      <div style="margin-top:0.5rem; font-size:0.9rem;">Marginal gain per sample: <span id="marginalGain">—</span></div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div class="footer">© 2025 claudflow.com</div>
+</div>
+
+<script>
+  (function() {
+    // ----- helpers -----
+    function binom(n, k) {
+      if (k < 0 || k > n) return 0;
+      if (k === 0 || k === n) return 1;
+      // Pascal's triangle up to 51
+      const row = [1];
+      for (let i = 1; i <= n; i++) {
+        row[i] = 1;
+        for (let j = i-1; j > 0; j--) row[j] = row[j] + row[j-1];
+      }
+      return row[k];
+    }
+
+    function majorityProb(p, N) {
+      if (N <= 0) return 0;
+      const ceil = Math.ceil(N/2);
+      let sum = 0;
+      for (let k = ceil; k <= N; k++) {
+        sum += binom(N, k) * Math.pow(p, k) * Math.pow(1-p, N-k);
+      }
+      return Math.min(sum, 1);
+    }
+
+    // ----- DOM refs -----
+    const pSlider = document.getElementById('pSlider');
+    const nSlider = document.getElementById('nSlider');
+    const costSlider = document.getElementById('costSlider');
+    const pVal = document.getElementById('pVal');
+    const nVal = document.getElementById('nVal');
+    const costVal = document.getElementById('costVal');
+    const targetAcc = document.getElementById('targetAcc');
+    const targetAcc2 = document.getElementById('targetAcc2');
+    const targetAcc3 = document.getElementById('targetAcc3');
+    const majorityDisplay = document.getElementById('majorityDisplay');
+    const binomDetail = document.getElementById('binomDetail');
+    const pRefChart = document.getElementById('pRefChart');
+    const req90 = document.getElementById('req90');
+    const req95 = document.getElementById('req95');
+    const req99 = document.getElementById('req99');
+    const optimalN = document.getElementById('optimalN');
+    const costTableBody = document.getElementById('costTableBody');
+    const sc10acc = document.getElementById('sc10acc');
+    const cot1acc = document.getElementById('cot1acc');
+    const breakEvenN = document.getElementById('breakEvenN');
+    const marginalGain = document.getElementById('marginalGain');
+    const canvas = document.getElementById('accChart');
+    const ctx = canvas.getContext('2d');
+
+    // ----- update all -----
+    function updateAll() {
+      const p = parseFloat(pSlider.value);
+      const N = parseInt(nSlider.value, 10);
+      const cost = parseFloat(costSlider.value);
+      const t1 = parseFloat(targetAcc.value) / 100;
+      const t2 = parseFloat(targetAcc2.value) / 100;
+      const t3 = parseFloat(targetAcc3.value) / 100;
+
+      pVal.textContent = p.toFixed(2);
+      nVal.textContent = N;
+      costVal.textContent = cost.toFixed(2);
+      pRefChart.textContent = p.toFixed(2);
+
+      // majority prob
+      const maj = majorityProb(p, N);
+      majorityDisplay.textContent = maj.toFixed(6);
+      binomDetail.textContent = `N=${N}, p=${p.toFixed(2)}`;
+
+      // required N for targets
+      function findNforTarget(target) {
+        if (target <= p) return 1;
+        for (let n = 1; n <= 51; n+=2) {
+          if (majorityProb(p, n) >= target) return n;
+        }
+        return '>51';
+      }
+      const r90 = findNforTarget(t1);
+      const r95 = findNforTarget(t2);
+      const r99 = findNforTarget(t3);
+      req90.textContent = r90;
+      req95.textContent = r95;
+      req99.textContent = r99;
+
+      // optimal N (marginal gain < 0.5%)
+      let optN = 1;
+      let prevAcc = majorityProb(p, 1);
+      for (let n = 3; n <= 51; n+=2) {
+        const curAcc = majorityProb(p, n);
+        const gain = curAcc - prevAcc;
+        if (gain < 0.005) { optN = n-2; break; }
+        prevAcc = curAcc;
+        if (n === 51) optN = 51;
+      }
+      if (optN < 1) optN = 1;
+      optimalN.textContent = optN;
+
+      // cost table (N=1,3,5,... up to 21 or 51)
+      costTableBody.innerHTML = '';
+      const maxRows = Math.min(21, N);
+      let prevAccCost = majorityProb(p, 1);
+      for (let n = 1; n <= maxRows; n+=2) {
+        const acc = majorityProb(p, n);
+        const totalCost = (n * cost);
+        const addCostPt = (n === 1) ? 0 : (totalCost - (n-2)*cost) / ((acc - prevAccCost)*100);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${n}</td><td>${(acc*100).toFixed(2)}%</td><td>$${totalCost.toFixed(3)}</td><td>${n===1 ? '—' : '$'+addCostPt.toFixed(4)}</td>`;
+        costTableBody.appendChild(tr);
+        prevAccCost = acc;
+      }
+
+      // comparison
+      const sc10 = majorityProb(0.7, 10);
+      const cot1 = 0.85;
+      sc10acc.textContent = (sc10*100).toFixed(2)+'%';
+      cot1acc.textContent = (cot1*100).toFixed(2)+'%';
+
+      // break-even: find N where SC accuracy >= CoT accuracy (0.85) given cost? simple: accuracy break-even
+      let beN = 'N/A';
+      for (let n = 1; n <= 51; n+=2) {
+        if (majorityProb(p, n) >= 0.85) { beN = n; break; }
+      }
+      breakEvenN.textContent = beN;
+
+      // marginal gain
+      const curMarg = (N>1) ? (majorityProb(p, N) - majorityProb(p, Math.max(1, N-2))) : 0;
+      marginalGain.textContent = (curMarg*100).toFixed(3) + '%';
+
+      // draw chart
+      drawChart(p);
+    }
+
+    function drawChart(p) {
+      const w = canvas.parentElement.clientWidth - 20;
+      const h = 200;
+      canvas.width = w * window.devicePixelRatio;
+      canvas.height = h * window.devicePixelRatio;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      const pad = {top: 20, bottom: 25, left: 35, right: 15};
+      const plotW = w - pad.left - pad.right;
+      const plotH = h - pad.top - pad.bottom;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#12121c';
+      ctx.fillRect(0, 0, w, h);
+
+      // draw grid
+      ctx.strokeStyle = '#2a2a38';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.top + (plotH * i / 4);
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w-pad.right, y); ctx.stroke();
+      }
+
+      // baseline curves: p=0.5, 0.7, 0.8
+      const baselines = [0.5, 0.7, 0.8];
+      const colors = ['#8e8e9e', '#f97316', '#2ecc71'];
+      const Nmax = 51;
+      const xScale = plotW / (Nmax-1);
+      baselines.forEach((bp, idx) => {
+        ctx.strokeStyle = colors[idx];
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let n = 1; n <= Nmax; n+=2) {
+          const acc = majorityProb(bp, n);
+          const x = pad.left + (n-1) * xScale;
+          const y = pad.top + plotH - (acc * plotH);
+          if (n===1) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        // label
+        ctx.fillStyle = colors[idx];
+        ctx.font = '10px sans-serif';
+        ctx.fillText('p='+bp, pad.left + (Nmax-1)*xScale - 30, pad.top + plotH - (majorityProb(bp, Nmax)*plotH) - 4);
+      });
+
+      // mark current p
+      const curN = parseInt(nSlider.value, 10);
+      const curAcc = majorityProb(parseFloat(pSlider.value), curN);
+      const xCur = pad.left + (curN-1) * xScale;
+      const yCur = pad.top + plotH - (curAcc * plotH);
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.arc(xCur, yCur, 5, 0, 2*Math.PI);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('◉', xCur-6, yCur-8);
+    }
+
+    // ----- event listeners -----
+    [pSlider, nSlider, costSlider, targetAcc, targetAcc2, targetAcc3].forEach(el => el.addEventListener('input', updateAll));
+    window.addEventListener('resize', () => { drawChart(parseFloat(pSlider.value)); });
+
+    // initial
+    updateAll();
+  })();
+</script>
+</body>
+</html>

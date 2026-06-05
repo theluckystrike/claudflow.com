@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Sub-Agent Parallelism Speedup Calculator · Amdahl &</title>
+  <meta name="description" content="Interactive Amdahl's Law & Gustafson's Law calculator for AI agent pipelines. Compute speedup, efficiency, cost, and optimal agent count with real-time charts.">
+  <meta name="keywords" content="Amdahl's Law, Gustafson's Law, sub-agent parallelism, speedup calculator, AI pipeline, orchestration overhead, cost efficiency">
+  <link rel="canonical" href="https://claudflow.com/tools/subagent-parallelism-speedup-calculator">
+  <!-- JSON-LD Schema: WebApplication + FAQPage + BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Sub-Agent Parallelism Speedup Calculator",
+    "url": "https://claudflow.com/tools/subagent-parallelism-speedup-calculator",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "JavaScript enabled",
+    "description": "Interactive Amdahl's Law and Gustafson's Law calculator for AI agent pipelines with cost-speedup tradeoff and optimal agent count.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "claudflow.com"
+    },
+    "mainEntity": [
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Amdahl's Law?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Amdahl's Law calculates the theoretical speedup when a fraction of a task is parallelized. Speedup = 1 / (serial_fraction + parallel_fraction / n_agents). It highlights diminishing returns beyond a certain number of agents."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is Gustafson's Law different?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Gustafson's Law assumes the problem size scales with the number of agents, giving speedup = n_agents - serial_fraction * (n_agents - 1). It often shows better scalability for larger workloads."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do you determine the optimal number of agents?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The calculator finds where marginal speedup per marginal cost is maximized, and also flags when efficiency drops below 50% (diminishing returns)."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com" },
+          { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools" },
+          { "@type": "ListItem", "position": 3, "name": "Sub-Agent Parallelism Speedup Calculator", "item": "https://claudflow.com/tools/subagent-parallelism-speedup-calculator" }
+        ]
+      }
+    ]
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background: #0b0f1a;
+      color: #e2e8f0;
+      padding: 1.2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background: #131926;
+      border-radius: 2rem;
+      padding: 1.8rem 1.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      border: 1px solid #2a3346;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #f97316;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+    }
+    h1 small {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-left: 0.5rem;
+    }
+    .subhead {
+      color: #94a3b8;
+      margin-bottom: 1.8rem;
+      border-left: 4px solid #f97316;
+      padding-left: 1rem;
+      font-size: 0.95rem;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 700px) {
+      .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+      h1 { font-size: 1.5rem; }
+    }
+    .input-card {
+      background: #1a2233;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.2rem;
+      border: 1px solid #2d3a52;
+    }
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    .input-group label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+    .input-group label span {
+      color: #f97316;
+      font-weight: 600;
+    }
+    .input-group input[type="range"] {
+      width: 100%;
+      accent-color: #f97316;
+      background: #2a3346;
+      height: 6px;
+      border-radius: 10px;
+      outline: none;
+    }
+    .input-group input[type="number"] {
+      background: #0f1625;
+      border: 1px solid #2d3a52;
+      color: #f1f5f9;
+      padding: 0.5rem 0.8rem;
+      border-radius: 1rem;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+    .param-row {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .param-row .input-group {
+      flex: 1;
+      min-width: 100px;
+    }
+    .value-badge {
+      background: #0f1625;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      border: 1px solid #f97316;
+      color: #f97316;
+    }
+    .chart-panel {
+      background: #1a2233;
+      border-radius: 1.5rem;
+      padding: 1rem 0.8rem 0.5rem 0.8rem;
+      border: 1px solid #2d3a52;
+    }
+    .chart-panel canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 200px;
+      background: transparent;
+      border-radius: 0.8rem;
+    }
+    .flex-charts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin: 1.8rem 0;
+    }
+    .flex-charts .chart-box {
+      flex: 1 1 280px;
+      min-width: 240px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0 1rem;
+      border-radius: 1rem;
+      background: #1a2233;
+      padding: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #0f1625;
+      color: #f97316;
+      padding: 0.7rem 0.5rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.6rem 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid #2a3346;
+    }
+    tr:last-child td { border-bottom: none; }
+    .highlight-row {
+      background: #1f2b40;
+      font-weight: 500;
+    }
+    .recommendation {
+      background: #1a2233;
+      border-left: 6px solid #f97316;
+      padding: 1rem 1.2rem;
+      border-radius: 1.2rem;
+      margin: 1.2rem 0;
+      font-size: 0.95rem;
+    }
+    .recommendation strong {
+      color: #f97316;
+    }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid #2a3346;
+      padding-top: 1.5rem;
+    }
+    .badge {
+      background: #f97316;
+      color: #0b0f1a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      display: inline-block;
+    }
+    .inline-orange {
+      color: #f97316;
+    }
+  </style>
+
+<meta property="og:title" content="Sub-Agent Parallelism Speedup Calculator · Amdahl &">
+<meta property="og:description" content="Interactive Amdahl">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://claudflow.com/tools/subagent-parallelism-speedup-calculator">
+</head>
+<body>
+<div class="container">
+  <h1>⚡ Sub-Agent Parallelism <small>speedup calculator</small></h1>
+  <div class="subhead">Amdahl’s Law · Gustafson’s Law · cost‑efficiency · optimal agent count</div>
+
+  <!-- inputs -->
+  <div class="grid-2col">
+    <div class="input-card">
+      <div class="input-group">
+        <label>🔹 Serial fraction <span id="serialVal">20</span>%</label>
+        <input type="range" id="serialSlider" min="0" max="100" value="20" step="0.5">
+      </div>
+      <div class="input-group">
+        <label>🔸 Parallel fraction <span id="parallelVal">80</span>%</label>
+        <input type="range" disabled value="80" style="opacity:0.7;">
+      </div>
+      <div class="input-group">
+        <label>🧠 Number of agents <span id="agentCountVal">8</span></label>
+        <input type="range" id="agentSlider" min="1" max="64" value="8" step="1">
+      </div>
+      <div class="param-row">
+        <div class="input-group">
+          <label>⏱️ Agent latency (ms)</label>
+          <input type="number" id="latencyMs" value="120" min="1" step="1">
+        </div>
+        <div class="input-group">
+          <label>⚙️ Orchestration overhead (ms)</label>
+          <input type="number" id="overheadMs" value="15" min="0" step="0.5">
+        </div>
+        <div class="input-group">
+          <label>💲 Cost per agent call ($)</label>
+          <input type="number" id="costPerCall" value="0.002" min="0.0001" step="0.0001">
+        </div>
+      </div>
+    </div>
+    <div class="chart-panel">
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; padding:0 0.3rem;">
+        <span>🚀 Speedup vs agents (Amdahl)</span>
+        <span class="badge">live</span>
+      </div>
+      <canvas id="speedupChart" width="400" height="180"></canvas>
+      <div style="display:flex; gap:1rem; justify-content:center; font-size:0.7rem; color:#94a3b8; margin-top:0.2rem;">
+        <span><span style="color:#f97316;">●</span> 5% serial</span>
+        <span><span style="color:#38bdf8;">●</span> 20% serial</span>
+        <span><span style="color:#a78bfa;">●</span> 50% serial</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- efficiency & cost-speedup charts -->
+  <div class="flex-charts">
+    <div class="chart-box chart-panel">
+      <div style="font-size:0.8rem; padding:0 0.3rem;">📉 Efficiency (speedup / n)</div>
+      <canvas id="efficiencyChart" width="300" height="140"></canvas>
+    </div>
+    <div class="chart-box chart-panel">
+      <div style="font-size:0.8rem; padding:0 0.3rem;">💵 Speedup per dollar</div>
+      <canvas id="costSpeedupChart" width="300" height="140"></canvas>
+    </div>
+  </div>
+
+  <!-- table -->
+  <div class="table-wrap">
+    <table id="resultsTable">
+      <thead><tr><th>Agents</th><th>Speedup (Amdahl)</th><th>Efficiency</th><th>Total Cost ($)</th><th>Cost Efficiency</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- recommendation -->
+  <div class="recommendation" id="recommendationBox">
+    <strong>⚡ Recommendation</strong> <span id="recText">Analyzing agent configuration…</span>
+  </div>
+
+  <div class="footer">© 2025 claudflow.com</div>
+</div>
+
+<script>
+  (function() {
+    // DOM refs
+    const serialSlider = document.getElementById('serialSlider');
+    const serialVal = document.getElementById('serialVal');
+    const parallelVal = document.getElementById('parallelVal');
+    const agentSlider = document.getElementById('agentSlider');
+    const agentCountVal = document.getElementById('agentCountVal');
+    const latencyMs = document.getElementById('latencyMs');
+    const overheadMs = document.getElementById('overheadMs');
+    const costPerCall = document.getElementById('costPerCall');
+
+    const speedupCanvas = document.getElementById('speedupChart');
+    const efficiencyCanvas = document.getElementById('efficiencyChart');
+    const costSpeedupCanvas = document.getElementById('costSpeedupChart');
+    const tableBody = document.getElementById('tableBody');
+    const recText = document.getElementById('recText');
+
+    // chart contexts
+    let ctxSpeed = speedupCanvas.getContext('2d');
+    let ctxEff = efficiencyCanvas.getContext('2d');
+    let ctxCost = costSpeedupCanvas.getContext('2d');
+
+    // helper: get current params
+    function getParams() {
+      const serial = parseFloat(serialSlider.value) / 100; // fraction
+      const n = parseInt(agentSlider.value, 10);
+      const latency = parseFloat(latencyMs.value) || 0;
+      const overhead = parseFloat(overheadMs.value) || 0;
+      const cost = parseFloat(costPerCall.value) || 0;
+      return { serial, n, latency, overhead, cost };
+    }
+
+    // compute speedup (Amdahl) for given n and serial fraction
+    function amdahlSpeedup(serial, n) {
+      if (n === 0) return 1;
+      const parallel = 1 - serial;
+      const denom = serial + parallel / n;
+      return denom > 0 ? 1 / denom : n;
+    }
+
+    // Gustafson speedup (scaled)
+    function gustafsonSpeedup(serial, n) {
+      return n - serial * (n - 1);
+    }
+
+    // efficiency
+    function efficiency(speedup, n) {
+      return n > 0 ? speedup / n : 0;
+    }
+
+    // total cost: n * cost_per_call + orchestration overhead (converted to cost? we treat overhead ms as cost factor? 
+    // but we have cost per call, orchestration overhead per agent (ms) but no $/ms. We'll treat overhead as additive ms cost? 
+    // For cost we use: n * cost_per_call + (overhead * n * 0.001 * some factor?) Actually we keep simple: total cost = n * cost_per_call + (overhead * n * 0.0001) as symbolic? 
+    // Better: total cost = n * cost_per_call + (overhead * n * 0.00005) to represent orchestration cost. But we want clarity: 
+    // Use cost per agent call + orchestration overhead per agent * (some conversion). Let's define: orchestration cost = overhead (ms) * 0.00001 (fake $/ms). 
+    // But to keep it meaningful, we set orchestration cost = (overhead * n * 0.00001). However we want to show cost in dollars.
+    // We'll use: totalCost = n * cost_per_call + (overhead * n * 0.00001) . 
+    // But user can adjust overhead ms. We'll keep conversion factor 0.00001 $/ms.
+    function totalCost(n, costPerCall, overheadMs) {
+      const overheadCost = overheadMs * n * 0.00001; // small contribution
+      return n * costPerCall + overheadCost;
+    }
+
+    // cost efficiency = speedup / totalCost
+    function costEfficiency(speedup, cost) {
+      return cost > 0 ? speedup / cost : 0;
+    }
+
+    // compute optimal agent count (max marginal speedup / marginal cost) brute 1..64
+    function optimalAgentCount(serial, costPerCall, overheadMs) {
+      let bestN = 1;
+      let bestRatio = -Infinity;
+      for (let n = 2; n <= 64; n++) {
+        const sPrev = amdahlSpeedup(serial, n-1);
+        const sCurr = amdahlSpeedup(serial, n);
+        const marginalSpeedup = sCurr - sPrev;
+        const costPrev = totalCost(n-1, costPerCall, overheadMs);
+        const costCurr = totalCost(n, costPerCall, overheadMs);
+        const marginalCost = costCurr - costPrev;
+        if (marginalCost > 0) {
+          const ratio = marginalSpeedup / marginalCost;
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestN = n;
+          }
+        }
+      }
+      return bestN;
+    }
+
+    // draw all charts and table
+    function refreshAll() {
+      const { serial, n, latency, overhead, cost } = getParams();
+      const parallel = 1 - serial;
+      serialVal.textContent = (serial * 100).toFixed(1);
+      parallelVal.textContent = (parallel * 100).toFixed(1);
+      agentCountVal.textContent = n;
+
+      // --- speedup curve (Amdahl) for 3 serial fractions: 5%, 20%, 50% ---
+      drawSpeedupCurves(serial);
+
+      // --- efficiency curve for current serial fraction ---
+      drawEfficiencyCurve(serial, n);
+
+      // --- cost-speedup tradeoff (speedup per dollar) ---
+      drawCostSpeedup(serial, cost, overhead, n);
+
+      // --- table for n=1,2,4,8,16,32 ---
+      const agentList = [1,2,4,8,16,32];
+      let html = '';
+      let bestEff = 0;
+      let bestN = 1;
+      for (let a of agentList) {
+        const s = amdahlSpeedup(serial, a);
+        const eff = efficiency(s, a);
+        const tCost = totalCost(a, cost, overhead);
+        const cEff = costEfficiency(s, tCost);
+        html += `<tr><td>${a}</td><td>${s.toFixed(3)}</td><td>${(eff*100).toFixed(1)}%</td><td>${tCost.toFixed(5)}</td><td>${cEff.toFixed(2)}</td></tr>`;
+        if (eff > bestEff) { bestEff = eff; bestN = a; }
+      }
+      tableBody.innerHTML = html;
+
+      // recommendation: efficiency < 50% => diminishing returns, also optimal agent count
+      const optN = optimalAgentCount(serial, cost, overhead);
+      let rec = '';
+      // find first agent where efficiency < 0.5
+      let dimAgent = 64;
+      for (let a = 1; a <= 64; a++) {
+        const s = amdahlSpeedup(serial, a);
+        const eff = efficiency(s, a);
+        if (eff < 0.5) {
+          dimAgent = a;
+          break;
+        }
+      }
+      if (dimAgent <= n) {
+        rec = `⚠️ Diminishing returns: efficiency < 50% at ${dimAgent} agents. `;
+      } else {
+        rec = `✅ Efficiency remains above 50% up to ${Math.min(64, dimAgent-1)} agents. `;
+      }
+      rec += `Optimal agent count (max marginal speedup/cost) ≈ ${optN}. `;
+      rec += `Current speedup (Amdahl): ${amdahlSpeedup(serial, n).toFixed(3)}x, Gustafson: ${gustafsonSpeedup(serial, n).toFixed(3)}x.`;
+      recText.textContent = rec;
+    }
+
+    // draw speedup curves for 3 serial fractions
+    function drawSpeedupCurves(currentSerial) {
+      const w = speedupCanvas.width, h = speedupCanvas.height;
+      const ctx = ctxSpeed;
+      ctx.clearRect(0, 0, w, h);
+      const fractions = [0.05, 0.20, 0.50];
+      const colors = ['#f97316', '#38bdf8', '#a78bfa'];
+      const maxN = 64;
+      // draw axes
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(20, 10); ctx.lineTo(20, h-15); ctx.lineTo(w-10, h-15);
+      ctx.stroke();
+      // labels
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '8px sans-serif';
+      ctx.fillText('agents', w-30, h-3);
+      ctx.fillText('speedup', 2, 12);
+      // compute max speedup for scaling
+      let maxSp = 0;
+      for (let f of fractions) {
+        for (let i=1; i<=maxN; i++) {
+          const sp = amdahlSpeedup(f, i);
+          if (sp > maxSp) maxSp = sp;
+        }
+      }
+      maxSp = Math.max(maxSp, 10);
+      // draw curves
+      for (let idx=0; idx<fractions.length; idx++) {
+        const f = fractions[idx];
+        ctx.strokeStyle = colors[idx];
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i=1; i<=maxN; i++) {
+          const sp = amdahlSpeedup(f, i);
+          const x = 20 + (i-1)/(maxN-1) * (w-30);
+          const y = h-15 - (sp / maxSp) * (h-25);
+          if (i===1) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      // mark current serial fraction as thicker? but we keep simple
+      // draw dot for current n and current serial
+      const curSp = amdahlSpeedup(currentSerial, parseInt(agentSlider.value));
+      const xCur = 20 + (parseInt(agentSlider.value)-1)/(maxN-1) * (w-30);
+      const yCur = h-15 - (curSp / maxSp) * (h-25);
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(xCur, yCur, 4, 0, 2*Math.PI);
+      ctx.fill();
+    }
+
+    function drawEfficiencyCurve(serial, currentN) {
+      const w = efficiencyCanvas.width, h = efficiencyCanvas.height;
+      const ctx = ctxEff;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(20, 10); ctx.lineTo(20, h-15); ctx.lineTo(w-10, h-15);
+      ctx.stroke();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '7px sans-serif';
+      ctx.fillText('efficiency', 2, 12);
+      // compute
+      const maxN = 64;
+      let maxEff = 1.0;
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i=1; i<=maxN; i++) {
+        const sp = amdahlSpeedup(serial, i);
+        const eff = efficiency(sp, i);
+        const x = 20 + (i-1)/(maxN-1) * (w-30);
+        const y = h-15 - (eff / maxEff) * (h-25);
+        if (i===1) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      // current dot
+      const spCur = amdahlSpeedup(serial, currentN);
+      const effCur = efficiency(spCur, currentN);
+      const xCur = 20 + (currentN-1)/(maxN-1) * (w-30);
+      const yCur = h-15 - (effCur / maxEff) * (h-25);
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(xCur, yCur, 4, 0, 2*Math.PI);
+      ctx.fill();
+    }
+
+    function drawCostSpeedup(serial, costPerCall, overheadMs, currentN) {
+      const w = costSpeedupChart.width, h = costSpeedupChart.height;
+      const ctx = ctxCost;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(20, 10); ctx.lineTo(20, h-15); ctx.lineTo(w-10, h-15);
+      ctx.stroke();
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '7px sans-serif';
+      ctx.fillText('speedup/$', 2, 12);
+      const maxN = 64;
+      // compute max costEff for scaling
+      let maxCE = 0;
+      for (let i=1; i<=maxN; i++) {
+        const sp = amdahlSpeedup(serial, i);
+        const tc = totalCost(i, costPerCall, overheadMs);
+        const ce = costEfficiency(sp, tc);
+        if (ce > maxCE) maxCE = ce;
+      }
+      maxCE = Math.max(maxCE, 0.1);
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i=1; i<=maxN; i++) {
+        const sp = amdahlSpeedup(serial, i);
+        const tc = totalCost(i, costPerCall, overheadMs);
+        const ce = costEfficiency(sp, tc);
+        const x = 20 + (i-1)/(maxN-1) * (w-30);
+        const y = h-15 - (ce / maxCE) * (h-25);
+        if (i===1) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      // current dot
+      const spCur = amdahlSpeedup(serial, currentN);
+      const tcCur = totalCost(currentN, costPerCall, overheadMs);
+      const ceCur = costEfficiency(spCur, tcCur);
+      const xCur = 20 + (currentN-1)/(maxN-1) * (w-30);
+      const yCur = h-15 - (ceCur / maxCE) * (h-25);
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(xCur, yCur, 4, 0, 2*Math.PI);
+      ctx.fill();
+    }
+
+    // event listeners
+    serialSlider.addEventListener('input', refreshAll);
+    agentSlider.addEventListener('input', refreshAll);
+    latencyMs.addEventListener('input', refreshAll);
+    overheadMs.addEventListener('input', refreshAll);
+    costPerCall.addEventListener('input', refreshAll);
+
+    // initial render
+    refreshAll();
+
+    // handle resize: redraw on orientation change (simple)
+    window.addEventListener('resize', () => {
+      // preserve canvas size (fixed)
+      refreshAll();
+    });
+  })();
+</script>
+</body>
+</html>

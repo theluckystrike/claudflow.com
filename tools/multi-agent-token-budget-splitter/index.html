@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Multi-Agent Token Budget Splitter · claudflow</title>
+  <meta name="description" content="Interactive budget allocation tool for multi-agent pipelines. Compare flat, hierarchical & pipeline topologies. Token flow, pie chart, tasks/month curves.">
+  <link rel="canonical" href="https://claudflow.com/tools/multi-agent-token-budget-splitter">
+  <meta name="robots" content="index, follow">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Multi-Agent Token Budget Splitter",
+      "url": "https://claudflow.com/tools/multi-agent-token-budget-splitter",
+      "description": "Allocate token budget across multi-agent pipelines. Compute tasks per month, cost per task, and compare topologies.",
+      "applicationCategory": "AI Configuration Tool",
+      "operatingSystem": "All",
+      "browserRequirements": "JavaScript enabled"
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"How is inter-agent overhead calculated?","acceptedAnswer":{"@type":"Answer","text":"Overhead = avg messages per task × avg tokens per message. Added to total tokens per task."}},
+        {"@type":"Question","name":"Which topology uses least tokens?","acceptedAnswer":{"@type":"Answer","text":"Pipeline typically uses fewest tokens because each agent only sees previous output, reducing context."}},
+        {"@type":"Question","name":"Can I set a monthly dollar budget?","acceptedAnswer":{"@type":"Answer","text":"Yes. Select a model and enter monthly $ budget; the tool converts to token budget using model price."}}
+      ]
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},
+        {"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools"},
+        {"@type":"ListItem","position":3,"name":"Multi-Agent Token Budget Splitter"}
+      ]
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0b0f15;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 1.2rem;
+      line-height: 1.5;
+    }
+    .container { max-width: 1300px; margin: 0 auto; }
+    h1, h2, h3 { color: #f97316; font-weight: 600; letter-spacing: -0.01em; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    h1 small { font-size: 1rem; font-weight: 400; color: #94a3b8; margin-left: 0.5rem; }
+    .subhead { color: #94a3b8; margin-bottom: 2rem; border-left: 4px solid #f97316; padding-left: 1rem; }
+    .card {
+      background: #131a24;
+      border-radius: 24px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border: 1px solid #2a3744;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; }
+    label { display: block; font-size: 0.9rem; font-weight: 500; color: #cbd5e1; margin-bottom: 0.3rem; }
+    input, select, button {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 0.7rem 1rem;
+      border-radius: 40px;
+      font-size: 1rem;
+      width: 100%;
+      transition: 0.2s;
+    }
+    input:focus, select:focus { outline: 2px solid #f97316; border-color: transparent; }
+    button {
+      background: #f97316;
+      color: #0b0f15;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 0.3px;
+    }
+    button:hover { background: #fb923c; transform: scale(0.98); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #f97316;
+      color: #f97316;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-weight: 500;
+    }
+    .btn-outline:hover { background: #f97316; color: #0b0f15; }
+    .flex-row { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; }
+    .agent-row { background: #1a2533; border-radius: 40px; padding: 0.6rem 1rem; margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; }
+    .agent-row select { width: auto; min-width: 120px; }
+    .agent-row input { width: 80px; }
+    .badge { background: #f97316; color: #0b0f15; border-radius: 40px; padding: 0.2rem 0.8rem; font-weight: 600; font-size: 0.8rem; }
+    .stat { background: #1e293b; border-radius: 20px; padding: 0.8rem 1.2rem; text-align: center; }
+    .stat .num { font-size: 1.8rem; font-weight: 700; color: #f97316; }
+    .stat .lbl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th { background: #1e293b; color: #f97316; padding: 0.7rem; text-align: left; }
+    td { padding: 0.6rem 0.7rem; border-bottom: 1px solid #2a3744; }
+    .orange { color: #f97316; }
+    .svg-container { background: #0f172a; border-radius: 20px; padding: 0.5rem; }
+    canvas { max-width: 100%; height: auto; background: #0f172a; border-radius: 20px; }
+    .foot { text-align: center; margin-top: 3rem; color: #64748b; font-size: 0.9rem; border-top: 1px solid #2a3744; padding-top: 1.5rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+
+<meta property="og:title" content="Multi-Agent Token Budget Splitter · claudflow">
+<meta property="og:description" content="Interactive budget allocation tool for multi-agent pipelines. Compare flat, hierarchical & pipeline topologies. Token flow, pie chart, tasks/month curves.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://claudflow.com/tools/multi-agent-token-budget-splitter">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ Multi-Agent Token Budget <span style="color:#e2e8f0;">Splitter</span> <small>claudflow</small></h1>
+    <div class="subhead">Allocate budget · compare topologies · optimize pipeline cost</div>
+  </header>
+
+  <!-- main inputs -->
+  <div class="card">
+    <div class="grid-2">
+      <div>
+        <label>💰 Budget type</label>
+        <select id="budgetType"><option value="token">Token budget (monthly)</option><option value="dollar">$ budget (monthly)</option></select>
+        <div style="margin-top:0.6rem;"><label id="budgetLabel">Total monthly token budget</label><input type="number" id="totalBudget" value="1000000" step="10000" min="1000"></div>
+        <div id="modelSelectWrap" style="display:none; margin-top:0.6rem;"><label>Model (price per 1M tokens)</label>
+          <select id="modelPriceSelect"><option value="15">GPT-4o · $15</option><option value="10">Claude 3.5 Sonnet · $10</option><option value="2">Llama 3 70B · $2</option><option value="0.5">Gemma 2 27B · $0.50</option></select>
+        </div>
+      </div>
+      <div>
+        <label>🤖 Number of agents (1–20)</label>
+        <input type="number" id="numAgents" value="4" min="1" max="20">
+        <label style="margin-top:0.6rem;">📨 Inter-agent overhead</label>
+        <div class="flex-row"><span>avg tokens/message</span><input type="number" id="avgTokensPerMsg" value="50" min="0" style="width:100px;"> <span>avg messages/task</span><input type="number" id="avgMsgsPerTask" value="6" min="0" style="width:80px;"></div>
+        <label style="margin-top:0.6rem;">📅 Tasks per month (for cost calc)</label>
+        <input type="number" id="tasksPerMonth" value="500" min="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent roles -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
+      <h3>🧑‍💻 Agent roles & token allocation</h3>
+      <button id="syncAgentsBtn" class="btn-outline" style="width:auto;">↻ sync to agent count</button>
+    </div>
+    <div id="agentRolesContainer"></div>
+    <p style="color:#94a3b8; font-size:0.8rem; margin-top:0.5rem;">Allocation % should sum to 100 (auto-normalized on compute).</p>
+  </div>
+
+  <!-- Compute -->
+  <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+    <button id="computeBtn" style="flex:2; padding:1rem; font-size:1.2rem;">⚙️ Compute Budget Split</button>
+    <button id="resetDefaultBtn" class="btn-outline" style="flex:1;">Reset defaults</button>
+  </div>
+
+  <!-- Results: stats + pie + flow -->
+  <div class="grid-2">
+    <div class="card">
+      <h3>📊 Budget allocation pie</h3>
+      <canvas id="pieChart" width="300" height="300"></canvas>
+      <div id="pieLegend" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;"></div>
+    </div>
+    <div class="card">
+      <h3>🔁 Token flow diagram (flat example)</h3>
+      <div class="svg-container" id="tokenFlowSvg"><svg viewBox="0 0 320 140" style="width:100%; height:auto;"><text x="10" y="30" fill="#f97316" font-size="12">⚡ orchestrator</text><text x="10" y="60" fill="#94a3b8" font-size="10">→ worker1 (30%)</text><text x="10" y="80" fill="#94a3b8" font-size="10">→ worker2 (30%)</text><text x="10" y="100" fill="#94a3b8" font-size="10">→ worker3 (20%)</text><text x="10" y="120" fill="#94a3b8" font-size="10">→ worker4 (20%)</text></svg></div>
+      <p style="font-size:0.8rem; color:#94a3b8;">Flat topology: orchestrator + N workers (allocation weighted).</p>
+    </div>
+  </div>
+
+  <!-- Topology comparison -->
+  <div class="card">
+    <h3>📐 Topology comparison (flat · hierarchical · pipeline)</h3>
+    <div style="overflow-x:auto;"><table id="topologyTable">
+      <thead><tr><th>Topology</th><th>Total tokens/task</th><th>Max parallel tasks</th><th>Cost/task ($)</th><th>Monthly tasks (budget)</th></tr></thead>
+      <tbody id="topologyBody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- tasks/month curve -->
+  <div class="card">
+    <h3>📈 Tasks/month vs agent count (flat topology)</h3>
+    <canvas id="curveCanvas" width="600" height="250"></canvas>
+  </div>
+
+  <!-- recommendation -->
+  <div class="card" id="recommendationCard">
+    <h3>🧠 Recommendation</h3>
+    <div id="recommendationText" style="background:#1e293b; border-radius:20px; padding:1rem;">Based on budget and overhead, <span class="orange">pipeline</span> topology yields lowest cost per task for your configuration.</div>
+  </div>
+
+  <!-- FAQ (schema already included) -->
+  <div class="card">
+    <h3>❓ FAQ</h3>
+    <ul style="list-style: none; color:#cbd5e1;">
+      <li><strong class="orange">How is inter-agent overhead calculated?</strong> Overhead = avg messages per task × avg tokens per message. Added to total tokens per task.</li>
+      <li><strong class="orange">Which topology uses least tokens?</strong> Pipeline typically uses fewest tokens because each agent only sees previous output, reducing context.</li>
+      <li><strong class="orange">Can I set a monthly dollar budget?</strong> Yes. Select a model and enter monthly $ budget; the tool converts to token budget using model price.</li>
+    </ul>
+  </div>
+
+  <footer class="foot">© 2025 claudflow.com</footer>
+</div>
+
+<script>
+  (function() {
+    // DOM refs
+    const budgetType = document.getElementById('budgetType');
+    const totalBudgetInput = document.getElementById('totalBudget');
+    const modelSelectWrap = document.getElementById('modelSelectWrap');
+    const modelPriceSelect = document.getElementById('modelPriceSelect');
+    const numAgentsInput = document.getElementById('numAgents');
+    const avgTokensPerMsg = document.getElementById('avgTokensPerMsg');
+    const avgMsgsPerTask = document.getElementById('avgMsgsPerTask');
+    const tasksPerMonthInput = document.getElementById('tasksPerMonth');
+    const agentContainer = document.getElementById('agentRolesContainer');
+    const syncBtn = document.getElementById('syncAgentsBtn');
+    const computeBtn = document.getElementById('computeBtn');
+    const resetBtn = document.getElementById('resetDefaultBtn');
+    const pieCanvas = document.getElementById('pieChart');
+    const pieLegend = document.getElementById('pieLegend');
+    const flowSvg = document.getElementById('tokenFlowSvg');
+    const topBody = document.getElementById('topologyBody');
+    const curveCanvas = document.getElementById('curveCanvas');
+    const recText = document.getElementById('recommendationText');
+
+    const roleOptions = ['orchestrator','researcher','coder','reviewer','executor','summarizer'];
+
+    // default agents
+    let agents = [
+      { role: 'orchestrator', pct: 25 },
+      { role: 'researcher', pct: 25 },
+      { role: 'coder', pct: 25 },
+      { role: 'reviewer', pct: 25 }
+    ];
+
+    function renderAgentRows() {
+      const n = parseInt(numAgentsInput.value) || 4;
+      // adjust agents array length
+      while (agents.length < n) agents.push({ role: 'executor', pct: 10 });
+      while (agents.length > n) agents.pop();
+      // ensure percentages roughly sum
+      let html = '';
+      agents.forEach((a, i) => {
+        html += `<div class="agent-row">
+          <select data-idx="${i}" class="roleSelect">${roleOptions.map(r => `<option value="${r}" ${r===a.role?'selected':''}>${r}</option>`).join('')}</select>
+          <input type="number" class="pctInput" data-idx="${i}" value="${a.pct}" min="0" max="100" step="1" style="width:70px;"> <span>%</span>
+          <button class="btn-outline removeAgent" data-idx="${i}" style="width:auto; padding:0.2rem 0.8rem;">✕</button>
+        </div>`;
+      });
+      agentContainer.innerHTML = html;
+      // attach events
+      document.querySelectorAll('.roleSelect').forEach(el => el.addEventListener('change', onAgentChange));
+      document.querySelectorAll('.pctInput').forEach(el => el.addEventListener('input', onAgentChange));
+      document.querySelectorAll('.removeAgent').forEach(el => el.addEventListener('click', function(e) {
+        const idx = parseInt(this.dataset.idx);
+        if (agents.length > 1) {
+          agents.splice(idx,1);
+          numAgentsInput.value = agents.length;
+          renderAgentRows();
+        }
+      }));
+    }
+
+    function onAgentChange(e) {
+      const idx = parseInt(e.target.dataset.idx);
+      const role = document.querySelector(`.roleSelect[data-idx="${idx}"]`).value;
+      const pct = parseFloat(document.querySelector(`.pctInput[data-idx="${idx}"]`).value) || 0;
+      agents[idx] = { role, pct };
+    }
+
+    // sync agents to count
+    syncBtn.addEventListener('click', function() {
+      const n = parseInt(numAgentsInput.value) || 4;
+      while (agents.length < n) agents.push({ role: 'executor', pct: 10 });
+      while (agents.length > n) agents.pop();
+      renderAgentRows();
+    });
+
+    // budget type toggle
+    budgetType.addEventListener('change', function() {
+      if (this.value === 'dollar') {
+        modelSelectWrap.style.display = 'block';
+        document.getElementById('budgetLabel').textContent = 'Monthly $ budget';
+        totalBudgetInput.value = 200;
+      } else {
+        modelSelectWrap.style.display = 'none';
+        document.getElementById('budgetLabel').textContent = 'Total monthly token budget';
+        totalBudgetInput.value = 1000000;
+      }
+    });
+
+    // compute core
+    function compute() {
+      // read agents from UI
+      const n = parseInt(numAgentsInput.value) || 4;
+      const roleSelects = document.querySelectorAll('.roleSelect');
+      const pctInputs = document.querySelectorAll('.pctInput');
+      let ags = [];
+      roleSelects.forEach((sel, i) => {
+        const pct = parseFloat(pctInputs[i]?.value) || 0;
+        ags.push({ role: sel.value, pct });
+      });
+      if (ags.length === 0) ags = agents;
+      agents = ags;
+
+      // normalize percentages
+      let totalPct = agents.reduce((s, a) => s + a.pct, 0);
+      if (totalPct === 0) totalPct = 1;
+      const normAgents = agents.map(a => ({ ...a, pct: a.pct / totalPct }));
+
+      // budget
+      let totalBudgetTokens = parseFloat(totalBudgetInput.value) || 1000000;
+      if (budgetType.value === 'dollar') {
+        const pricePerM = parseFloat(modelPriceSelect.value) || 15;
+        totalBudgetTokens = (totalBudgetTokens / pricePerM) * 1e6;
+      }
+      const overheadPerTask = (parseFloat(avgTokensPerMsg.value)||0) * (parseFloat(avgMsgsPerTask.value)||0);
+      const tasksPerMonth = parseFloat(tasksPerMonthInput.value) || 500;
+
+      // compute per topology
+      // flat: orchestrator sees all -> sum agent tokens + overhead
+      const sumAgentTokensFlat = normAgents.reduce((s, a) => s + a.pct * 1000, 0); // scale
+      const flatTokens = sumAgentTokensFlat + overheadPerTask;
+      // hierarchical: orchestrator sees sub-orch -> assume 20% reduction
+      const hierTokens = sumAgentTokensFlat * 0.8 + overheadPerTask;
+      // pipeline: sequential, each sees only previous -> assume 60% of flat
+      const pipeTokens = sumAgentTokensFlat * 0.6 + overheadPerTask;
+
+      const modelPrice = budgetType.value === 'dollar' ? parseFloat(modelPriceSelect.value) : 15;
+      const costPerTaskFlat = (flatTokens / 1e6) * modelPrice;
+      const costPerTaskHier = (hierTokens / 1e6) * modelPrice;
+      const costPerTaskPipe = (pipeTokens / 1e6) * modelPrice;
+
+      const maxParallelFlat = Math.floor(totalBudgetTokens / flatTokens);
+      const maxParallelHier = Math.floor(totalBudgetTokens / hierTokens);
+      const maxParallelPipe = Math.floor(totalBudgetTokens / pipeTokens);
+
+      const monthlyTasksFlat = Math.floor(totalBudgetTokens / flatTokens);
+      const monthlyTasksHier = Math.floor(totalBudgetTokens / hierTokens);
+      const monthlyTasksPipe = Math.floor(totalBudgetTokens / pipeTokens);
+
+      // update table
+      topBody.innerHTML = `
+        <tr><td>⚡ Flat</td><td>${flatTokens.toFixed(0)}</td><td>${maxParallelFlat}</td><td>${costPerTaskFlat.toFixed(4)}</td><td>${monthlyTasksFlat}</td></tr>
+        <tr><td>🏛️ Hierarchical</td><td>${hierTokens.toFixed(0)}</td><td>${maxParallelHier}</td><td>${costPerTaskHier.toFixed(4)}</td><td>${monthlyTasksHier}</td></tr>
+        <tr><td>🔗 Pipeline</td><td>${pipeTokens.toFixed(0)}</td><td>${maxParallelPipe}</td><td>${costPerTaskPipe.toFixed(4)}</td><td>${monthlyTasksPipe}</td></tr>
+      `;
+
+      // recommendation
+      let best = 'pipeline';
+      let minCost = costPerTaskPipe;
+      if (costPerTaskFlat < minCost) { minCost = costPerTaskFlat; best = 'flat'; }
+      if (costPerTaskHier < minCost) { minCost = costPerTaskHier; best = 'hierarchical'; }
+      recText.innerHTML = `Based on budget and overhead, <span class="orange">${best}</span> topology yields lowest cost per task ($${minCost.toFixed(4)}).`;
+
+      // pie chart
+      drawPie(normAgents);
+      // flow svg
+      drawFlow(normAgents);
+      // curve
+      drawCurve(totalBudgetTokens, overheadPerTask, modelPrice);
+    }
+
+    function drawPie(normAgents) {
+      const ctx = pieCanvas.getContext('2d');
+      const w = pieCanvas.width, h = pieCanvas.height;
+      ctx.clearRect(0,0,w,h);
+      const cx = w/2, cy = h/2, r = Math.min(cx,cy)-20;
+      let start = -Math.PI/2;
+      const colors = ['#f97316','#3b82f6','#22c55e','#eab308','#a855f7','#ec4899','#14b8a6','#f43f5e'];
+      pieLegend.innerHTML = '';
+      normAgents.forEach((a,i) => {
+        const slice = a.pct * 2 * Math.PI;
+        const col = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,r,start,start+slice);
+        ctx.closePath();
+        ctx.fillStyle = col;
+        ctx.fill();
+        // legend
+        const span = document.createElement('span');
+        span.style.cssText = `display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;`;
+        span.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${col};"></span>${a.role} ${(a.pct*100).toFixed(0)}%`;
+        pieLegend.appendChild(span);
+        start += slice;
+      });
+    }
+
+    function drawFlow(normAgents) {
+      let svg = `<svg viewBox="0 0 320 ${40 + normAgents.length * 28}" style="width:100%;height:auto;">`;
+      svg += `<text x="10" y="24" fill="#f97316" font-size="13" font-weight="600">orchestrator</text>`;
+      normAgents.forEach((a,i) => {
+        if (a.role === 'orchestrator' && i>0) return;
+        const y = 50 + i*26;
+        svg += `<text x="20" y="${y}" fill="#94a3b8" font-size="11">→ ${a.role} (${(a.pct*100).toFixed(0)}%)</text>`;
+      });
+      svg += `</svg>`;
+      flowSvg.innerHTML = svg;
+    }
+
+    function drawCurve(totalBudget, overhead, modelPrice) {
+      const ctx = curveCanvas.getContext('2d');
+      const w = curveCanvas.width, h = curveCanvas.height;
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0,0,w,h);
+      // compute tasks for agent count 1..12
+      const points = [];
+      for (let n=1; n<=12; n++) {
+        let sumTokens = 0;
+        for (let i=0; i<n; i++) sumTokens += (1000/n);
+        const tokensPerTask = sumTokens + overhead;
+        const tasks = Math.floor(totalBudget / tokensPerTask);
+        points.push(tasks);
+      }
+      const maxTasks = Math.max(...points, 1);
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      points.forEach((t,i) => {
+        const x = 30 + i*(w-50)/12;
+        const y = h - 20 - (t/maxTasks)*(h-40);
+        i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      ctx.fillStyle = '#f97316';
+      points.forEach((t,i) => {
+        const x = 30 + i*(w-50)/12;
+        const y = h - 20 - (t/maxTasks)*(h-40);
+        ctx.beginPath(); ctx.arc(x,y,3,0,2*Math.PI); ctx.fill();
+      });
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '9px sans-serif';
+      ctx.fillText('agents →', w-60, h-5);
+    }
+
+    // reset
+    resetBtn.addEventListener('click', function() {
+      budgetType.value = 'token';
+      modelSelectWrap.style.display = 'none';
+      totalBudgetInput.value = 1000000;
+      numAgentsInput.value = 4;
+      avgTokensPerMsg.value = 50;
+      avgMsgsPerTask.value = 6;
+      tasksPerMonthInput.value = 500;
+      agents = [{ role: 'orchestrator', pct: 25 },{ role: 'researcher', pct: 25 },{ role: 'coder', pct: 25 },{ role: 'reviewer', pct: 25 }];
+      renderAgentRows();
+      compute();
+    });
+
+    computeBtn.addEventListener('click', compute);
+    // init
+    renderAgentRows();
+    compute();
+    // extra triggers
+    numAgentsInput.addEventListener('change', function() {
+      const n = parseInt(this.value) || 4;
+      while (agents.length < n) agents.push({ role: 'executor', pct: 10 });
+      while (agents.length > n) agents.pop();
+      renderAgentRows();
+    });
+  })();
+</script>
+</body>
+</html>

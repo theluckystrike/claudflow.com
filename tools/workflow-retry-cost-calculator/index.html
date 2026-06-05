@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Agentic Workflow Retry Cost Calculator | claudflow.com</title>
+  <meta name="description" content="Model multi-step agentic workflows with retries. Compute expected cost, success rate, cost multiplier, and fragile steps. Dark theme, mobile-ready.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/workflow-retry-cost-calculator">
+  <!-- JSON-LD schemas: WebApplication, FAQPage, BreadcrumbList -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Agentic Workflow Retry Cost Calculator",
+      "url": "https://claudflow.com/tools/workflow-retry-cost-calculator",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "JavaScript enabled",
+      "description": "Interactive cost modeling for multi-step agentic workflows with retry strategies. Compute expected attempts, cost, success rate, and sensitivity."
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How is expected attempts per step calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Expected attempts = sum_{k=0}^{maxRetries} k * (1-p)^k * p, where p = success probability per attempt. This geometric series accounts for up to maxRetries retries."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does the cost multiplier mean?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cost multiplier = expected total cost (with retries) / baseline cost (no failures). It shows how much retries inflate the original cost."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I interpret 'most fragile step'?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The step with the highest expected cost contribution (cost per attempt × expected attempts) is the biggest cost driver, indicating fragility."
+          }
+        }
+      ]
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools" },
+        { "@type": "ListItem", "position": 3, "name": "Workflow Retry Cost Calculator", "item": "https://claudflow.com/tools/workflow-retry-cost-calculator" }
+      ]
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #0b0f1a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 1.2rem;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      color: #f97316;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .subhead {
+      color: #94a3b8;
+      margin-bottom: 1.8rem;
+      font-size: 0.95rem;
+      border-left: 3px solid #f97316;
+      padding-left: 0.75rem;
+    }
+    .card {
+      background: #131a2a;
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1.8rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      border: 1px solid #1e2a3e;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+    .badge {
+      background: #f97316;
+      color: #0b0f1a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.3px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .step-item {
+      background: #0f1625;
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      border-left: 4px solid #f97316;
+      transition: 0.2s;
+    }
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .step-name {
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .step-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.8rem 1.2rem;
+      margin-top: 0.6rem;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem 0.6rem;
+      flex-wrap: wrap;
+    }
+    .control-group label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    input, select {
+      background: #1a2337;
+      border: 1px solid #2d3a52;
+      color: #f1f5f9;
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      width: 80px;
+      transition: 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(249,115,22,0.3);
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button {
+      opacity: 0.5;
+    }
+    .btn {
+      background: #f97316;
+      border: none;
+      color: #0b0f1a;
+      font-weight: 600;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(249,115,22,0.3);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #f97316;
+      color: #f97316;
+      box-shadow: none;
+    }
+    .btn-outline:hover {
+      background: #f97316;
+      color: #0b0f1a;
+    }
+    .btn-sm {
+      padding: 0.3rem 1rem;
+      font-size: 0.75rem;
+    }
+    .btn-danger {
+      background: #b91c1c;
+      border-color: #b91c1c;
+      color: white;
+      box-shadow: none;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th {
+      text-align: left;
+      padding: 0.6rem 0.4rem;
+      color: #94a3b8;
+      font-weight: 500;
+      border-bottom: 1px solid #1e2a3e;
+    }
+    td {
+      padding: 0.5rem 0.4rem;
+      border-bottom: 1px solid #1a2337;
+    }
+    .highlight-orange {
+      color: #f97316;
+      font-weight: 600;
+    }
+    .highlight-warning {
+      background: rgba(249,115,22,0.15);
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .stat-card {
+      background: #0f1625;
+      padding: 0.8rem 1rem;
+      border-radius: 16px;
+      border: 1px solid #1e2a3e;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #64748b;
+      letter-spacing: 0.3px;
+    }
+    .stat-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .fragile-tag {
+      background: #f97316;
+      color: #0b0f1a;
+      border-radius: 30px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .rec-box {
+      background: #0f1625;
+      border-radius: 16px;
+      padding: 1rem;
+      margin-top: 0.8rem;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      color: #475569;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e2a3e;
+      padding-top: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .step-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .control-group {
+        justify-content: space-between;
+      }
+      input, select {
+        width: 100%;
+      }
+    }
+  </style>
+
+<meta property="og:title" content="Agentic Workflow Retry Cost Calculator | claudflow.com">
+<meta property="og:description" content="Model multi-step agentic workflows with retries. Compute expected cost, success rate, cost multiplier, and fragile steps. Dark theme, mobile-ready.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://claudflow.com/tools/workflow-retry-cost-calculator">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚙️ Agentic Workflow Retry Cost</h1>
+    <div class="subhead">Multi-step · retry strategies · expected cost & success · sensitivity</div>
+  </header>
+
+  <!-- Workflow builder -->
+  <div class="card">
+    <div class="card-header">
+      <h2>🧩 Steps</h2>
+      <div>
+        <button class="btn btn-sm" id="addStepBtn">+ Add step</button>
+        <span class="badge" id="stepCounter">0 / 10</span>
+      </div>
+    </div>
+    <div id="stepListContainer" class="step-list"></div>
+    <div style="margin-top: 1rem; display: flex; gap: 0.8rem; flex-wrap: wrap;">
+      <button class="btn" id="computeBtn">▶ Compute & analyze</button>
+      <button class="btn btn-outline btn-sm" id="resetDefaultBtn">Reset defaults</button>
+    </div>
+  </div>
+
+  <!-- Results: step table + pipeline stats -->
+  <div class="card" id="resultsCard">
+    <div class="card-header">
+      <h2>📊 Results</h2>
+      <span class="badge">live</span>
+    </div>
+    <div id="resultsContent">
+      <div style="color:#94a3b8; padding: 1rem 0;">Add steps and click "Compute & analyze"</div>
+    </div>
+  </div>
+
+  <!-- FAQ (schema) -->
+  <div class="card" style="background: #0f1625;">
+    <h3 style="margin-bottom: 0.8rem;">❓ Quick FAQ</h3>
+    <div style="display: grid; gap: 1rem;">
+      <div><strong style="color:#f97316;">Expected attempts?</strong> <span style="color:#cbd5e1;">Geometric series: Σ k·(1-p)^k·p up to maxRetries.</span></div>
+      <div><strong style="color:#f97316;">Cost multiplier?</strong> <span style="color:#cbd5e1;">Expected cost / baseline (no failures).</span></div>
+      <div><strong style="color:#f97316;">Most fragile step?</strong> <span style="color:#cbd5e1;">Step with highest expected cost contribution.</span></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    © 2025 claudflow.com
+  </footer>
+</div>
+
+<script>
+  (function() {
+    // ----- state -----
+    let steps = []; // array of { id, name, successProb, tokens, costPerAttempt, maxRetries, backoffType, baseMultiplier }
+    let stepIdCounter = 0;
+
+    // DOM refs
+    const stepListEl = document.getElementById('stepListContainer');
+    const stepCounterEl = document.getElementById('stepCounter');
+    const resultsContent = document.getElementById('resultsContent');
+    const addBtn = document.getElementById('addStepBtn');
+    const computeBtn = document.getElementById('computeBtn');
+    const resetBtn = document.getElementById('resetDefaultBtn');
+
+    // ----- helpers -----
+    function generateId() { return ++stepIdCounter; }
+
+    // ----- default step factory -----
+    function createDefaultStep(id) {
+      return {
+        id: id || generateId(),
+        name: `Step ${steps.length+1}`,
+        successProb: 80,
+        tokens: 500,
+        costPerAttempt: 0.02,
+        maxRetries: 2,
+        backoffType: 'fixed',
+        baseMultiplier: 1.5
+      };
+    }
+
+    // ----- render steps -----
+    function renderSteps() {
+      if (!stepListEl) return;
+      if (steps.length === 0) {
+        stepListEl.innerHTML = `<div style="color:#64748b; padding: 1rem 0;">No steps yet. Add up to 10.</div>`;
+        stepCounterEl.textContent = `0 / 10`;
+        return;
+      }
+      let html = '';
+      steps.forEach((step, idx) => {
+        html += `
+          <div class="step-item" data-step-id="${step.id}">
+            <div class="step-header">
+              <span class="step-name">${escapeHtml(step.name)}</span>
+              <button class="btn btn-danger btn-sm remove-step-btn" data-id="${step.id}" style="padding:0.2rem 0.8rem;">✕</button>
+            </div>
+            <div class="step-controls">
+              <div class="control-group"><label>Name</label><input type="text" class="step-field" data-field="name" value="${escapeHtml(step.name)}" style="width:100px;"></div>
+              <div class="control-group"><label>Success %</label><input type="number" class="step-field" data-field="successProb" min="1" max="100" value="${step.successProb}" style="width:70px;"></div>
+              <div class="control-group"><label>Tokens</label><input type="number" class="step-field" data-field="tokens" min="0" value="${step.tokens}" style="width:70px;"></div>
+              <div class="control-group"><label>Cost/attempt $</label><input type="number" class="step-field" data-field="costPerAttempt" min="0" step="0.001" value="${step.costPerAttempt}" style="width:80px;"></div>
+              <div class="control-group"><label>Max retries</label><input type="number" class="step-field" data-field="maxRetries" min="0" max="10" value="${step.maxRetries}" style="width:60px;"></div>
+              <div class="control-group"><label>Backoff</label>
+                <select class="step-field" data-field="backoffType">
+                  <option value="none" ${step.backoffType==='none'?'selected':''}>none</option>
+                  <option value="fixed" ${step.backoffType==='fixed'?'selected':''}>fixed</option>
+                  <option value="exponential" ${step.backoffType==='exponential'?'selected':''}>exponential</option>
+                </select>
+              </div>
+              <div class="control-group"><label>Base mult.</label><input type="number" class="step-field" data-field="baseMultiplier" min="1" step="0.1" value="${step.baseMultiplier}" style="width:60px;"></div>
+            </div>
+          </div>
+        `;
+      });
+      stepListEl.innerHTML = html;
+      stepCounterEl.textContent = `${steps.length} / 10`;
+
+      // attach remove listeners
+      document.querySelectorAll('.remove-step-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const id = parseInt(this.dataset.id);
+          removeStepById(id);
+        });
+      });
+
+      // attach input change listeners
+      document.querySelectorAll('.step-field').forEach(input => {
+        input.addEventListener('change', function(e) {
+          const stepItem = this.closest('.step-item');
+          if (!stepItem) return;
+          const stepId = parseInt(stepItem.dataset.stepId);
+          const field = this.dataset.field;
+          const step = steps.find(s => s.id === stepId);
+          if (!step) return;
+          let val = this.value;
+          if (field === 'name') { step.name = val; }
+          else if (field === 'successProb') { step.successProb = clamp(Number(val), 1, 100); }
+          else if (field === 'tokens') { step.tokens = Math.max(0, Number(val)); }
+          else if (field === 'costPerAttempt') { step.costPerAttempt = Math.max(0, Number(val)); }
+          else if (field === 'maxRetries') { step.maxRetries = clamp(Number(val), 0, 10); }
+          else if (field === 'backoffType') { step.backoffType = val; }
+          else if (field === 'baseMultiplier') { step.baseMultiplier = Math.max(1, Number(val)); }
+          // update display if needed
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"]/g, function(m) {
+        if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;';
+        return m;
+      });
+    }
+
+    function clamp(v, min, max) { return Math.min(max, Math.max(min, Number(v))); }
+
+    // ----- step mutations -----
+    function addStep() {
+      if (steps.length >= 10) return;
+      const newStep = createDefaultStep(generateId());
+      steps.push(newStep);
+      renderSteps();
+    }
+
+    function removeStepById(id) {
+      steps = steps.filter(s => s.id !== id);
+      renderSteps();
+    }
+
+    function resetDefault() {
+      steps = [];
+      for (let i=0; i<3; i++) {
+        const s = createDefaultStep(generateId());
+        s.name = `Step ${i+1}`;
+        s.successProb = 80;
+        s.tokens = 500;
+        s.costPerAttempt = 0.02;
+        s.maxRetries = 2;
+        s.backoffType = 'fixed';
+        s.baseMultiplier = 1.5;
+        steps.push(s);
+      }
+      // customize a bit
+      if (steps[0]) { steps[0].name = 'LLM call'; steps[0].successProb = 85; steps[0].costPerAttempt = 0.05; }
+      if (steps[1]) { steps[1].name = 'Tool invoke'; steps[1].successProb = 75; steps[1].costPerAttempt = 0.03; }
+      if (steps[2]) { steps[2].name = 'Validation'; steps[2].successProb = 90; steps[2].costPerAttempt = 0.01; }
+      renderSteps();
+      computeResults();
+    }
+
+    // ----- computation engine -----
+    function computeResults() {
+      if (!steps.length) {
+        resultsContent.innerHTML = `<div style="color:#94a3b8; padding: 1rem 0;">Add steps and click "Compute & analyze"</div>`;
+        return;
+      }
+
+      // gather fresh values from inputs
+      steps.forEach(step => {
+        const item = document.querySelector(`.step-item[data-step-id="${step.id}"]`);
+        if (!item) return;
+        const nameInput = item.querySelector('input[data-field="name"]');
+        if (nameInput) step.name = nameInput.value;
+        const probInput = item.querySelector('input[data-field="successProb"]');
+        if (probInput) step.successProb = clamp(Number(probInput.value), 1, 100);
+        const tokenInput = item.querySelector('input[data-field="tokens"]');
+        if (tokenInput) step.tokens = Math.max(0, Number(tokenInput.value));
+        const costInput = item.querySelector('input[data-field="costPerAttempt"]');
+        if (costInput) step.costPerAttempt = Math.max(0, Number(costInput.value));
+        const retryInput = item.querySelector('input[data-field="maxRetries"]');
+        if (retryInput) step.maxRetries = clamp(Number(retryInput.value), 0, 10);
+        const backSelect = item.querySelector('select[data-field="backoffType"]');
+        if (backSelect) step.backoffType = backSelect.value;
+        const multInput = item.querySelector('input[data-field="baseMultiplier"]');
+        if (multInput) step.baseMultiplier = Math.max(1, Number(multInput.value));
+      });
+
+      // compute per step
+      let stepResults = [];
+      let totalExpectedCost = 0;
+      let totalBaselineCost = 0;
+      let totalExpectedAttempts = 0;
+      let totalRetryTokens = 0;
+      let pipelineSuccessRate = 1;
+
+      steps.forEach(step => {
+        const p = step.successProb / 100;
+        const q = 1 - p;
+        const maxR = step.maxRetries;
+        // expected attempts = sum_{k=0}^{maxR} k * q^k * p   (if p>0)
+        let expectedAttempts = 0;
+        if (p > 0) {
+          for (let k = 0; k <= maxR; k++) {
+            expectedAttempts += k * Math.pow(q, k) * p;
+          }
+          // add final failure term? geometric series with retries: if all retries fail, we still have attempts = maxR+1? but we treat as expected attempts given success or final failure.
+          // standard: expected attempts = (1 - q^{maxR+1}) / p   (including success and failure)
+          // but we want expected attempts until success or exhaustion. Use formula: (1 - q^{maxR+1}) / p
+          // However we want sum_{k=0}^{maxR} k * q^k * p  = (q - (maxR+1)*q^{maxR+1} + maxR*q^{maxR+2}) / (1-q)   but simpler:
+          // Use closed form: E = (1 - q^{maxR+1}) / p   (including final attempt)
+          // For clarity, we compute numeric sum:
+          let sumAttempts = 0;
+          for (let k = 0; k <= maxR; k++) {
+            sumAttempts += (k+1) * Math.pow(q, k) * p; // attempts count (1-based)
+          }
+          // add final failure case: probability q^{maxR+1} * (maxR+1)
+          sumAttempts += Math.pow(q, maxR+1) * (maxR+1);
+          expectedAttempts = sumAttempts;
+        } else {
+          expectedAttempts = maxR+1;
+        }
+
+        const costPer = step.costPerAttempt;
+        const expectedCost = expectedAttempts * costPer;
+        const baselineCost = costPer; // 1 attempt
+        const stepSuccessWithRetries = 1 - Math.pow(q, maxR+1);
+        const retryTokens = (expectedAttempts - 1) * step.tokens; // overhead
+
+        stepResults.push({
+          name: step.name,
+          successProb: p,
+          maxRetries: maxR,
+          expectedAttempts: expectedAttempts,
+          expectedCost: expectedCost,
+          baselineCost: baselineCost,
+          stepSuccessRate: stepSuccessWithRetries,
+          retryTokens: retryTokens,
+          tokensPerAttempt: step.tokens
+        });
+
+        totalExpectedCost += expectedCost;
+        totalBaselineCost += baselineCost;
+        totalExpectedAttempts += expectedAttempts;
+        totalRetryTokens += retryTokens;
+        pipelineSuccessRate *= stepSuccessWithRetries;
+      });
+
+      // cost multiplier
+      const costMultiplier = totalBaselineCost > 0 ? totalExpectedCost / totalBaselineCost : 1;
+
+      // most fragile step (highest expected cost)
+      let maxCost = -1;
+      let fragileStepName = '';
+      stepResults.forEach(r => {
+        if (r.expectedCost > maxCost) {
+          maxCost = r.expectedCost;
+          fragileStepName = r.name;
+        }
+      });
+
+      // recommendation: steps with success rate < 0.9 or high cost impact -> human-in-the-loop
+      let recSteps = stepResults.filter(r => r.stepSuccessRate < 0.9 || r.expectedCost > 0.1).map(r => r.name);
+      if (recSteps.length === 0) recSteps = ['All steps are robust'];
+
+      // ----- render results -----
+      let html = `
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Pipeline success</div><div class="stat-value" style="color:${pipelineSuccessRate<0.8?'#f97316':'#4ade80'}">${(pipelineSuccessRate*100).toFixed(1)}%</div>${pipelineSuccessRate<0.8?' <span class="highlight-warning">needs attention</span>':''}</div>
+          <div class="stat-card"><div class="stat-label">Expected total cost</div><div class="stat-value">$${totalExpectedCost.toFixed(4)}</div></div>
+          <div class="stat-card"><div class="stat-label">Baseline cost (no retry)</div><div class="stat-value">$${totalBaselineCost.toFixed(4)}</div></div>
+          <div class="stat-card"><div class="stat-label">Cost multiplier</div><div class="stat-value">${costMultiplier.toFixed(3)}×</div></div>
+          <div class="stat-card"><div class="stat-label">Mean attempts</div><div class="stat-value">${totalExpectedAttempts.toFixed(2)}</div></div>
+          <div class="stat-card"><div class="stat-label">Retry token overhead</div><div class="stat-value">${Math.round(totalRetryTokens)}</div></div>
+        </div>
+        <div style="margin: 1rem 0 0.5rem;"><span class="fragile-tag">⚠️ Most fragile step: ${escapeHtml(fragileStepName)}</span></div>
+        <div class="rec-box"><strong style="color:#f97316;">🧠 Human-in-the-loop checkpoints recommended for:</strong> ${recSteps.map(s=>escapeHtml(s)).join(', ')}</div>
+        <h3 style="margin-top:1.5rem;">Step-by-step details</h3>
+        <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Step</th><th>Success %</th><th>Max retries</th><th>Expected attempts</th><th>Expected cost $</th><th>Step success rate</th><th>Retry tokens</th></tr></thead>
+          <tbody>
+      `;
+      stepResults.forEach(r => {
+        html += `<tr><td>${escapeHtml(r.name)}</td><td>${(r.successProb*100).toFixed(1)}%</td><td>${r.maxRetries}</td><td>${r.expectedAttempts.toFixed(3)}</td><td>${r.expectedCost.toFixed(4)}</td><td>${(r.stepSuccessRate*100).toFixed(1)}%</td><td>${Math.round(r.retryTokens)}</td></tr>`;
+      });
+      html += `</tbody></table></div>`;
+      resultsContent.innerHTML = html;
+    }
+
+    // ----- event binding -----
+    addBtn.addEventListener('click', addStep);
+    computeBtn.addEventListener('click', computeResults);
+    resetBtn.addEventListener('click', resetDefault);
+
+    // initial default
+    resetDefault();
+
+    // re-compute on any change? we keep manual compute, but also auto on add/remove? we'll auto compute after add/remove
+    // override add/remove to auto compute
+    const origAdd = addStep;
+    addStep = function() { origAdd(); computeResults(); };
+    const origRemove = removeStepById;
+    removeStepById = function(id) { origRemove(id); computeResults(); };
+    // re-bind
+    addBtn.removeEventListener('click', origAdd);
+    addBtn.addEventListener('click', addStep);
+    // recompute after reset
+    const origReset = resetDefault;
+    resetDefault = function() { origReset(); computeResults(); };
+    resetBtn.removeEventListener('click', origReset);
+    resetBtn.addEventListener('click', resetDefault);
+
+    // final compute
+    computeResults();
+  })();
+</script>
+</body>
+</html>
