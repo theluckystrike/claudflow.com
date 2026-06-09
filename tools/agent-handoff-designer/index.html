@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Design agent-to-agent handoff protocols with role assignment, trigger configuration, and data passing rules.">
+    <meta name="theme-color" content="#10b981">
+    <meta property="og:title" content="Agent Handoff Designer">
+    <meta property="og:description" content="Create multi-agent handoff workflows with automatic flow diagrams and JSON configs.">
+    <meta property="og:url" content="https://claudflow.com/tools/agent-handoff-designer">
+    <meta property="og:type" content="website">
+    <title>Agent Handoff Designer</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .panel h2 {
+            font-size: 1.2rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        button {
+            background: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #475569;
+            color: #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+        .agent-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .agent-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .agent-role {
+            color: #10b981;
+            font-weight: 600;
+        }
+        .agent-caps {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .output-section {
+            grid-column: 1 / -1;
+        }
+        .diagram-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1.5rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #10b981;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .json-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1.5rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        .copy-btn {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.8rem;
+            margin-top: 0.8rem;
+        }
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+            padding-top: 2rem;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+<link rel="canonical" href="https://claudflow.com/tools/agent-handoff-designer">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agent Handoff Designer</h1>
+            <p class="subtitle">Design multi-agent handoff protocols with flow diagrams and JSON configs</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Agent Configuration</h2>
+                <div class="form-group">
+                    <label>Agent Role</label>
+                    <input type="text" id="agentRole" placeholder="e.g., Classifier, Router, Analyzer">
+                </div>
+                <div class="form-group">
+                    <label>Capabilities (comma-separated)</label>
+                    <textarea id="agentCaps" placeholder="e.g., classification, routing, analysis" rows="2"></textarea>
+                </div>
+                <button onclick="addAgent()">Add Agent</button>
+
+                <div class="agent-list" style="margin-top: 1.5rem;">
+                    <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">Configured Agents:</div>
+                    <div id="agentList"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Handoff Rules</h2>
+                <div class="form-group">
+                    <label>Source Agent</label>
+                    <select id="sourceAgent">
+                        <option value="">Select source agent...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Agent</label>
+                    <select id="targetAgent">
+                        <option value="">Select target agent...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Handoff Trigger</label>
+                    <input type="text" id="trigger" placeholder="e.g., confidence < 0.7, tag = urgent">
+                </div>
+                <div class="form-group">
+                    <label>Data to Pass</label>
+                    <textarea id="dataPass" placeholder="e.g., message, context, metadata" rows="2"></textarea>
+                </div>
+                <button onclick="addHandoff()">Add Handoff Rule</button>
+                <div id="handoffList" style="margin-top: 1rem;"></div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Handoff Flow Diagram</h2>
+                <div class="diagram-box" id="diagram">No agents configured yet. Add agents to generate diagram.</div>
+                <button class="copy-btn" onclick="copyDiagram()">Copy Diagram</button>
+            </div>
+
+            <div class="panel output-section">
+                <h2>JSON Configuration</h2>
+                <div class="json-box" id="jsonOutput">{}</div>
+                <button class="copy-btn" onclick="copyJSON()">Copy JSON</button>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Summary Statistics</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="agentCount">0</div>
+                        <div class="stat-label">Total Agents</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="handoffCount">0</div>
+                        <div class="stat-label">Handoff Rules</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="complexity">Low</div>
+                        <div class="stat-label">Complexity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 claudflow.com — AI Agent Orchestration Tools
+        </footer>
+    </div>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Agent Handoff Designer",
+        "description": "Design multi-agent handoff protocols with flow diagrams and JSON configs",
+        "url": "https://claudflow.com/tools/agent-handoff-designer",
+        "applicationCategory": "UtilityApplication"
+    }
+    </script>
+
+    <script>
+        let agents = [];
+        let handoffs = [];
+
+        function addAgent() {
+            const role = document.getElementById('agentRole').value.trim();
+            const caps = document.getElementById('agentCaps').value.trim();
+            if (!role) {
+                alert('Please enter agent role');
+                return;
+            }
+            agents.push({ role, capabilities: caps.split(',').map(c => c.trim()) });
+            document.getElementById('agentRole').value = '';
+            document.getElementById('agentCaps').value = '';
+            renderAgents();
+            updateSelects();
+            generateOutputs();
+        }
+
+        function addHandoff() {
+            const source = document.getElementById('sourceAgent').value;
+            const target = document.getElementById('targetAgent').value;
+            const trigger = document.getElementById('trigger').value.trim();
+            const dataPass = document.getElementById('dataPass').value.trim();
+            if (!source || !target) {
+                alert('Please select source and target agents');
+                return;
+            }
+            handoffs.push({ source, target, trigger, data: dataPass.split(',').map(d => d.trim()) });
+            document.getElementById('trigger').value = '';
+            document.getElementById('dataPass').value = '';
+            renderHandoffs();
+            generateOutputs();
+        }
+
+        function renderAgents() {
+            const list = document.getElementById('agentList');
+            if (agents.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 0.85rem;">No agents added yet</div>';
+                return;
+            }
+            list.innerHTML = agents.map((a, i) => `
+                <div class="agent-item">
+                    <div>
+                        <div class="agent-role">${a.role}</div>
+                        <div class="agent-caps">${a.capabilities.join(', ')}</div>
+                    </div>
+                    <button class="btn-secondary" style="padding: 0.4rem 0.8rem;" onclick="removeAgent(${i})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function renderHandoffs() {
+            const list = document.getElementById('handoffList');
+            if (handoffs.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 0.85rem;">No handoff rules yet</div>';
+                return;
+            }
+            list.innerHTML = handoffs.map((h, i) => `
+                <div style="background: #0f172a; border-left: 3px solid #10b981; padding: 0.6rem; margin-bottom: 0.5rem; border-radius: 2px;">
+                    <div style="font-size: 0.85rem;"><strong>${h.source}</strong> → <strong>${h.target}</strong></div>
+                    <div style="color: #94a3b8; font-size: 0.8rem;">Trigger: ${h.trigger || 'always'}</div>
+                    <button class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin-top: 0.4rem;" onclick="removeHandoff(${i})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function updateSelects() {
+            const sourceOpts = agents.map((a, i) => `<option value="${a.role}">${a.role}</option>`).join('');
+            const targetOpts = agents.map((a, i) => `<option value="${a.role}">${a.role}</option>`).join('');
+            document.getElementById('sourceAgent').innerHTML = '<option value="">Select source agent...</option>' + sourceOpts;
+            document.getElementById('targetAgent').innerHTML = '<option value="">Select target agent...</option>' + targetOpts;
+        }
+
+        function removeAgent(idx) {
+            agents.splice(idx, 1);
+            handoffs = handoffs.filter(h => {
+                const agentRoles = agents.map(a => a.role);
+                return agentRoles.includes(h.source) && agentRoles.includes(h.target);
+            });
+            renderAgents();
+            renderHandoffs();
+            updateSelects();
+            generateOutputs();
+        }
+
+        function removeHandoff(idx) {
+            handoffs.splice(idx, 1);
+            renderHandoffs();
+            generateOutputs();
+        }
+
+        function generateOutputs() {
+            generateDiagram();
+            generateJSON();
+            updateStats();
+        }
+
+        function generateDiagram() {
+            if (agents.length === 0) {
+                document.getElementById('diagram').textContent = 'No agents configured yet. Add agents to generate diagram.';
+                return;
+            }
+
+            let diagram = 'AGENT HANDOFF FLOW\n';
+            diagram += '='.repeat(40) + '\n\n';
+
+            agents.forEach((a, i) => {
+                diagram += `[${i + 1}] ${a.role}\n`;
+                diagram += `    Caps: ${a.capabilities.join(', ')}\n\n`;
+            });
+
+            diagram += '\nHANDOFF ROUTES\n';
+            diagram += '-'.repeat(40) + '\n';
+            if (handoffs.length === 0) {
+                diagram += 'No handoff rules configured\n';
+            } else {
+                handoffs.forEach((h, i) => {
+                    diagram += `\n[${i + 1}] ${h.source} → ${h.target}\n`;
+                    if (h.trigger) diagram += `    Trigger: ${h.trigger}\n`;
+                    if (h.data.length > 0) diagram += `    Data: ${h.data.join(', ')}\n`;
+                });
+            }
+
+            document.getElementById('diagram').textContent = diagram;
+        }
+
+        function generateJSON() {
+            const config = {
+                agents: agents.map(a => ({ role: a.role, capabilities: a.capabilities })),
+                handoffs: handoffs.map(h => ({
+                    source: h.source,
+                    target: h.target,
+                    trigger: h.trigger || 'always',
+                    data_passed: h.data
+                })),
+                version: '1.0',
+                created: new Date().toISOString()
+            };
+            document.getElementById('jsonOutput').textContent = JSON.stringify(config, null, 2);
+        }
+
+        function updateStats() {
+            document.getElementById('agentCount').textContent = agents.length;
+            document.getElementById('handoffCount').textContent = handoffs.length;
+            let complexity = 'Low';
+            if (agents.length > 5 || handoffs.length > 10) complexity = 'High';
+            else if (agents.length > 3 || handoffs.length > 5) complexity = 'Medium';
+            document.getElementById('complexity').textContent = complexity;
+        }
+
+        function copyDiagram() {
+            navigator.clipboard.writeText(document.getElementById('diagram').textContent);
+            alert('Diagram copied to clipboard');
+        }
+
+        function copyJSON() {
+            navigator.clipboard.writeText(document.getElementById('jsonOutput').textContent);
+            alert('JSON copied to clipboard');
+        }
+    </script>
+</body>
+</html>

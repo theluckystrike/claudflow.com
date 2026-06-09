@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive decision tree for choosing the right orchestration pattern for your multi-agent system.">
+    <meta name="theme-color" content="#10b981">
+    <meta property="og:title" content="Orchestration Pattern Picker">
+    <meta property="og:description" content="Find the ideal orchestration pattern with interactive decision tree and pattern comparisons.">
+    <meta property="og:url" content="https://claudflow.com/tools/orchestration-pattern-picker">
+    <meta property="og:type" content="website">
+    <title>Orchestration Pattern Picker</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .panel h2 {
+            font-size: 1.2rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 0.5rem;
+        }
+        .question {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .question-text {
+            color: #cbd5e1;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: #334155;
+            border: 2px solid #475569;
+            color: #e2e8f0;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .option-btn:hover {
+            background: #475569;
+            border-color: #10b981;
+        }
+        .option-btn.selected {
+            background: #10b981;
+            color: #0f172a;
+            border-color: #10b981;
+            font-weight: 600;
+        }
+        button {
+            background: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #475569;
+            color: #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+        .result {
+            background: #0f172a;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .result-name {
+            color: #10b981;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .result-section {
+            margin-top: 0.8rem;
+        }
+        .result-label {
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        .result-content {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #334155;
+            padding: 0.6rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #1e293b;
+            color: #10b981;
+            font-weight: 600;
+        }
+        .comparison-table tr:nth-child(even) {
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .rating-good {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .rating-medium {
+            color: #fbbf24;
+            font-weight: 600;
+        }
+        .rating-poor {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .output-section {
+            grid-column: 1 / -1;
+        }
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+            padding-top: 2rem;
+        }
+        .progress-bar {
+            background: #334155;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress-fill {
+            background: #10b981;
+            height: 100%;
+            transition: width 0.3s;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+<link rel="canonical" href="https://claudflow.com/tools/orchestration-pattern-picker">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Orchestration Pattern Picker</h1>
+            <p class="subtitle">Find the ideal orchestration pattern through interactive decision tree</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Decision Tree</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div id="questions"></div>
+                <button onclick="resetQuiz()" class="btn-secondary" style="width: 100%;">Start Over</button>
+            </div>
+
+            <div class="panel">
+                <h2 id="resultTitle">Your Recommendation</h2>
+                <div id="resultContent" style="color: #94a3b8;">
+                    Answer questions to get pattern recommendations
+                </div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Pattern Comparison Matrix</h2>
+                <table class="comparison-table" id="comparisonTable">
+                    <tr>
+                        <th>Characteristic</th>
+                        <th>Sequential</th>
+                        <th>Parallel</th>
+                        <th>Hierarchical</th>
+                        <th>Consensus</th>
+                        <th>Routing</th>
+                    </tr>
+                    <tr>
+                        <td>Latency</td>
+                        <td class="rating-poor">Low (slowest)</td>
+                        <td class="rating-good">High (fastest)</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-poor">Low</td>
+                        <td class="rating-good">High</td>
+                    </tr>
+                    <tr>
+                        <td>Complexity</td>
+                        <td class="rating-good">Low</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-poor">High</td>
+                        <td class="rating-poor">High</td>
+                        <td class="rating-medium">Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Cost</td>
+                        <td class="rating-good">Low</td>
+                        <td class="rating-poor">High (parallel calls)</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-poor">High (multiple agents)</td>
+                        <td class="rating-good">Low-Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Accuracy</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-good">High (specialized)</td>
+                        <td class="rating-good">High (ensemble)</td>
+                        <td class="rating-medium">Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Failure Handling</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-good">Good (redundancy)</td>
+                        <td class="rating-good">Good (fallback)</td>
+                        <td class="rating-good">Good (consensus)</td>
+                        <td class="rating-medium">Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Scalability</td>
+                        <td class="rating-good">Good</td>
+                        <td class="rating-medium">Medium</td>
+                        <td class="rating-good">Good</td>
+                        <td class="rating-poor">Poor (N² cost)</td>
+                        <td class="rating-good">Good</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="panel output-section">
+                <h2>All Patterns Overview</h2>
+                <div id="allPatterns"></div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 claudflow.com — AI Agent Orchestration Tools
+        </footer>
+    </div>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Orchestration Pattern Picker",
+        "description": "Interactive decision tree for choosing orchestration patterns for multi-agent systems",
+        "url": "https://claudflow.com/tools/orchestration-pattern-picker",
+        "applicationCategory": "UtilityApplication"
+    }
+    </script>
+
+    <script>
+        const patterns = {
+            sequential: {
+                name: 'Sequential',
+                icon: '→',
+                description: 'One agent processes, passes to next, one at a time',
+                pros: 'Simple logic, low cost, easy to debug, supports dependencies',
+                cons: 'High latency, single point of failure, no parallelism',
+                useCases: 'Multi-step workflows (classify → extract → analyze), data pipelines',
+                example: 'Agent1 classifies email → Agent2 extracts entities → Agent3 generates response',
+                cost: 'Low',
+                latency: 'High (sum of all steps)',
+                complexity: 'Low'
+            },
+            parallel: {
+                name: 'Parallel',
+                icon: '⟿',
+                description: 'Multiple agents process same input simultaneously, results merged',
+                pros: 'Fast latency, redundancy, can handle diverse subtasks',
+                cons: 'Higher cost, merge complexity, coordination challenges',
+                useCases: 'Ensemble methods, multi-perspective analysis, independent subtasks',
+                example: 'Input sent to Sentiment + Toxicity + Intent agents in parallel → merge results',
+                cost: 'High (N agents in parallel)',
+                latency: 'Low (max latency of all agents)',
+                complexity: 'Medium'
+            },
+            hierarchical: {
+                name: 'Hierarchical',
+                icon: '⊕',
+                description: 'Master agent delegates to specialized worker agents with feedback loop',
+                pros: 'Specialization, clear roles, good for complex domains',
+                cons: 'More complex, overhead from coordination',
+                useCases: 'Domain-specific workflows, multi-domain problems, delegation patterns',
+                example: 'Master → Marketing Agent, Sales Agent, Support Agent → Master aggregates',
+                cost: 'Medium',
+                latency: 'Medium (depends on structure)',
+                complexity: 'High'
+            },
+            consensus: {
+                name: 'Consensus',
+                icon: '✓',
+                description: 'Multiple agents independently evaluate, majority vote on result',
+                pros: 'High accuracy, reduces hallucinations, robust to agent failures',
+                cons: 'Very high cost (N agents for every decision), high latency',
+                useCases: 'Critical decisions, legal/financial/medical tasks, hallucination-sensitive',
+                example: '5 agents evaluate contract independently, majority decides → final answer',
+                cost: 'Very High (N parallel evaluations)',
+                latency: 'Medium-High',
+                complexity: 'Medium'
+            },
+            routing: {
+                name: 'Routing',
+                icon: '⊲',
+                description: 'Router agent selects which specialist agent handles each request',
+                pros: 'Cost-effective (one agent per request), flexible, specialization',
+                cons: 'Router quality critical, single agent per task',
+                useCases: 'Multi-specialty systems, intent-based routing, load balancing',
+                example: 'Router classifies query → sends to Billing/Technical/Sales agent as appropriate',
+                cost: 'Low (one agent per query)',
+                latency: 'Low (one sequential call)',
+                complexity: 'Medium (routing logic)'
+            }
+        };
+
+        const questions = [
+            {
+                id: 1,
+                text: 'What is your primary concern?',
+                options: [
+                    { text: 'Speed (low latency)', weight: { parallel: 3, routing: 3, sequential: -2, consensus: -2 } },
+                    { text: 'Accuracy (high correctness)', weight: { hierarchical: 2, consensus: 3, sequential: 1 } },
+                    { text: 'Cost (minimize API calls)', weight: { sequential: 3, routing: 3, parallel: -3, consensus: -3 } },
+                    { text: 'Simplicity (easy to maintain)', weight: { sequential: 3, routing: 1, parallel: 0, hierarchical: -2 } }
+                ]
+            },
+            {
+                id: 2,
+                text: 'How many independent subtasks does your workflow have?',
+                options: [
+                    { text: 'Linear (1-2 steps)', weight: { sequential: 3, routing: 2 } },
+                    { text: 'Multiple independent (3-5)', weight: { parallel: 3, hierarchical: 2 } },
+                    { text: 'Many specialized domains (5+)', weight: { hierarchical: 3, routing: 2 } },
+                    { text: 'Same task, multiple perspectives', weight: { parallel: 2, consensus: 3 } }
+                ]
+            },
+            {
+                id: 3,
+                text: 'How critical is failure tolerance?',
+                options: [
+                    { text: 'Low (acceptable to fail)', weight: { sequential: 2, routing: 1 } },
+                    { text: 'Medium (graceful degradation)', weight: { parallel: 2, hierarchical: 1 } },
+                    { text: 'High (must succeed)', weight: { consensus: 3, parallel: 2 } }
+                ]
+            },
+            {
+                id: 4,
+                text: 'What is your token budget per request?',
+                options: [
+                    { text: '<1K tokens total', weight: { routing: 3, sequential: 2 } },
+                    { text: '1K-5K tokens', weight: { hierarchical: 2, sequential: 1, parallel: 1 } },
+                    { text: '>5K tokens (high budget)', weight: { consensus: 3, parallel: 2 } }
+                ]
+            },
+            {
+                id: 5,
+                text: 'Does output require dependency handling?',
+                options: [
+                    { text: 'Yes (output A needs input from B)', weight: { sequential: 3, hierarchical: 1 } },
+                    { text: 'No (independent outputs)', weight: { parallel: 3, routing: 2, consensus: 2 } }
+                ]
+            }
+        ];
+
+        let scores = {};
+        let currentQuestion = 0;
+
+        function initScores() {
+            scores = {
+                sequential: 0,
+                parallel: 0,
+                hierarchical: 0,
+                consensus: 0,
+                routing: 0
+            };
+        }
+
+        function selectOption(qIdx, optIdx) {
+            const weights = questions[qIdx].options[optIdx].weight;
+            Object.keys(weights).forEach(p => {
+                scores[p] += weights[p];
+            });
+            currentQuestion++;
+            updateUI();
+        }
+
+        function updateUI() {
+            const progress = (currentQuestion / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            if (currentQuestion < questions.length) {
+                renderQuestion();
+            } else {
+                renderResult();
+            }
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestion];
+            let html = `<div class="question">
+                <div class="question-text">${q.id}. ${q.text}</div>`;
+            q.options.forEach((opt, idx) => {
+                html += `<button class="option-btn" onclick="selectOption(${currentQuestion}, ${idx})">${opt.text}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('questions').innerHTML = html;
+        }
+
+        function renderResult() {
+            const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+            const top = sorted[0][0];
+            const pattern = patterns[top];
+
+            let html = `
+                <div class="result-name">${pattern.name} Pattern</div>
+                <div class="result-section">
+                    <div class="result-label">Description</div>
+                    <div class="result-content">${pattern.description}</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">Pros</div>
+                    <div class="result-content">✓ ${pattern.pros}</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">Cons</div>
+                    <div class="result-content">✗ ${pattern.cons}</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">Use Cases</div>
+                    <div class="result-content">${pattern.useCases}</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">Example</div>
+                    <div class="result-content">"${pattern.example}"</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">Key Metrics</div>
+                    <div class="result-content">Cost: ${pattern.cost} | Latency: ${pattern.latency} | Complexity: ${pattern.complexity}</div>
+                </div>
+            `;
+            document.getElementById('resultTitle').textContent = '🎯 Recommended: ' + pattern.name;
+            document.getElementById('resultContent').innerHTML = html;
+
+            renderAllPatterns(sorted);
+        }
+
+        function renderAllPatterns(sorted) {
+            let html = '';
+            sorted.forEach(([key, score], idx) => {
+                const p = patterns[key];
+                html += `
+                    <div style="background: #0f172a; border-left: 4px solid ${idx === 0 ? '#10b981' : '#475569'}; padding: 1rem; margin-bottom: 0.8rem; border-radius: 4px;">
+                        <div style="color: ${idx === 0 ? '#10b981' : '#cbd5e1'}; font-weight: 600; font-size: 1rem;">${idx + 1}. ${p.name} ${idx === 0 ? '★ RECOMMENDED' : ''}</div>
+                        <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.3rem;">Score: ${score} | Cost: ${p.cost} | Latency: ${p.latency}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('allPatterns').innerHTML = html;
+        }
+
+        function resetQuiz() {
+            initScores();
+            currentQuestion = 0;
+            updateUI();
+        }
+
+        // Initialize
+        initScores();
+        renderQuestion();
+    </script>
+</body>
+</html>

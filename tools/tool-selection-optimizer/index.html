@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Optimize AI agent toolkits by selecting the best tools for each task type while minimizing token cost.">
+    <meta name="theme-color" content="#10b981">
+    <meta property="og:title" content="Tool Selection Optimizer">
+    <meta property="og:description" content="Find optimal tool subsets per task type with token savings analysis.">
+    <meta property="og:url" content="https://claudflow.com/tools/tool-selection-optimizer">
+    <meta property="og:type" content="website">
+    <title>Tool Selection Optimizer</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .panel h2 {
+            font-size: 1.2rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        button {
+            background: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #475569;
+            color: #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+        .tool-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .tool-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 0.6rem;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.5rem;
+        }
+        .tool-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-name {
+            color: #10b981;
+            font-weight: 600;
+        }
+        .tool-meta {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .tool-cost {
+            text-align: right;
+            color: #fbbf24;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .output-section {
+            grid-column: 1 / -1;
+        }
+        .results-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .result-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+        .result-title {
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .coverage-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 0.8rem;
+        }
+        .coverage-matrix th, .coverage-matrix td {
+            border: 1px solid #334155;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        .coverage-matrix th {
+            background: #1e293b;
+            color: #10b981;
+        }
+        .coverage-yes {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        .coverage-no {
+            background: rgba(239, 68, 68, 0.1);
+            color: #94a3b8;
+        }
+        .savings {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .summary-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #334155;
+        }
+        .summary-stat:last-child {
+            border-bottom: none;
+        }
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+            padding-top: 2rem;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+<link rel="canonical" href="https://claudflow.com/tools/tool-selection-optimizer">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tool Selection Optimizer</h1>
+            <p class="subtitle">Optimize toolkits by task type with token cost analysis</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Available Tools</h2>
+                <div class="form-group">
+                    <label>Tool Name</label>
+                    <input type="text" id="toolName" placeholder="e.g., database-query">
+                </div>
+                <div class="form-group">
+                    <label>Token Cost (input + output)</label>
+                    <input type="number" id="toolCost" placeholder="e.g., 500" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Supported Tasks (comma-separated)</label>
+                    <textarea id="toolTasks" placeholder="e.g., data-retrieval, analysis, reporting" rows="2"></textarea>
+                </div>
+                <button onclick="addTool()">Add Tool</button>
+
+                <div class="tool-list" style="margin-top: 1.5rem;">
+                    <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">Tools:</div>
+                    <div id="toolsList"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Task Types</h2>
+                <div class="form-group">
+                    <label>Task Type Name</label>
+                    <input type="text" id="taskName" placeholder="e.g., customer-analysis">
+                </div>
+                <div class="form-group">
+                    <label>Required Capabilities (comma-separated)</label>
+                    <textarea id="taskCaps" placeholder="e.g., data-retrieval, real-time, security" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Max Token Budget (optional)</label>
+                    <input type="number" id="taskBudget" placeholder="e.g., 2000" min="1">
+                </div>
+                <button onclick="addTask()">Add Task Type</button>
+
+                <div style="margin-top: 1.5rem;">
+                    <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">Task Types:</div>
+                    <div id="tasksList" style="max-height: 250px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Optimal Tool Subsets</h2>
+                <div class="results-grid" id="resultsGrid">
+                    <div style="color: #94a3b8; font-size: 0.9rem; padding: 1rem;">Configure tools and tasks to see recommendations</div>
+                </div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Coverage Matrix</h2>
+                <table class="coverage-matrix" id="coverageTable">
+                    <tr>
+                        <th>Tool</th>
+                        <th>Add Coverage</th>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 1rem; color: #94a3b8;">Add tools to build matrix</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Summary</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="totalTools">0</div>
+                        <div class="stat-label">Total Tools</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalTasks">0</div>
+                        <div class="stat-label">Task Types</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="avgSavings">0%</div>
+                        <div class="stat-label">Avg Savings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 claudflow.com — AI Agent Orchestration Tools
+        </footer>
+    </div>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Tool Selection Optimizer",
+        "description": "Optimize AI agent toolkits by task type with token cost analysis",
+        "url": "https://claudflow.com/tools/tool-selection-optimizer",
+        "applicationCategory": "UtilityApplication"
+    }
+    </script>
+
+    <script>
+        let tools = [];
+        let tasks = [];
+
+        function addTool() {
+            const name = document.getElementById('toolName').value.trim();
+            const cost = parseInt(document.getElementById('toolCost').value);
+            const taskStr = document.getElementById('toolTasks').value.trim();
+            if (!name || !cost || !taskStr) {
+                alert('Fill in all tool fields');
+                return;
+            }
+            tools.push({
+                name,
+                cost,
+                tasks: taskStr.split(',').map(t => t.trim().toLowerCase())
+            });
+            document.getElementById('toolName').value = '';
+            document.getElementById('toolCost').value = '';
+            document.getElementById('toolTasks').value = '';
+            renderTools();
+            generateResults();
+        }
+
+        function addTask() {
+            const name = document.getElementById('taskName').value.trim();
+            const caps = document.getElementById('taskCaps').value.trim();
+            const budget = parseInt(document.getElementById('taskBudget').value) || Infinity;
+            if (!name || !caps) {
+                alert('Fill in task name and capabilities');
+                return;
+            }
+            tasks.push({
+                name,
+                capabilities: caps.split(',').map(c => c.trim().toLowerCase()),
+                budget
+            });
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskCaps').value = '';
+            document.getElementById('taskBudget').value = '';
+            renderTasks();
+            generateResults();
+        }
+
+        function renderTools() {
+            const list = document.getElementById('toolsList');
+            if (tools.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 0.85rem;">No tools added</div>';
+                return;
+            }
+            list.innerHTML = tools.map((t, i) => `
+                <div class="tool-item">
+                    <div class="tool-info">
+                        <div class="tool-name">${t.name}</div>
+                        <div class="tool-meta">${t.tasks.join(', ')}</div>
+                    </div>
+                    <div>
+                        <div class="tool-cost">${t.cost}T</div>
+                        <button class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="removeTool(${i})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('tasksList');
+            if (tasks.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 0.85rem;">No tasks added</div>';
+                return;
+            }
+            list.innerHTML = tasks.map((t, i) => `
+                <div style="background: #0f172a; border-left: 3px solid #10b981; padding: 0.6rem; margin-bottom: 0.4rem; border-radius: 2px;">
+                    <div style="font-weight: 600; color: #10b981;">${t.name}</div>
+                    <div style="color: #94a3b8; font-size: 0.8rem;">${t.capabilities.join(', ')}</div>
+                    ${t.budget !== Infinity ? `<div style="color: #fbbf24; font-size: 0.8rem;">Budget: ${t.budget}T</div>` : ''}
+                    <button class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; margin-top: 0.3rem;" onclick="removeTask(${i})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeTool(idx) {
+            tools.splice(idx, 1);
+            renderTools();
+            generateResults();
+        }
+
+        function removeTask(idx) {
+            tasks.splice(idx, 1);
+            renderTasks();
+            generateResults();
+        }
+
+        function generateResults() {
+            if (tools.length === 0 || tasks.length === 0) {
+                document.getElementById('resultsGrid').innerHTML = '<div style="color: #94a3b8; font-size: 0.9rem; padding: 1rem;">Configure tools and tasks to see recommendations</div>';
+                document.getElementById('totalTools').textContent = tools.length;
+                document.getElementById('totalTasks').textContent = tasks.length;
+                return;
+            }
+
+            let resultsHTML = '';
+            let totalSavings = 0;
+
+            tasks.forEach(task => {
+                const matchingTools = tools.filter(t =>
+                    t.tasks.some(tt => task.capabilities.includes(tt))
+                );
+                matchingTools.sort((a, b) => a.cost - b.cost);
+
+                const optimalSet = [];
+                let totalCost = 0;
+                let fullSet = matchingTools;
+                let fullCost = fullSet.reduce((s, t) => s + t.cost, 0);
+
+                for (const tool of matchingTools) {
+                    if (totalCost + tool.cost <= task.budget) {
+                        optimalSet.push(tool);
+                        totalCost += tool.cost;
+                    }
+                }
+
+                const savings = fullCost > 0 ? Math.round(((fullCost - totalCost) / fullCost) * 100) : 0;
+                totalSavings += savings;
+
+                resultsHTML += `
+                    <div class="result-box">
+                        <div class="result-title">${task.name}</div>
+                        <div class="summary-stat">
+                            <span>Optimal Tools:</span>
+                            <strong>${optimalSet.map(t => t.name).join(', ') || 'none'}</strong>
+                        </div>
+                        <div class="summary-stat">
+                            <span>Cost (optimal):</span>
+                            <strong>${totalCost}T</strong>
+                        </div>
+                        <div class="summary-stat">
+                            <span>Cost (all matching):</span>
+                            <strong>${fullCost}T</strong>
+                        </div>
+                        <div class="summary-stat">
+                            <span>Savings:</span>
+                            <strong class="savings">-${savings}%</strong>
+                        </div>
+                        <div class="summary-stat">
+                            <span>Coverage:</span>
+                            <strong>${Math.round((optimalSet.length / matchingTools.length) * 100)}%</strong>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('resultsGrid').innerHTML = resultsHTML;
+            document.getElementById('totalTools').textContent = tools.length;
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('avgSavings').textContent = tasks.length > 0 ? Math.round(totalSavings / tasks.length) + '%' : '0%';
+
+            buildCoverageMatrix();
+        }
+
+        function buildCoverageMatrix() {
+            if (tools.length === 0 || tasks.length === 0) return;
+
+            let html = '<tr><th>Tool</th>';
+            tasks.forEach(t => {
+                html += `<th>${t.name.split('-').slice(0, 2).join('-')}</th>`;
+            });
+            html += '</tr>';
+
+            tools.forEach(tool => {
+                html += `<tr><td style="text-align: left;"><strong>${tool.name}</strong></td>`;
+                tasks.forEach(task => {
+                    const hasCoverage = tool.tasks.some(tt => task.capabilities.includes(tt));
+                    html += `<td class="${hasCoverage ? 'coverage-yes' : 'coverage-no'}">${hasCoverage ? '✓' : '✗'}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            document.getElementById('coverageTable').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

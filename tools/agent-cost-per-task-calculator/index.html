@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate cost per completed task for multi-agent systems with retry policies and success rates.">
+    <meta name="theme-color" content="#10b981">
+    <meta property="og:title" content="Agent Cost Per Task Calculator">
+    <meta property="og:description" content="Calculate true cost per task completion for multi-agent systems with advanced scenarios.">
+    <meta property="og:url" content="https://claudflow.com/tools/agent-cost-per-task-calculator">
+    <meta property="og:type" content="website">
+    <title>Agent Cost Per Task Calculator</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .panel h2 {
+            font-size: 1.2rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        .input-helper {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+        button {
+            background: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .output-section {
+            grid-column: 1 / -1;
+        }
+        .metric-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1.2rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+        .metric-value {
+            color: #10b981;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        .metric-detail {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .breakdown {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1.2rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .breakdown-title {
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #334155;
+            font-size: 0.9rem;
+        }
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        .breakdown-label {
+            color: #cbd5e1;
+        }
+        .breakdown-value {
+            color: #10b981;
+            font-weight: 600;
+            font-family: monospace;
+        }
+        .scenario {
+            background: #0f172a;
+            border-left: 3px solid #10b981;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 2px;
+        }
+        .scenario-title {
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+        .scenario-result {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #334155;
+            padding: 0.8rem;
+            text-align: right;
+        }
+        .comparison-table th {
+            background: #1e293b;
+            color: #10b981;
+            text-align: left;
+        }
+        .comparison-table tr:nth-child(even) {
+            background: rgba(16, 185, 129, 0.05);
+        }
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+            padding-top: 2rem;
+        }
+        .warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+            padding: 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+<link rel="canonical" href="https://claudflow.com/tools/agent-cost-per-task-calculator">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agent Cost Per Task Calculator</h1>
+            <p class="subtitle">Calculate true completion cost for multi-agent systems with retry logic</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>System Configuration</h2>
+
+                <div class="form-group">
+                    <label>Number of Agents</label>
+                    <input type="number" id="agentCount" value="3" min="1" max="50" onchange="calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label>Avg Input Tokens per Task</label>
+                    <input type="number" id="inputTokens" value="500" min="1" onchange="calculate()">
+                    <div class="input-helper">Includes prompt engineering and context</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Avg Output Tokens per Agent</label>
+                    <input type="number" id="outputTokens" value="300" min="1" onchange="calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label>Model (for pricing)</label>
+                    <select id="model" onchange="updateModelPricing()">
+                        <option value="gpt4o">GPT-4o ($0.005/$0.015 per 1K)</option>
+                        <option value="claude3.5">Claude 3.5 ($0.003/$0.015 per 1K)</option>
+                        <option value="gpt4turbo">GPT-4 Turbo ($0.01/$0.03 per 1K)</option>
+                        <option value="llama">Llama 2 (on-premise, custom)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Input Cost (per 1K tokens)</label>
+                    <input type="number" id="inputCost" value="0.005" min="0" step="0.0001" onchange="calculate()">
+                </div>
+
+                <div class="form-group">
+                    <label>Output Cost (per 1K tokens)</label>
+                    <input type="number" id="outputCost" value="0.015" min="0" step="0.0001" onchange="calculate()">
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Task Configuration</h2>
+
+                <div class="form-group">
+                    <label>Success Rate (%) per Agent Call</label>
+                    <input type="number" id="successRate" value="85" min="0" max="100" onchange="calculate()">
+                    <div class="input-helper">Probability of acceptable output on first attempt</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Max Retries per Agent</label>
+                    <input type="number" id="maxRetries" value="2" min="0" max="10" onchange="calculate()">
+                    <div class="input-helper">How many times to retry failed attempts</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Orchestration Pattern</label>
+                    <select id="pattern" onchange="calculate()">
+                        <option value="sequential">Sequential (agents in order)</option>
+                        <option value="parallel">Parallel (all agents simultaneously)</option>
+                        <option value="hierarchical">Hierarchical (master + workers)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tasks per Month</label>
+                    <input type="number" id="tasksPerMonth" value="10000" min="1" onchange="calculate()">
+                    <div class="input-helper">For monthly projection</div>
+                </div>
+
+                <button onclick="calculate()">Calculate</button>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Cost Analysis</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Cost Per Attempt</div>
+                        <div class="metric-value">$<span id="costPerAttempt">0.00</span></div>
+                        <div class="metric-detail">Single agent call (no retry)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Cost Per Success</div>
+                        <div class="metric-value">$<span id="costPerSuccess">0.00</span></div>
+                        <div class="metric-detail">Including retry overhead</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Monthly Cost</div>
+                        <div class="metric-value">$<span id="monthlyCost">0.00</span></div>
+                        <div class="metric-detail">Projected full month</div>
+                    </div>
+                </div>
+
+                <div class="breakdown">
+                    <div class="breakdown-title">Cost Breakdown</div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Input tokens per task:</span>
+                        <span class="breakdown-value"><span id="bd-input">500</span> tokens</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Output tokens (all agents):</span>
+                        <span class="breakdown-value"><span id="bd-output">900</span> tokens</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Total tokens per attempt:</span>
+                        <span class="breakdown-value"><span id="bd-total">1,400</span></span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Expected attempts to success:</span>
+                        <span class="breakdown-value"><span id="bd-attempts">1.18</span></span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Total tokens per success:</span>
+                        <span class="breakdown-value"><span id="bd-success">1,652</span></span>
+                    </div>
+                </div>
+
+                <div class="warning" id="warningBox"></div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Scenario Comparison</h2>
+                <div id="scenarioBox"></div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Pattern Cost Comparison</h2>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Pattern</th>
+                        <th>Agents Called</th>
+                        <th>Calls per Task</th>
+                        <th>Cost Per Success</th>
+                        <th>Monthly Cost</th>
+                        <th>Latency</th>
+                    </tr>
+                    <tr>
+                        <td>Sequential</td>
+                        <td id="seq-agents">3</td>
+                        <td id="seq-calls">3</td>
+                        <td id="seq-cost">$0.00</td>
+                        <td id="seq-month">$0.00</td>
+                        <td>High (slowest)</td>
+                    </tr>
+                    <tr>
+                        <td>Parallel</td>
+                        <td id="par-agents">3</td>
+                        <td id="par-calls">3</td>
+                        <td id="par-cost">$0.00</td>
+                        <td id="par-month">$0.00</td>
+                        <td>Low (fastest)</td>
+                    </tr>
+                    <tr>
+                        <td>Hierarchical</td>
+                        <td id="hier-agents">4</td>
+                        <td id="hier-calls">4</td>
+                        <td id="hier-cost">$0.00</td>
+                        <td id="hier-month">$0.00</td>
+                        <td>Medium</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 claudflow.com — AI Agent Orchestration Tools
+        </footer>
+    </div>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Agent Cost Per Task Calculator",
+        "description": "Calculate cost per completed task for multi-agent systems with retry policies",
+        "url": "https://claudflow.com/tools/agent-cost-per-task-calculator",
+        "applicationCategory": "UtilityApplication"
+    }
+    </script>
+
+    <script>
+        function updateModelPricing() {
+            const model = document.getElementById('model').value;
+            const pricing = {
+                'gpt4o': { input: 0.005, output: 0.015 },
+                'claude3.5': { input: 0.003, output: 0.015 },
+                'gpt4turbo': { input: 0.01, output: 0.03 },
+                'llama': { input: 0, output: 0 }
+            };
+            if (pricing[model]) {
+                document.getElementById('inputCost').value = pricing[model].input;
+                document.getElementById('outputCost').value = pricing[model].output;
+            }
+            calculate();
+        }
+
+        function calculate() {
+            const agentCount = parseInt(document.getElementById('agentCount').value);
+            const inputTokens = parseInt(document.getElementById('inputTokens').value);
+            const outputTokens = parseInt(document.getElementById('outputTokens').value);
+            const inputCost = parseFloat(document.getElementById('inputCost').value);
+            const outputCost = parseFloat(document.getElementById('outputCost').value);
+            const successRate = parseInt(document.getElementById('successRate').value) / 100;
+            const maxRetries = parseInt(document.getElementById('maxRetries').value);
+            const pattern = document.getElementById('pattern').value;
+            const tasksPerMonth = parseInt(document.getElementById('tasksPerMonth').value);
+
+            // Calculate cost per agent call
+            const totalOutputTokens = pattern === 'sequential' ? outputTokens * agentCount : outputTokens * agentCount;
+            const inputCostPerCall = (inputTokens / 1000) * inputCost;
+            const outputCostPerCall = (totalOutputTokens / 1000) * outputCost;
+            const costPerAttempt = inputCostPerCall + outputCostPerCall;
+
+            // Calculate expected attempts (geometric distribution)
+            let expectedAttempts = 0;
+            for (let r = 0; r <= maxRetries; r++) {
+                expectedAttempts += (1 - Math.pow(successRate, r + 1)) < 1 ? r + 1 : 0;
+            }
+            expectedAttempts = 1 / successRate;
+            if (expectedAttempts > 1 + maxRetries) {
+                expectedAttempts = 1 + maxRetries;
+            } else {
+                expectedAttempts = 1 / (1 - Math.pow(1 - successRate, maxRetries + 1));
+            }
+            expectedAttempts = Math.min(expectedAttempts, 1 + maxRetries);
+
+            const costPerSuccess = costPerAttempt * expectedAttempts;
+            const monthlyCost = costPerSuccess * tasksPerMonth;
+
+            // Display results
+            document.getElementById('costPerAttempt').textContent = costPerAttempt.toFixed(4);
+            document.getElementById('costPerSuccess').textContent = costPerSuccess.toFixed(4);
+            document.getElementById('monthlyCost').textContent = monthlyCost.toFixed(2);
+
+            // Breakdown
+            document.getElementById('bd-input').textContent = inputTokens.toLocaleString();
+            document.getElementById('bd-output').textContent = totalOutputTokens.toLocaleString();
+            document.getElementById('bd-total').textContent = (inputTokens + totalOutputTokens).toLocaleString();
+            document.getElementById('bd-attempts').textContent = expectedAttempts.toFixed(2);
+            document.getElementById('bd-success').textContent = Math.round((inputTokens + totalOutputTokens) * expectedAttempts).toLocaleString();
+
+            // Warning
+            let warning = '';
+            if (successRate < 0.8) {
+                warning = '⚠️ Low success rate (<80%). Consider improving prompts or model selection.';
+            }
+            if (monthlyCost > 5000) {
+                warning += (warning ? ' ' : '') + '⚠️ High monthly cost. Consider reducing task volume or agent count.';
+            }
+            document.getElementById('warningBox').innerHTML = warning || '✓ Configuration looks reasonable';
+
+            // Scenarios
+            generateScenarios(costPerAttempt, successRate, maxRetries, tasksPerMonth);
+
+            // Pattern comparison
+            updatePatternComparison(costPerAttempt, successRate, maxRetries, tasksPerMonth);
+        }
+
+        function generateScenarios(costPerAttempt, successRate, maxRetries, tasksPerMonth) {
+            const scenarios = [
+                {
+                    name: 'Best Case (first attempt success)',
+                    multiplier: 1,
+                    successChance: Math.round(successRate * 100)
+                },
+                {
+                    name: 'Average Case (with retries)',
+                    multiplier: 1 / successRate,
+                    successChance: 100
+                },
+                {
+                    name: 'Worst Case (max retries)',
+                    multiplier: 1 + parseInt(document.getElementById('maxRetries').value),
+                    successChance: Math.round(Math.pow(successRate, 1 + parseInt(document.getElementById('maxRetries').value)) * 100)
+                }
+            ];
+
+            let html = '';
+            scenarios.forEach(s => {
+                const cost = (costPerAttempt * s.multiplier).toFixed(4);
+                const monthly = (cost * tasksPerMonth).toFixed(2);
+                html += `
+                    <div class="scenario">
+                        <div class="scenario-title">${s.name}</div>
+                        <div class="scenario-result">Cost per task: <strong>$${cost}</strong> | Monthly: <strong>$${monthly}</strong> | Success: <strong>${s.successChance}%</strong></div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('scenarioBox').innerHTML = html;
+        }
+
+        function updatePatternComparison(costPerAttempt, successRate, maxRetries, tasksPerMonth) {
+            const patterns = {
+                sequential: { agents: parseInt(document.getElementById('agentCount').value), multiplier: 1 },
+                parallel: { agents: parseInt(document.getElementById('agentCount').value), multiplier: 1 },
+                hierarchical: { agents: parseInt(document.getElementById('agentCount').value) + 1, multiplier: 1.1 }
+            };
+
+            Object.keys(patterns).forEach(p => {
+                const agents = patterns[p].agents;
+                const cost = (costPerAttempt * patterns[p].multiplier / successRate).toFixed(4);
+                const monthly = (cost * tasksPerMonth).toFixed(2);
+
+                document.getElementById(p.substring(0, 3) + '-agents').textContent = agents;
+                document.getElementById(p.substring(0, 3) + '-calls').textContent = agents;
+                document.getElementById(p.substring(0, 3) + '-cost').textContent = '$' + cost;
+                document.getElementById(p.substring(0, 3) + '-month').textContent = '$' + monthly;
+            });
+        }
+
+        // Initialize
+        calculate();
+    </script>
+</body>
+</html>

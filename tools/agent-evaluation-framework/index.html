@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create evaluation criteria and scoring rubrics for AI agents with customizable metrics and test templates.">
+    <meta name="theme-color" content="#10b981">
+    <meta property="og:title" content="Agent Evaluation Framework">
+    <meta property="og:description" content="Build evaluation rubrics with metrics, weights, and test case templates for AI agents.">
+    <meta property="og:url" content="https://claudflow.com/tools/agent-evaluation-framework">
+    <meta property="og:type" content="website">
+    <title>Agent Evaluation Framework</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .panel h2 {
+            font-size: 1.2rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        button {
+            background: #10b981;
+            color: #0f172a;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #475569;
+            color: #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+        .checkbox-group {
+            display: grid;
+            gap: 0.6rem;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem;
+            background: #0f172a;
+            border-radius: 4px;
+        }
+        input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .metric-name {
+            color: #10b981;
+            font-weight: 600;
+        }
+        .metric-desc {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        .metric-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        .metric-item {
+            background: #0f172a;
+            border-left: 3px solid #10b981;
+            padding: 0.8rem;
+            margin-bottom: 0.6rem;
+            border-radius: 2px;
+        }
+        .output-section {
+            grid-column: 1 / -1;
+        }
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .rubric-table th, .rubric-table td {
+            border: 1px solid #334155;
+            padding: 0.8rem;
+            text-align: left;
+        }
+        .rubric-table th {
+            background: #1e293b;
+            color: #10b981;
+            font-weight: 600;
+        }
+        .rubric-table tr:nth-child(even) {
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .test-case {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 4px;
+        }
+        .test-title {
+            color: #10b981;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .test-item {
+            color: #cbd5e1;
+            margin: 0.4rem 0;
+            padding-left: 1rem;
+        }
+        .test-item:before {
+            content: "• ";
+            color: #10b981;
+        }
+        .weight-input {
+            width: 80px;
+        }
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+            padding-top: 2rem;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .stat {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+<link rel="canonical" href="https://claudflow.com/tools/agent-evaluation-framework">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agent Evaluation Framework</h1>
+            <p class="subtitle">Create evaluation rubrics with metrics, weights, and test templates</p>
+        </header>
+
+        <div class="content">
+            <div class="panel">
+                <h2>Metric Selection</h2>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="accuracy" checked>
+                        <label for="accuracy" class="checkbox-label">
+                            <span class="metric-name">Accuracy</span>
+                            <span class="metric-desc">Correctness of outputs against ground truth</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="latency" checked>
+                        <label for="latency" class="checkbox-label">
+                            <span class="metric-name">Latency</span>
+                            <span class="metric-desc">Response time in milliseconds</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cost">
+                        <label for="cost" class="checkbox-label">
+                            <span class="metric-name">Cost Efficiency</span>
+                            <span class="metric-desc">API/token cost per task completion</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="safety">
+                        <label for="safety" class="checkbox-label">
+                            <span class="metric-name">Safety</span>
+                            <span class="metric-desc">Adherence to safety constraints and guardrails</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hallucination">
+                        <label for="hallucination" class="checkbox-label">
+                            <span class="metric-name">Hallucination Rate</span>
+                            <span class="metric-desc">Percent of false/unsupported claims</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="consistency">
+                        <label for="consistency" class="checkbox-label">
+                            <span class="metric-name">Consistency</span>
+                            <span class="metric-desc">Reproducibility across multiple runs</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="completeness">
+                        <label for="completeness" class="checkbox-label">
+                            <span class="metric-name">Completeness</span>
+                            <span class="metric-desc">Coverage of all required output elements</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="metric-list">
+                    <div style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem; margin-top: 1rem;">Selected Metrics:</div>
+                    <div id="metricsList"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Metric Weights</h2>
+                <div class="form-group">
+                    <label>Framework Name</label>
+                    <input type="text" id="frameworkName" placeholder="e.g., Customer Support Agent">
+                </div>
+                <div id="weightForm" style="max-height: 350px; overflow-y: auto;"></div>
+                <button onclick="generateRubric()" style="margin-top: 1rem;">Generate Rubric</button>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Evaluation Rubric</h2>
+                <table class="rubric-table" id="rubricTable">
+                    <tr>
+                        <th>Metric</th>
+                        <th>Weight</th>
+                        <th>Excellent (5)</th>
+                        <th>Good (3)</th>
+                        <th>Poor (1)</th>
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 1.5rem; color: #94a3b8;">Select metrics and click Generate to build rubric</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Test Case Templates</h2>
+                <div id="testCases">
+                    <div style="color: #94a3b8; padding: 1rem;">Configure metrics to generate test templates</div>
+                </div>
+            </div>
+
+            <div class="panel output-section">
+                <h2>Framework Summary</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="metricCount">0</div>
+                        <div class="stat-label">Metrics</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="totalWeight">0</div>
+                        <div class="stat-label">Total Weight</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="maxScore">0</div>
+                        <div class="stat-label">Max Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 claudflow.com — AI Agent Orchestration Tools
+        </footer>
+    </div>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Agent Evaluation Framework",
+        "description": "Create evaluation criteria and scoring rubrics for AI agents",
+        "url": "https://claudflow.com/tools/agent-evaluation-framework",
+        "applicationCategory": "UtilityApplication"
+    }
+    </script>
+
+    <script>
+        const metrics = {
+            accuracy: { name: 'Accuracy', weight: 25, excellent: '>95% correct', good: '80-95% correct', poor: '<80% correct' },
+            latency: { name: 'Latency', weight: 15, excellent: '<500ms response time', good: '500ms-2s response time', poor: '>2s response time' },
+            cost: { name: 'Cost Efficiency', weight: 15, excellent: '<$0.01 per task', good: '$0.01-$0.05 per task', poor: '>$0.05 per task' },
+            safety: { name: 'Safety', weight: 20, excellent: 'No safety violations', good: '1-2 violations per 100 tasks', poor: '>2 violations per 100 tasks' },
+            hallucination: { name: 'Hallucination Rate', weight: 15, excellent: '<1% hallucinations', good: '1-5% hallucinations', poor: '>5% hallucinations' },
+            consistency: { name: 'Consistency', weight: 10, excellent: '99%+ reproduction rate', good: '95-99% reproduction rate', poor: '<95% reproduction rate' },
+            completeness: { name: 'Completeness', weight: 10, excellent: '100% elements present', good: '85-99% elements', poor: '<85% elements' }
+        };
+
+        function updateMetricsList() {
+            const selected = Object.keys(metrics).filter(k => document.getElementById(k).checked);
+            const list = document.getElementById('metricsList');
+
+            if (selected.length === 0) {
+                list.innerHTML = '<div style="color: #64748b; font-size: 0.85rem;">None selected</div>';
+                document.getElementById('metricCount').textContent = '0';
+                return;
+            }
+
+            list.innerHTML = selected.map(m => `
+                <div class="metric-item">
+                    <div style="color: #10b981; font-weight: 600;">${metrics[m].name}</div>
+                    <div style="color: #94a3b8; font-size: 0.8rem;">Default weight: ${metrics[m].weight}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('metricCount').textContent = selected.length;
+            updateWeightForm(selected);
+        }
+
+        function updateWeightForm(selected) {
+            let form = '';
+            let total = 0;
+            selected.forEach(m => {
+                total += metrics[m].weight;
+                form += `
+                    <div class="form-group">
+                        <label>${metrics[m].name}</label>
+                        <input type="number" class="weight-input" id="weight-${m}" value="${metrics[m].weight}" min="1" max="100" onchange="updateWeights()">
+                    </div>
+                `;
+            });
+            document.getElementById('weightForm').innerHTML = form;
+            document.getElementById('totalWeight').textContent = total;
+        }
+
+        function updateWeights() {
+            const weights = {};
+            let total = 0;
+            Object.keys(metrics).forEach(m => {
+                const el = document.getElementById(`weight-${m}`);
+                if (el) {
+                    const w = parseInt(el.value) || metrics[m].weight;
+                    weights[m] = w;
+                    total += w;
+                }
+            });
+            document.getElementById('totalWeight').textContent = total;
+        }
+
+        function generateRubric() {
+            const selected = Object.keys(metrics).filter(k => document.getElementById(k).checked);
+            if (selected.length === 0) {
+                alert('Select at least one metric');
+                return;
+            }
+
+            let table = '<tr><th>Metric</th><th>Weight</th><th>Excellent (5)</th><th>Good (3)</th><th>Poor (1)</th></tr>';
+            let totalScore = 0;
+
+            selected.forEach(m => {
+                const weight = parseInt(document.getElementById(`weight-${m}`).value) || metrics[m].weight;
+                const points = weight / 10 * 5;
+                totalScore += points;
+
+                table += `
+                    <tr>
+                        <td>${metrics[m].name}</td>
+                        <td>${weight}</td>
+                        <td>${metrics[m].excellent}</td>
+                        <td>${metrics[m].good}</td>
+                        <td>${metrics[m].poor}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('rubricTable').innerHTML = table;
+            document.getElementById('maxScore').textContent = Math.round(totalScore);
+
+            generateTestCases(selected);
+        }
+
+        function generateTestCases(selected) {
+            let html = '';
+
+            if (selected.includes('accuracy')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Accuracy Test</div>
+                        <div class="test-item">Setup: Prepare 100 queries with known correct answers</div>
+                        <div class="test-item">Procedure: Run agent on each query, capture response</div>
+                        <div class="test-item">Evaluation: Compare against ground truth, calculate % correct</div>
+                        <div class="test-item">Passing: ≥95% accuracy</div>
+                    </div>
+                `;
+            }
+
+            if (selected.includes('latency')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Latency Test</div>
+                        <div class="test-item">Setup: Create 50 representative queries</div>
+                        <div class="test-item">Procedure: Measure end-to-end response time for each</div>
+                        <div class="test-item">Evaluation: Calculate p50, p95, p99 latencies</div>
+                        <div class="test-item">Passing: p95 < 2000ms</div>
+                    </div>
+                `;
+            }
+
+            if (selected.includes('cost')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Cost Efficiency Test</div>
+                        <div class="test-item">Setup: Define token limits per model</div>
+                        <div class="test-item">Procedure: Log input/output tokens for 100 tasks</div>
+                        <div class="test-item">Evaluation: Calculate total cost using pricing model</div>
+                        <div class="test-item">Passing: Cost per task < $0.05</div>
+                    </div>
+                `;
+            }
+
+            if (selected.includes('safety')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Safety Test</div>
+                        <div class="test-item">Setup: Create adversarial prompts (jailbreaks, harmful requests)</div>
+                        <div class="test-item">Procedure: Run agent on each prompt, check for violations</div>
+                        <div class="test-item">Evaluation: Count safety violations</div>
+                        <div class="test-item">Passing: 0-2 violations per 100 queries</div>
+                    </div>
+                `;
+            }
+
+            if (selected.includes('hallucination')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Hallucination Test</div>
+                        <div class="test-item">Setup: Prepare queries with factual questions</div>
+                        <div class="test-item">Procedure: Have human expert rate claim validity</div>
+                        <div class="test-item">Evaluation: % of unsupported or false claims</div>
+                        <div class="test-item">Passing: <1% hallucinations</div>
+                    </div>
+                `;
+            }
+
+            if (selected.includes('consistency')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Consistency Test</div>
+                        <div class="test-item">Setup: Create 30 queries with deterministic outputs</div>
+                        <div class="test-item">Procedure: Run each query 5 times, compare outputs</div>
+                        <div class="test-item">Evaluation: % of identical outputs across runs</div>
+                        <div class="test-item">Passing: ≥95% consistency rate</div>
+                    </div>
+                `;
+            }
+
+            if (selected.includes('completeness')) {
+                html += `
+                    <div class="test-case">
+                        <div class="test-title">Completeness Test</div>
+                        <div class="test-item">Setup: Define required output elements per task type</div>
+                        <div class="test-item">Procedure: Check agent output for each element</div>
+                        <div class="test-item">Evaluation: % of required elements present</div>
+                        <div class="test-item">Passing: ≥85% elements present</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('testCases').innerHTML = html || '<div style="color: #94a3b8;">No test cases generated</div>';
+        }
+
+        // Event listeners
+        Object.keys(metrics).forEach(m => {
+            document.getElementById(m).addEventListener('change', updateMetricsList);
+        });
+
+        // Initialize
+        updateMetricsList();
+    </script>
+</body>
+</html>
