@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Retry Cost Calculator</title>
+<meta name="description" content="Project expected token cost and attempt count when agents retry on failure at a given error rate and max-retry limit.">
+<link rel="canonical" href="https://claudflow.com/tools/agent-retry-cost-calculator">
+<meta property="og:title" content="Agent Retry Cost Calculator">
+<meta property="og:description" content="Project expected token cost and attempt count when agents retry on failure at a given error rate and max-retry limit.">
+<meta property="og:url" content="https://claudflow.com/tools/agent-retry-cost-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Agent Retry Cost Calculator",
+      "url": "https://claudflow.com/tools/agent-retry-cost-calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Agent Retry Cost Calculator", "item": "https://claudflow.com/tools/agent-retry-cost-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0c1018;color:#e6ecf5;line-height:1.6}
+nav{display:flex;gap:20px;padding:16px 24px;background:#11161f;border-bottom:1px solid #232c3b}
+nav a{color:#7fb2ff;text-decoration:none;font-weight:600}
+nav a:hover{text-decoration:underline}
+main{max-width:860px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:1.9rem;line-height:1.25;margin:.4em 0}
+h2{font-size:1.3rem;margin-top:1.8em;border-bottom:1px solid #232c3b;padding-bottom:.3em}
+.intro{color:#aab8cc;font-size:1.05rem}
+#tool{background:#11161f;border:1px solid #232c3b;border-radius:14px;padding:22px;margin:24px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+label{display:block;font-size:.85rem;color:#aab8cc;margin-bottom:6px;font-weight:600}
+input{width:100%;padding:10px 12px;background:#0c1018;border:1px solid #2c3850;border-radius:8px;color:#e6ecf5;font-size:1rem}
+input:focus{outline:none;border-color:#4d8dff}
+.out{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.card{background:#0c1018;border:1px solid #2c3850;border-radius:10px;padding:16px}
+.card .v{font-size:1.5rem;font-weight:700;color:#7fb2ff}
+.card .k{font-size:.78rem;color:#aab8cc;text-transform:uppercase;letter-spacing:.04em}
+.note{font-size:.85rem;color:#8595aa;margin-top:14px}
+code{background:#0c1018;border:1px solid #2c3850;border-radius:5px;padding:1px 6px;font-size:.9em;color:#9fd0ff}
+.formula{background:#11161f;border-left:3px solid #4d8dff;padding:12px 16px;margin:16px 0;border-radius:0 8px 8px 0;font-size:.95rem}
+section a{color:#7fb2ff}
+footer{border-top:1px solid #232c3b;padding:24px;text-align:center;color:#8595aa;font-size:.9rem}
+footer a{color:#7fb2ff;text-decoration:none;margin:0 10px}
+ul{padding-left:20px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">claudflow.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<main>
+<h1>Estimate Token Spend When AI Agents Retry on Failure</h1>
+<p class="intro">When an agent step can fail and retry, your real cost is a probability-weighted sum across attempts — not just one call. Enter your error rate, retry limit, and per-attempt tokens to see the expected cost, attempt count, and worst case.</p>
+
+<section id="tool">
+  <div class="grid">
+    <div>
+      <label for="tasks">Number of tasks / agent calls</label>
+      <input id="tasks" type="number" min="1" step="1" value="1000">
+    </div>
+    <div>
+      <label for="err">Per-attempt failure rate (%)</label>
+      <input id="err" type="number" min="0" max="99" step="0.5" value="20">
+    </div>
+    <div>
+      <label for="retries">Max retries (extra attempts after first)</label>
+      <input id="retries" type="number" min="0" max="20" step="1" value="3">
+    </div>
+    <div>
+      <label for="intok">Input tokens per attempt</label>
+      <input id="intok" type="number" min="0" step="100" value="4000">
+    </div>
+    <div>
+      <label for="outtok">Output tokens per attempt</label>
+      <input id="outtok" type="number" min="0" step="100" value="1200">
+    </div>
+    <div>
+      <label for="inprice">Input price ($ / 1M tokens)</label>
+      <input id="inprice" type="number" min="0" step="0.1" value="3">
+    </div>
+    <div>
+      <label for="outprice">Output price ($ / 1M tokens)</label>
+      <input id="outprice" type="number" min="0" step="0.1" value="15">
+    </div>
+  </div>
+
+  <div class="out" id="out"></div>
+  <p class="note" id="note"></p>
+</section>
+
+<h2>How the retry cost model works</h2>
+<p>A naive estimate multiplies one call's cost by your task count. That undercounts any pipeline where a failed attempt is retried, because every retry consumes the full input and output tokens again. This calculator computes the <strong>expected number of attempts per task</strong> as a finite geometric series, then scales tokens and price by it.</p>
+
+<div class="formula">
+Let <code>p</code> = failure probability per attempt, <code>R</code> = max retries.<br>
+Expected attempts per task = <code>1 + p + p² + … + p^R</code> = <code>(1 − p^(R+1)) / (1 − p)</code>.<br>
+Expected tokens = attempts × (input + output) per attempt.<br>
+Final-failure probability = <code>p^(R+1)</code> (every attempt failed).
+</div>
+
+<p>The series captures the diminishing likelihood of each successive retry: the second attempt only runs with probability <code>p</code>, the third with <code>p²</code>, and so on. As <code>p</code> approaches 0 the expected attempts approach exactly 1; as <code>p</code> approaches 1 it approaches <code>R+1</code>, the hard ceiling. Because attempts are bounded by the retry limit, the geometric sum is finite even at high error rates — that bound is what makes the worst-case column meaningful for budgeting.</p>
+
+<p>Two figures matter most for an orchestration budget. The <strong>expected cost</strong> tells you the average bill once retries are amortized over many tasks. The <strong>worst-case cost</strong> assumes every task exhausts all <code>R+1</code> attempts — the ceiling your concurrency and rate-limit headroom must survive during an incident. The <strong>final-failure rate</strong> (<code>p^(R+1)</code>) is the share of tasks that still fail after all retries; those need a dead-letter path, human escalation, or a fallback model, and they are pure sunk cost since they consumed every attempt without producing a usable result. Tune the retry limit against this number: raising <code>R</code> shrinks final failures but inflates worst-case spend, so the right setting balances reliability against the tail of your token bill.</p>
+
+<section>
+<h2>Related Tools</h2>
+<ul>
+  <li><a href="/tools/agent-loop-cost-calculator">Agent Loop Cost Calculator</a> — multi-step reasoning loop spend.</li>
+  <li><a href="/tools/agent-cost-per-task-calculator">Agent Cost Per Task Calculator</a> — unit economics of a single agent run.</li>
+  <li><a href="/tools/tool-use-cost-estimator">Tool-Use Cost Estimator</a> — token overhead of function-calling round trips.</li>
+</ul>
+</section>
+</main>
+
+<footer>
+  <div><a href="/">Home</a><a href="/tools/">All Tools</a></div>
+  <div>© 2026 claudflow.com</div>
+</footer>
+
+<script>
+(function(){
+  var ids=['tasks','err','retries','intok','outtok','inprice','outprice'];
+  var el={};
+  ids.forEach(function(i){el[i]=document.getElementById(i);});
+  var out=document.getElementById('out');
+  var note=document.getElementById('note');
+
+  function num(id){var v=parseFloat(el[id].value);return isNaN(v)?0:v;}
+
+  function fmtMoney(x){
+    if(x>=1000)return '$'+x.toLocaleString('en-US',{maximumFractionDigits:0});
+    return '$'+x.toFixed(x<10?4:2);
+  }
+  function fmtNum(x){return x.toLocaleString('en-US',{maximumFractionDigits:0});}
+
+  function card(k,v){return '<div class="card"><div class="v">'+v+'</div><div class="k">'+k+'</div></div>';}
+
+  function compute(){
+    var tasks=Math.max(0,num('tasks'));
+    var p=Math.min(0.99,Math.max(0,num('err')/100));
+    var R=Math.max(0,Math.round(num('retries')));
+    var perAttemptTok=num('intok')+num('outtok');
+
+    // Expected attempts per task = (1 - p^(R+1)) / (1 - p), with p->1 limit = R+1
+    var expAttempts;
+    if(p>=0.999999){expAttempts=R+1;}
+    else{expAttempts=(1-Math.pow(p,R+1))/(1-p);}
+
+    var maxAttempts=R+1;
+    var finalFail=Math.pow(p,R+1);
+
+    var inCostPer=num('intok')/1e6*num('inprice');
+    var outCostPer=num('outtok')/1e6*num('outprice');
+    var costPerAttempt=inCostPer+outCostPer;
+
+    var expCost=tasks*expAttempts*costPerAttempt;
+    var worstCost=tasks*maxAttempts*costPerAttempt;
+    var naiveCost=tasks*costPerAttempt;
+    var overhead=naiveCost>0?(expCost/naiveCost-1)*100:0;
+
+    var totalExpTok=tasks*expAttempts*perAttemptTok;
+    var failedTasks=tasks*finalFail;
+
+    out.innerHTML=
+      card('Expected attempts / task',expAttempts.toFixed(3))+
+      card('Expected total cost',fmtMoney(expCost))+
+      card('Worst-case cost',fmtMoney(worstCost))+
+      card('Retry overhead',overhead.toFixed(1)+'%')+
+      card('Expected tokens',fmtNum(totalExpTok))+
+      card('Final-failure rate',(finalFail*100).toFixed(2)+'%');
+
+    note.innerHTML='About <strong>'+fmtNum(Math.round(failedTasks))+
+      '</strong> of '+fmtNum(Math.round(tasks))+
+      ' tasks still fail after all retries (need a fallback path). '+
+      'Naive single-call estimate: '+fmtMoney(naiveCost)+
+      ' — retries add '+fmtMoney(expCost-naiveCost)+' on average.';
+  }
+
+  ids.forEach(function(i){el[i].addEventListener('input',compute);});
+  compute();
+})();
+</script>
+</body>
+</html>

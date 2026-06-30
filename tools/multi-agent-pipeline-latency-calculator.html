@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multi-Agent Pipeline Latency Calculator</title>
+<meta name="description" content="Compare sequential versus parallel end-to-end latency across your multi-agent pipeline stages and spot the bottleneck.">
+<link rel="canonical" href="https://claudflow.com/tools/multi-agent-pipeline-latency-calculator">
+<meta property="og:title" content="Multi-Agent Pipeline Latency Calculator">
+<meta property="og:description" content="Compare sequential versus parallel end-to-end latency across your multi-agent pipeline stages and spot the bottleneck.">
+<meta property="og:url" content="https://claudflow.com/tools/multi-agent-pipeline-latency-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Multi-Agent Pipeline Latency Calculator",
+      "description": "Compare sequential versus parallel end-to-end latency across your multi-agent pipeline stages and spot the bottleneck.",
+      "url": "https://claudflow.com/tools/multi-agent-pipeline-latency-calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Multi-Agent Pipeline Latency Calculator", "item": "https://claudflow.com/tools/multi-agent-pipeline-latency-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#0c0f17;--panel:#141925;--panel2:#1b2230;--line:#2a3243;
+    --text:#e7ecf4;--muted:#9aa6bd;--accent:#5b8cff;--accent2:#34d399;
+    --warn:#fbbf24;--danger:#f87171;--radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    line-height:1.6;font-size:16px}
+  nav{display:flex;gap:18px;padding:16px 22px;border-bottom:1px solid var(--line);
+    background:#0a0d14;position:sticky;top:0;z-index:5}
+  nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:14px}
+  nav a:hover{color:var(--accent)}
+  main{max-width:920px;margin:0 auto;padding:26px 18px 60px}
+  h1{font-size:1.85rem;line-height:1.2;margin:.4em 0 .2em}
+  h2{font-size:1.3rem;margin:1.6em 0 .5em;border-left:3px solid var(--accent);padding-left:10px}
+  .intro{color:var(--muted);max-width:680px}
+  section#tool{background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px;margin-top:22px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--line);
+    color:var(--text);border-radius:8px;padding:10px 11px;font-size:15px;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--accent)}
+  .stages{margin-top:18px}
+  .stage-row{display:grid;grid-template-columns:2fr 1.3fr 1.1fr auto;gap:10px;
+    align-items:end;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:12px;margin-bottom:10px}
+  @media(max-width:560px){.stage-row{grid-template-columns:1fr 1fr}}
+  .stage-row .full{grid-column:1/-1}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:8px;
+    padding:10px 14px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+  .btn.sec{background:var(--panel2);border:1px solid var(--line);color:var(--text)}
+  .btn.del{background:transparent;border:1px solid var(--line);color:var(--danger);padding:8px 11px}
+  .btn:hover{filter:brightness(1.1)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+  .out{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:560px){.out{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .card .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .card .v{font-size:1.6rem;font-weight:700;margin-top:4px}
+  .v.green{color:var(--accent2)}.v.blue{color:var(--accent)}.v.warn{color:var(--warn)}
+  .bottleneck{margin-top:16px;background:#1a1410;border:1px solid #3a2e16;
+    border-radius:10px;padding:14px;font-size:14px}
+  .bottleneck b{color:var(--warn)}
+  table.bars{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+  table.bars td{padding:6px 4px;vertical-align:middle}
+  .bar{height:16px;border-radius:4px;background:var(--accent);min-width:2px}
+  .bar.crit{background:var(--danger)}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+  footer{border-top:1px solid var(--line);padding:24px 18px;margin-top:40px;
+    color:var(--muted);font-size:14px;text-align:center}
+  footer a{color:var(--accent);text-decoration:none;margin:0 8px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:13px}
+  .rel a{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:20px;padding:7px 14px;margin:5px 6px 0 0;color:var(--accent);
+    text-decoration:none;font-size:14px;font-weight:600}
+  .rel a:hover{border-color:var(--accent)}
+  p{max-width:720px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">claudflow.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<main>
+  <h1>Estimate End-to-End Latency of Your Agent Pipeline</h1>
+  <p class="intro">Model each stage of a multi-agent workflow, then compare a strictly sequential run against a concurrency-aware schedule. The tool surfaces your critical path and the single stage costing you the most wall-clock time.</p>
+
+  <section id="tool">
+    <div class="grid">
+      <div>
+        <label for="parallelism">Max concurrent agents (parallel run)</label>
+        <input id="parallelism" type="number" min="1" max="64" step="1" value="3">
+      </div>
+      <div>
+        <label for="orch">Per-handoff orchestration overhead (ms)</label>
+        <input id="orch" type="number" min="0" max="60000" step="10" value="40">
+      </div>
+    </div>
+
+    <h2 style="border:none;padding:0;margin:18px 0 6px;font-size:1.05rem">Pipeline stages</h2>
+    <div class="toolbar">
+      <button class="btn" id="add">+ Add stage</button>
+      <button class="btn sec" id="reset">Reset example</button>
+    </div>
+    <div class="stages" id="stages"></div>
+
+    <div class="out">
+      <div class="card"><div class="k">Sequential total</div><div class="v blue" id="seqOut">–</div></div>
+      <div class="card"><div class="k">Parallel total</div><div class="v green" id="parOut">–</div></div>
+      <div class="card"><div class="k">Speed-up</div><div class="v warn" id="spdOut">–</div></div>
+    </div>
+
+    <div class="bottleneck" id="bottleneck"></div>
+    <table class="bars" id="bars"></table>
+    <p class="note">Each stage latency = model/compute time + tokens ÷ throughput. Stages sharing the same group run concurrently up to the worker limit.</p>
+  </section>
+
+  <h2>How the latency model works</h2>
+  <p>Every stage in a multi-agent pipeline contributes a <b>per-stage latency</b> computed as <code>base_ms + (tokens / throughput) × 1000</code>, where <code>throughput</code> is tokens per second for that agent's model. The base time absorbs queueing, tool calls, and time-to-first-token; the token term captures generation length. You enter these per stage so the math reflects your real workload, not a generic benchmark.</p>
+  <p>The <b>sequential total</b> is the naive sum: every stage waits for the previous one to finish, plus one orchestration handoff between each pair of stages. This is the latency you get from a simple chain where each agent's output feeds the next. Formally, <code>T_seq = Σ stage_i + (n − 1) × overhead</code>.</p>
+  <p>The <b>parallel total</b> models concurrency. Stages that share a group label can run at the same time, bounded by your <i>max concurrent agents</i> limit. Within a group we use a greedy longest-processing-time bin-packing pass: the heaviest stages are assigned to the least-loaded of the available worker slots, and the group's duration becomes the busiest slot. Groups still run in order, so the pipeline total is the sum of each group's packed duration plus one handoff between groups. When a group has more stages than workers, the calculator shows how the queue serializes the overflow — the same effect you see when ten subagents fan out onto three concurrent connections.</p>
+  <p>The <b>critical path</b> is the longest single chain of work that cannot be parallelized away. The calculator flags the stage with the largest individual latency as your bottleneck: shaving time there, or splitting it into a faster model, moves the whole pipeline more than optimizing any cheaper stage. Speed-up is simply <code>T_seq / T_par</code> — a number above 1 means concurrency is buying you wall-clock time, while a value near 1 means your stages are too serially dependent to benefit from more workers. Use it to decide whether adding agents or shrinking the bottleneck is the better next move.</p>
+
+  <section class="rel">
+    <h2>Related Tools</h2>
+    <a href="/tools/multi-agent-pipeline-designer">Multi-Agent Pipeline Designer</a>
+    <a href="/tools/orchestration-pattern-picker">Orchestration Pattern Picker</a>
+    <a href="/tools/agent-handoff-designer">Agent Handoff Designer</a>
+  </section>
+</main>
+
+<footer>
+  <div><a href="/">Home</a> · <a href="/tools/">All Tools</a></div>
+  <div style="margin-top:8px">© 2026 claudflow.com — built by <a href="https://zovo.one">Michael Lip</a></div>
+</footer>
+
+<script>
+(function(){
+  var EX = [
+    {name:"Router / planner", tokens:600, tput:60, group:1},
+    {name:"Retriever A", tokens:1200, tput:80, group:2},
+    {name:"Retriever B", tokens:1100, tput:80, group:2},
+    {name:"Retriever C", tokens:900, tput:80, group:2},
+    {name:"Synthesizer", tokens:1800, tput:45, group:3}
+  ];
+  var stages = JSON.parse(JSON.stringify(EX));
+  var elS = document.getElementById('stages');
+  var BASE = 120; // implicit base ms per stage (TTFT + queue)
+
+  function row(s, i){
+    var d = document.createElement('div');
+    d.className = 'stage-row';
+    d.innerHTML =
+      '<div class="full"><label>Stage name</label><input data-k="name" data-i="'+i+'" type="text" value="'+esc(s.name)+'"></div>'+
+      '<div><label>Output tokens</label><input data-k="tokens" data-i="'+i+'" type="number" min="0" max="200000" step="50" value="'+s.tokens+'"></div>'+
+      '<div><label>Throughput (tok/s)</label><input data-k="tput" data-i="'+i+'" type="number" min="1" max="5000" step="1" value="'+s.tput+'"></div>'+
+      '<div><label>Group</label><input data-k="group" data-i="'+i+'" type="number" min="1" max="99" step="1" value="'+s.group+'"></div>'+
+      '<div><button class="btn del" data-del="'+i+'">✕</button></div>';
+    return d;
+  }
+  function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  function render(){
+    elS.innerHTML='';
+    stages.forEach(function(s,i){ elS.appendChild(row(s,i)); });
+    compute();
+  }
+
+  function stageLatency(s){
+    var tput = Math.max(1, +s.tput || 1);
+    var tok = Math.max(0, +s.tokens || 0);
+    return BASE + (tok / tput) * 1000;
+  }
+
+  function compute(){
+    var P = Math.max(1, Math.floor(+document.getElementById('parallelism').value||1));
+    var OV = Math.max(0, +document.getElementById('orch').value||0);
+
+    var lat = stages.map(stageLatency);
+
+    // Sequential: sum + (n-1) handoffs
+    var seq = lat.reduce(function(a,b){return a+b;},0);
+    if(stages.length>1) seq += (stages.length-1)*OV;
+
+    // Parallel: group by group label, ordered; greedy LPT bin-pack within each group
+    var groups = {};
+    stages.forEach(function(s,i){
+      var g = +s.group||1;
+      (groups[g]=groups[g]||[]).push(lat[i]);
+    });
+    var gKeys = Object.keys(groups).map(Number).sort(function(a,b){return a-b;});
+    var par = 0;
+    gKeys.forEach(function(g){
+      var items = groups[g].slice().sort(function(a,b){return b-a;});
+      var slots = new Array(P).fill(0);
+      items.forEach(function(v){
+        var m=0; for(var j=1;j<slots.length;j++){ if(slots[j]<slots[m]) m=j; }
+        slots[m]+=v;
+      });
+      par += Math.max.apply(null, slots);
+    });
+    if(gKeys.length>1) par += (gKeys.length-1)*OV;
+
+    var spd = par>0 ? seq/par : 1;
+
+    document.getElementById('seqOut').textContent = fmt(seq);
+    document.getElementById('parOut').textContent = fmt(par);
+    document.getElementById('spdOut').textContent = spd.toFixed(2)+'×';
+
+    // Bottleneck
+    var maxI=0; lat.forEach(function(v,i){ if(v>lat[maxI]) maxI=i; });
+    var bn = document.getElementById('bottleneck');
+    if(stages.length){
+      var pct = seq>0 ? (lat[maxI]/seq*100) : 0;
+      bn.innerHTML = 'Bottleneck stage: <b>'+esc(stages[maxI].name||('Stage '+(maxI+1)))+'</b> at '+
+        fmt(lat[maxI])+' ('+pct.toFixed(0)+'% of sequential time). '+
+        (spd>1.15 ? 'Concurrency is helping — speed-up '+spd.toFixed(2)+'×.'
+                  : 'Stages are mostly serial; faster models on the bottleneck will help more than adding workers.');
+    } else { bn.innerHTML='Add a stage to begin.'; }
+
+    // Bars
+    var tbl = document.getElementById('bars');
+    var maxLat = Math.max.apply(null, lat.concat([1]));
+    tbl.innerHTML='';
+    stages.forEach(function(s,i){
+      var w = Math.round(lat[i]/maxLat*100);
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td style="width:30%">'+esc(s.name||('Stage '+(i+1)))+
+        '</td><td><div class="bar'+(i===maxI?' crit':'')+'" style="width:'+w+'%"></div></td>'+
+        '<td style="width:22%;text-align:right">'+fmt(lat[i])+'</td>';
+      tbl.appendChild(tr);
+    });
+  }
+
+  function fmt(ms){
+    if(ms>=1000) return (ms/1000).toFixed(2)+' s';
+    return Math.round(ms)+' ms';
+  }
+
+  elS.addEventListener('input', function(e){
+    var i=e.target.getAttribute('data-i'), k=e.target.getAttribute('data-k');
+    if(i===null) return;
+    var v = (k==='name') ? e.target.value : e.target.value;
+    stages[+i][k] = v;
+    compute();
+  });
+  elS.addEventListener('click', function(e){
+    var d=e.target.getAttribute('data-del');
+    if(d!==null){ stages.splice(+d,1); render(); }
+  });
+  document.getElementById('add').addEventListener('click', function(){
+    stages.push({name:"New stage", tokens:800, tput:60, group:(stages.length?+stages[stages.length-1].group+1:1)});
+    render();
+  });
+  document.getElementById('reset').addEventListener('click', function(){
+    stages = JSON.parse(JSON.stringify(EX)); render();
+  });
+  document.getElementById('parallelism').addEventListener('input', compute);
+  document.getElementById('orch').addEventListener('input', compute);
+
+  render();
+})();
+</script>
+</body>
+</html>

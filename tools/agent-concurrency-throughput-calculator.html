@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Concurrency Throughput Calculator</title>
+<meta name="description" content="Compute how many tasks per second your agent pipeline handles from concurrent workers, per-task latency, and queue time. Free, instant, no signup.">
+<link rel="canonical" href="https://claudflow.com/tools/agent-concurrency-throughput-calculator">
+<meta property="og:title" content="Agent Concurrency Throughput Calculator">
+<meta property="og:description" content="Compute how many tasks per second your agent pipeline handles from concurrent workers, per-task latency, and queue time.">
+<meta property="og:url" content="https://claudflow.com/tools/agent-concurrency-throughput-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Agent Concurrency Throughput Calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "url": "https://claudflow.com/tools/agent-concurrency-throughput-calculator",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Agent Concurrency Throughput Calculator", "item": "https://claudflow.com/tools/agent-concurrency-throughput-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{--bg:#0c1018;--panel:#151c28;--panel2:#1d2736;--ink:#e8eef7;--mut:#93a2b8;--acc:#5eb0ff;--acc2:#7ef0c0;--line:#27344a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{display:flex;gap:18px;padding:16px 22px;border-bottom:1px solid var(--line);background:#0a0e15;flex-wrap:wrap}
+nav a{color:var(--acc);text-decoration:none;font-weight:600;font-size:.95rem}
+nav a:hover{text-decoration:underline}
+.wrap{max-width:860px;margin:0 auto;padding:30px 22px 60px}
+h1{font-size:1.85rem;line-height:1.25;margin-bottom:10px}
+.intro{color:var(--mut);margin-bottom:26px;font-size:1.05rem}
+section{margin:30px 0}
+h2{font-size:1.3rem;margin-bottom:14px;border-left:3px solid var(--acc);padding-left:10px}
+#tool{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.field label{display:block;font-size:.85rem;color:var(--mut);margin-bottom:6px;font-weight:600}
+.field input,.field select{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:1rem}
+.field input:focus,.field select:focus{outline:none;border-color:var(--acc)}
+.hint{font-size:.72rem;color:var(--mut);margin-top:4px}
+.out{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:16px}
+.card .k{font-size:.78rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.card .v{font-size:1.5rem;font-weight:700;margin-top:6px;color:var(--acc2)}
+.card .s{font-size:.74rem;color:var(--mut);margin-top:3px}
+.note{margin-top:18px;padding:13px 15px;background:#10202c;border:1px solid #1c3a4a;border-radius:9px;font-size:.9rem;color:#bfe2f5}
+.prose p{margin-bottom:13px;color:#cdd8e8}
+.prose code{background:#0a0e15;padding:2px 6px;border-radius:5px;font-size:.88rem;color:var(--acc2)}
+.prose h3{margin:18px 0 8px;font-size:1.05rem}
+.rel a{display:inline-block;margin:6px 10px 6px 0;padding:9px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--acc);text-decoration:none;font-weight:600;font-size:.92rem}
+.rel a:hover{border-color:var(--acc)}
+footer{border-top:1px solid var(--line);padding:24px 22px;text-align:center;color:var(--mut);font-size:.9rem}
+footer a{color:var(--acc);text-decoration:none;margin:0 8px}
+@media(max-width:480px){h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">claudflow.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<div class="wrap">
+<h1>How Many Tasks Per Second Can Your Agent Pipeline Run?</h1>
+<p class="intro">Estimate sustained throughput, effective utilization, and queue wait for a concurrent multi-agent workflow. Adjust workers, latency, and arrival rate to find the bottleneck before you scale.</p>
+
+<section id="tool">
+  <div class="grid">
+    <div class="field">
+      <label for="workers">Concurrent workers (agents)</label>
+      <input id="workers" type="number" min="1" step="1" value="8">
+      <div class="hint">Parallel agent slots / max in-flight tasks</div>
+    </div>
+    <div class="field">
+      <label for="latency">Per-task latency (seconds)</label>
+      <input id="latency" type="number" min="0.01" step="0.1" value="4">
+      <div class="hint">Mean wall-clock time one agent spends per task</div>
+    </div>
+    <div class="field">
+      <label for="arrival">Incoming task rate (tasks/sec)</label>
+      <input id="arrival" type="number" min="0" step="0.1" value="1.2">
+      <div class="hint">How fast new tasks arrive at the queue</div>
+    </div>
+    <div class="field">
+      <label for="overhead">Orchestration overhead (%)</label>
+      <input id="overhead" type="number" min="0" max="95" step="1" value="10">
+      <div class="hint">Scheduling, routing, retries lost to coordination</div>
+    </div>
+    <div class="field">
+      <label for="batch">Tasks per batch call</label>
+      <input id="batch" type="number" min="1" step="1" value="1">
+      <div class="hint">Tasks an agent processes per single invocation</div>
+    </div>
+    <div class="field">
+      <label for="window">Reporting window</label>
+      <select id="window">
+        <option value="1">Per second</option>
+        <option value="60" selected>Per minute</option>
+        <option value="3600">Per hour</option>
+      </select>
+      <div class="hint">Scale the throughput figure</div>
+    </div>
+  </div>
+
+  <div class="out" id="out"></div>
+  <div class="note" id="verdict"></div>
+</section>
+
+<section class="prose">
+  <h2>How this calculator works</h2>
+  <p>Throughput in a concurrent agent system is governed by the same math as a multi-server queue. With <code>W</code> workers each finishing a task in <code>L</code> seconds, one worker completes <code>1/L</code> tasks per second, so the raw service capacity is:</p>
+  <p><code>capacity = (W &times; B) / L</code></p>
+  <p>where <code>B</code> is the tasks handled per batch invocation. Orchestration is never free, so we discount capacity by the overhead fraction <code>o</code> to get effective capacity <code>C_eff = capacity &times; (1 - o)</code>. This overhead captures the scheduler, message routing, retries, and serialization that steal time from useful work in real multi-agent pipelines.</p>
+  <p>The system can only sustain whatever the slower side allows, so actual sustained <code>throughput = min(arrival_rate, C_eff)</code>. Utilization is <code>&rho; = arrival_rate / C_eff</code>. When <code>&rho; &lt; 1</code> the pipeline keeps up; as <code>&rho;</code> approaches 1, queueing explodes.</p>
+  <h3>Queue wait estimate</h3>
+  <p>We approximate the mean time a task waits before an agent picks it up using an M/M/c-style heavy-traffic factor: <code>wait &asymp; (&rho; / (1 - &rho;)) &times; (L / W)</code> seconds. This is intentionally conservative — it climbs sharply once utilization passes ~85%, which is exactly where adding workers or trimming latency pays off most. If <code>&rho; &ge; 1</code> the queue is unstable and grows without bound, so we flag it instead of printing a finite number.</p>
+  <p>The marginal-worker hint compares current effective capacity against capacity with one extra worker, telling you the incremental tasks/sec a new agent slot buys — useful when each concurrent agent has a real dollar cost. Unlike generic throughput calculators, this tool folds orchestration overhead and batch size directly into the capacity term, so the number reflects an agent fleet rather than an idealized CPU.</p>
+</section>
+
+<section class="rel">
+  <h2>Related Tools</h2>
+  <a href="/tools/agent-loop-cost-calculator">Agent Loop Cost Calculator</a>
+  <a href="/tools/multi-agent-pipeline-designer">Multi-Agent Pipeline Designer</a>
+  <a href="/tools/agent-cost-per-task-calculator">Agent Cost Per Task Calculator</a>
+</section>
+</div>
+
+<footer>
+  <a href="/">Home</a> · <a href="/tools/">All Tools</a><br>
+  © 2026 claudflow.com — built for agent builders.
+</footer>
+
+<script>
+(function(){
+  var ids=['workers','latency','arrival','overhead','batch','window'];
+  var el={};
+  ids.forEach(function(i){el[i]=document.getElementById(i);});
+  var out=document.getElementById('out');
+  var verdict=document.getElementById('verdict');
+
+  function num(x,min){var v=parseFloat(x);if(isNaN(v))v=min;if(v<min)v=min;return v;}
+  function fmt(n,d){if(!isFinite(n))return '∞';return n.toLocaleString(undefined,{maximumFractionDigits:d===undefined?2:d});}
+
+  function calc(){
+    var W=num(el.workers.value,1);
+    var L=num(el.latency.value,0.01);
+    var A=num(el.arrival.value,0);
+    var o=Math.min(num(el.overhead.value,0),95)/100;
+    var B=num(el.batch.value,1);
+    var win=parseFloat(el.window.value)||1;
+
+    var capacity=(W*B)/L;                 // raw tasks/sec
+    var cEff=capacity*(1-o);              // effective tasks/sec
+    var thru=Math.min(A,cEff);            // sustained tasks/sec
+    var rho=cEff>0?A/cEff:Infinity;       // utilization
+
+    var wait;
+    if(rho>=1) wait=Infinity;
+    else wait=(rho/(1-rho))*(L/W);
+
+    // marginal worker value
+    var capPlus=((W+1)*B)/L*(1-o);
+    var marginal=capPlus-cEff;
+
+    var winLabel=win===1?'/sec':win===60?'/min':'/hr';
+
+    var cards=[
+      ['Effective throughput',fmt(thru*win,1)+' tasks',winLabel+' sustained'],
+      ['Max capacity',fmt(cEff*win,1)+' tasks',winLabel+' if fully fed'],
+      ['Utilization',fmt(rho*100,1)+'%',rho<0.85?'healthy headroom':rho<1?'near saturation':'OVERLOADED'],
+      ['Est. queue wait',(isFinite(wait)?fmt(wait,2)+' s':'unbounded'),'before pickup'],
+      ['Per worker rate',fmt((B/L)*(1-o)*win,2)+' tasks',winLabel+' each'],
+      ['+1 worker buys',fmt(marginal*win,2)+' tasks',winLabel+' marginal']
+    ];
+    out.innerHTML=cards.map(function(c){
+      return '<div class="card"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div><div class="s">'+c[2]+'</div></div>';
+    }).join('');
+
+    var msg;
+    if(rho>=1){
+      var need=Math.ceil(A*L/(B*(1-o)));
+      msg='⚠️ Overloaded: arrivals exceed effective capacity, so the queue grows without bound. You need at least <b>'+need+' workers</b> at this latency to keep up.';
+    } else if(rho>=0.85){
+      msg='⚡ Running hot at '+fmt(rho*100,0)+'% utilization. The pipeline keeps up, but queue wait spikes with any traffic burst — add a worker or shave latency for safety margin.';
+    } else if(A===0){
+      msg='ℹ️ No incoming tasks set. Showing pure capacity: this fleet could finish up to <b>'+fmt(cEff*win,1)+' tasks'+winLabel+'</b> if kept busy.';
+    } else {
+      msg='✅ Comfortable: '+fmt(rho*100,0)+'% utilization with '+fmt((cEff-A)*win,1)+' tasks'+winLabel+' of spare headroom. Latency, not worker count, is your main lever here.';
+    }
+    verdict.innerHTML=msg;
+  }
+
+  ids.forEach(function(i){el[i].addEventListener('input',calc);el[i].addEventListener('change',calc);});
+  calc();
+})();
+</script>
+</body>
+</html>

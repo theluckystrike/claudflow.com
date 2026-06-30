@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Rate Limit Throughput Calculator</title>
+<meta name="description" content="Find the max safe concurrency and tasks per minute your pipeline can run within your API RPM and TPM rate limits. Free, instant, no signup.">
+<link rel="canonical" href="https://claudflow.com/tools/llm-rate-limit-throughput-calculator">
+<meta property="og:title" content="LLM Rate Limit Throughput Calculator">
+<meta property="og:description" content="Find the max safe concurrency and tasks per minute your pipeline can run within your API RPM and TPM rate limits.">
+<meta property="og:url" content="https://claudflow.com/tools/llm-rate-limit-throughput-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "LLM Rate Limit Throughput Calculator",
+      "description": "Find the max safe concurrency and tasks per minute your pipeline can run within your API RPM and TPM rate limits.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "url": "https://claudflow.com/tools/llm-rate-limit-throughput-calculator",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "LLM Rate Limit Throughput Calculator", "item": "https://claudflow.com/tools/llm-rate-limit-throughput-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{
+  --bg:#0c0f17;--panel:#141a26;--panel2:#1b2433;--line:#26324a;
+  --txt:#e6edf7;--mut:#94a3bd;--acc:#6aa6ff;--acc2:#34d399;--warn:#fbbf24;--bad:#f87171;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;line-height:1.6}
+nav,main,footer{max-width:880px;margin:0 auto;padding:0 18px}
+nav{display:flex;gap:18px;align-items:center;height:58px;font-size:14px;border-bottom:1px solid var(--line)}
+nav a{color:var(--acc);text-decoration:none}
+nav a:hover{text-decoration:underline}
+h1{font-size:1.7rem;line-height:1.25;margin:28px 0 8px}
+.intro{color:var(--mut);margin:0 0 22px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 22px}
+h2{font-size:1.2rem;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--mut);margin:0 0 6px;font-weight:600}
+input,select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+  color:var(--txt);padding:11px 12px;font-size:15px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--acc)}
+.field{margin:0 0 14px}
+.hint{font-size:12px;color:var(--mut);margin:5px 0 0}
+.out{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:6px}
+.big{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px}
+.stat{flex:1;min-width:150px;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:14px}
+.stat .n{font-size:1.8rem;font-weight:800;color:var(--acc2);line-height:1.1}
+.stat .l{font-size:12px;color:var(--mut);margin-top:4px}
+.bind{font-weight:700}
+.bind.rpm{color:var(--acc)}.bind.tpm{color:var(--warn)}.bind.conc{color:var(--acc2)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td.r,th.r{text-align:right}
+.msg{font-size:14px;padding:10px 12px;border-radius:9px;margin-top:10px}
+.msg.ok{background:rgba(52,211,153,.1);border:1px solid #1f5e49;color:#a7f3d0}
+.msg.warn{background:rgba(251,191,36,.1);border:1px solid #6b551a;color:#fde68a}
+.prose p{margin:0 0 12px}
+.prose code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+.prose h3{margin:18px 0 8px;font-size:1.02rem}
+.rel a{color:var(--acc);text-decoration:none;display:block;padding:9px 0;border-bottom:1px solid var(--line)}
+.rel a:last-child{border-bottom:none}
+.rel a:hover{text-decoration:underline}
+footer{border-top:1px solid var(--line);padding-top:18px;padding-bottom:40px;color:var(--mut);font-size:14px;margin-top:8px}
+footer a{color:var(--acc);text-decoration:none;margin-right:16px}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">claudflow.com</a>
+  <a href="/tools/">All Tools</a>
+</nav>
+<main>
+  <h1>Plan throughput for your LLM API rate limits</h1>
+  <p class="intro">Enter your account's RPM and TPM limits plus your per-task token and latency profile. The calculator finds the safe concurrency, the binding limit, and how many tasks per minute your agent pipeline can actually push.</p>
+
+  <section id="tool">
+    <h2>Inputs</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="rpm">Requests per minute (RPM) limit</label>
+        <input id="rpm" type="number" min="1" step="1" value="500">
+        <p class="hint">From your provider dashboard / tier.</p>
+      </div>
+      <div class="field">
+        <label for="tpm">Tokens per minute (TPM) limit</label>
+        <input id="tpm" type="number" min="1" step="1000" value="2000000">
+        <p class="hint">Combined input + output token budget.</p>
+      </div>
+      <div class="field">
+        <label for="inTok">Input tokens per task</label>
+        <input id="inTok" type="number" min="0" step="100" value="3000">
+        <p class="hint">Prompt + context per request.</p>
+      </div>
+      <div class="field">
+        <label for="outTok">Output tokens per task</label>
+        <input id="outTok" type="number" min="0" step="100" value="800">
+        <p class="hint">Completion length per request.</p>
+      </div>
+      <div class="field">
+        <label for="reqs">API calls per task</label>
+        <input id="reqs" type="number" min="1" step="1" value="1">
+        <p class="hint">e.g. multi-turn agent loops &gt; 1.</p>
+      </div>
+      <div class="field">
+        <label for="lat">Avg latency per call (seconds)</label>
+        <input id="lat" type="number" min="0.1" step="0.1" value="6">
+        <p class="hint">Wall-clock time per request.</p>
+      </div>
+      <div class="field">
+        <label for="cached">Cached input share (%)</label>
+        <input id="cached" type="number" min="0" max="100" step="5" value="0">
+        <p class="hint">Prompt-cache hits count less toward TPM.</p>
+      </div>
+      <div class="field">
+        <label for="headroom">Safety headroom (%)</label>
+        <input id="headroom" type="number" min="0" max="90" step="5" value="15">
+        <p class="hint">Buffer to avoid 429s on bursts.</p>
+      </div>
+    </div>
+
+    <div class="out" id="out" aria-live="polite">
+      <div class="big">
+        <div class="stat"><div class="n" id="oTasks">—</div><div class="l">Tasks / minute (safe)</div></div>
+        <div class="stat"><div class="n" id="oConc">—</div><div class="l">Max concurrency</div></div>
+        <div class="stat"><div class="n" id="oBind">—</div><div class="l">Binding limit</div></div>
+      </div>
+      <table>
+        <thead><tr><th>Constraint</th><th class="r">Capacity (tasks/min)</th><th class="r">% of limit used</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="msg" id="msg"></div>
+    </div>
+  </section>
+
+  <section class="prose">
+    <h2>How the throughput is calculated</h2>
+    <p>Every LLM provider enforces two independent ceilings: a <strong>requests-per-minute (RPM)</strong> cap and a <strong>tokens-per-minute (TPM)</strong> cap. Your real throughput is whichever runs out first. This tool computes both capacities in the same unit — <em>tasks per minute</em> — so the bottleneck is obvious instead of hidden behind raw 429 errors.</p>
+    <h3>The formula</h3>
+    <p>First it derives the token cost of one task. Input tokens are split into cached and fresh: <code>billable_in = in × (1 − cached%)</code>, since prompt-cache reads barely touch your TPM budget. Then <code>tokens_per_task = (billable_in + out) × calls</code>.</p>
+    <p>Two independent capacities follow, each multiplied by an effective limit after headroom (<code>eff = limit × (1 − headroom%)</code>):</p>
+    <p><code>rpm_capacity = eff_RPM ÷ calls</code> &nbsp;and&nbsp; <code>tpm_capacity = eff_TPM ÷ tokens_per_task</code>.</p>
+    <p>The achievable rate is <code>tasks_per_min = min(rpm_capacity, tpm_capacity)</code>, and the <strong>binding limit</strong> is whichever produced that minimum. A third ceiling matters in practice: latency. With a per-call wall time of <code>L</code> seconds and <code>N</code> calls per task, a single worker finishes <code>60 ÷ (N × L)</code> tasks per minute, so the <strong>concurrency</strong> needed to actually reach the rate-limit ceiling is <code>ceil(tasks_per_min ÷ tasks_per_worker)</code>. If you launch more workers than that, you only generate 429s; fewer, and you leave quota on the table.</p>
+    <h3>Why it matters for agent pipelines</h3>
+    <p>Multi-agent and tool-loop workloads multiply calls per task, so a job that looks RPM-safe at 1 call quietly becomes TPM-bound at 6 calls with long contexts. The percent-of-limit columns show exactly how much of each ceiling a balanced run consumes, letting you right-size worker pools, batch windows, and retry budgets before paying for throughput you can't legally use.</p>
+  </section>
+
+  <section class="rel">
+    <h2>Related Tools</h2>
+    <a href="/tools/multi-agent-pipeline-designer">Multi-Agent Pipeline Designer</a>
+    <a href="/tools/agent-loop-cost-calculator">Agent Loop Cost Calculator</a>
+    <a href="/tools/agent-cost-per-task-calculator">Agent Cost Per Task Calculator</a>
+  </section>
+</main>
+<footer>
+  <a href="/">Home</a>
+  <a href="/tools/">All Tools</a>
+  <div style="margin-top:10px">© 2026 claudflow.com — built for AI agent &amp; orchestration teams.</div>
+</footer>
+
+<script>
+(function(){
+  var ids=["rpm","tpm","inTok","outTok","reqs","lat","cached","headroom"];
+  var el={};
+  ids.forEach(function(id){el[id]=document.getElementById(id);});
+  var oTasks=document.getElementById("oTasks"),
+      oConc=document.getElementById("oConc"),
+      oBind=document.getElementById("oBind"),
+      rows=document.getElementById("rows"),
+      msg=document.getElementById("msg");
+
+  function num(id,min){var v=parseFloat(el[id].value);if(isNaN(v))v=0;if(min!=null&&v<min)v=min;return v;}
+  function fmt(n){
+    if(!isFinite(n))return "∞";
+    if(n>=1000)return Math.round(n).toLocaleString();
+    if(n>=100)return Math.round(n).toString();
+    if(n>=10)return (Math.round(n*10)/10).toString();
+    return (Math.round(n*100)/100).toString();
+  }
+
+  function calc(){
+    var rpm=num("rpm",0), tpm=num("tpm",0),
+        inTok=num("inTok",0), outTok=num("outTok",0),
+        calls=num("reqs",1)||1, lat=num("lat",0.01)||0.01,
+        cached=Math.min(100,Math.max(0,num("cached",0))),
+        head=Math.min(90,Math.max(0,num("headroom",0)));
+
+    var hf=1-head/100;
+    var effRpm=rpm*hf, effTpm=tpm*hf;
+    var billableIn=inTok*(1-cached/100);
+    var tokPerTask=(billableIn+outTok)*calls;
+
+    var rpmCap = calls>0 ? effRpm/calls : Infinity;
+    var tpmCap = tokPerTask>0 ? effTpm/tokPerTask : Infinity;
+
+    var tasks=Math.min(rpmCap,tpmCap);
+    var bind, bindCls;
+    if(rpmCap<tpmCap){bind="RPM";bindCls="rpm";}
+    else if(tpmCap<rpmCap){bind="TPM";bindCls="tpm";}
+    else{bind="RPM = TPM";bindCls="conc";}
+
+    // latency -> concurrency to hit that rate
+    var tasksPerWorker = 60/(calls*lat); // tasks/min a single worker completes
+    var conc = tasksPerWorker>0 ? Math.ceil(tasks/tasksPerWorker) : Infinity;
+    if(conc<1 && isFinite(conc)) conc=1;
+
+    oTasks.textContent=fmt(tasks);
+    oConc.textContent=isFinite(conc)?conc.toLocaleString():"—";
+    oBind.innerHTML='<span class="bind '+bindCls+'">'+bind+'</span>';
+
+    // rows
+    var data=[
+      {n:"RPM ceiling",cap:rpmCap,used:tasks>0?(tasks*calls/Math.max(effRpm,1e-9))*100:0},
+      {n:"TPM ceiling",cap:tpmCap,used:tasks>0?(tasks*tokPerTask/Math.max(effTpm,1e-9))*100:0}
+    ];
+    rows.innerHTML="";
+    data.forEach(function(d){
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td>"+d.n+"</td><td class='r'>"+fmt(d.cap)+
+        "</td><td class='r'>"+(isFinite(d.used)?Math.round(d.used)+"%":"—")+"</td>";
+      rows.appendChild(tr);
+    });
+    var lr=document.createElement("tr");
+    lr.innerHTML="<td>Tokens per task</td><td class='r'>"+fmt(tokPerTask)+
+      "</td><td class='r'>"+calls+" call"+(calls!=1?"s":"")+"</td>";
+    rows.appendChild(lr);
+
+    if(tasks<=0||!isFinite(tasks)){
+      msg.className="msg warn";
+      msg.textContent="Enter non-zero limits and per-task tokens to see capacity.";
+    }else if(bind==="TPM"){
+      msg.className="msg warn";
+      msg.textContent="TPM-bound: long contexts cap you at ~"+fmt(tasks)+" tasks/min. Trim context, enable prompt caching, or request a TPM raise — adding workers won't help.";
+    }else{
+      msg.className="msg ok";
+      msg.textContent="RPM-bound: run ~"+(isFinite(conc)?conc:"—")+" concurrent workers to reach ~"+fmt(tasks)+" tasks/min. More requests, not bigger ones, raise throughput.";
+    }
+  }
+
+  ids.forEach(function(id){el[id].addEventListener("input",calc);});
+  calc();
+})();
+</script>
+</body>
+</html>
