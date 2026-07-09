@@ -96,4 +96,7 @@
 <url><loc>https://claudflow.com/tools/llm-rate-limit-throughput-calculator</loc><lastmod>2026-06-30</lastmod></url>
 <url><loc>https://claudflow.com/tools/multi-agent-pipeline-latency-calculator</loc><lastmod>2026-06-30</lastmod></url>
 <url><loc>https://claudflow.com/tools/prompt-caching-savings-calculator</loc><lastmod>2026-06-30</lastmod></url>
+<url><loc>https://claudflow.com/tools/concurrency-limit-sizing-calculator</loc><lastmod>2026-07-09</lastmod></url>
+<url><loc>https://claudflow.com/tools/exponential-backoff-schedule-generator</loc><lastmod>2026-07-09</lastmod></url>
+<url><loc>https://claudflow.com/tools/streaming-latency-slo-budget-calculator</loc><lastmod>2026-07-09</lastmod></url>
 </urlset>

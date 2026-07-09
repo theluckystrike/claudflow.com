@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streaming Latency & SLO Budget Calculator</title>
+<meta name="description" content="Model single-response TTFT plus token-streaming time against a latency SLO. Get total latency, tail percentiles, and pass/fail budget margin.">
+<link rel="canonical" href="https://claudflow.com/tools/streaming-latency-slo-budget-calculator">
+<meta property="og:title" content="Streaming Latency & SLO Budget Calculator">
+<meta property="og:description" content="Model single-response TTFT plus token-streaming time against a latency SLO. Get total latency, tail percentiles, and pass/fail budget margin.">
+<meta property="og:url" content="https://claudflow.com/tools/streaming-latency-slo-budget-calculator">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Streaming Latency & SLO Budget Calculator",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "url": "https://claudflow.com/tools/streaming-latency-slo-budget-calculator",
+      "description": "Model single-response TTFT plus token-streaming time against a latency SLO. Get total latency, tail percentiles, and pass/fail budget margin.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+        { "@type": "ListItem", "position": 3, "name": "Streaming Latency & SLO Budget Calculator", "item": "https://claudflow.com/tools/streaming-latency-slo-budget-calculator" }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#0b0e14;--panel:#141924;--panel2:#1b2230;--line:#28303f;
+    --ink:#e6ebf2;--muted:#93a0b4;--accent:#5e8bff;--accent2:#7c5cff;
+    --ok:#37d399;--warn:#ffb454;--bad:#ff5d6c;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  nav{display:flex;gap:20px;padding:16px 22px;border-bottom:1px solid var(--line);
+    font-size:14px;position:sticky;top:0;background:rgba(11,14,20,.9);backdrop-filter:blur(8px);z-index:5}
+  .wrap{max-width:960px;margin:0 auto;padding:26px 20px 60px}
+  h1{font-size:28px;line-height:1.25;margin:18px 0 8px}
+  h2{font-size:20px;margin:38px 0 12px}
+  h3{font-size:15px;margin:22px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .lede{color:var(--muted);font-size:16px;max-width:70ch}
+  #tool{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:22px;margin:26px 0;display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  @media(max-width:760px){#tool{grid-template-columns:1fr}h1{font-size:23px}}
+  .field{margin-bottom:15px}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  label .hint{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+  input[type=number],select{width:100%;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:9px;padding:10px 12px;font-size:15px;font-family:var(--mono)}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  input:focus,select:focus{outline:none;border-color:var(--accent)}
+  .row{display:flex;gap:12px}.row>*{flex:1}
+  .out{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+  .verdict{font-size:19px;font-weight:700;padding:14px 16px;border-radius:10px;margin-bottom:16px;
+    display:flex;align-items:center;gap:10px}
+  .verdict.pass{background:rgba(55,211,153,.12);border:1px solid var(--ok);color:var(--ok)}
+  .verdict.fail{background:rgba(255,93,108,.12);border:1px solid var(--bad);color:var(--bad)}
+  .big{font-family:var(--mono);font-size:30px;font-weight:700}
+  .big small{font-size:14px;color:var(--muted);font-weight:400}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px;margin-top:6px}
+  th,td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.m{font-weight:700}
+  .g-ok{color:var(--ok)}.g-bad{color:var(--bad)}.g-warn{color:var(--warn)}
+  .kpi{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0}
+  .kpi .k{color:var(--muted);font-size:13px}.kpi .v{font-family:var(--mono);font-weight:600}
+  .bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
+  .bar>i{display:block;height:100%;border-radius:6px}
+  .prose{max-width:74ch}.prose p{margin:12px 0}
+  code{font-family:var(--mono);background:var(--panel2);padding:2px 6px;border-radius:5px;font-size:13px;color:#cdd8ea}
+  .formula{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent2);
+    border-radius:8px;padding:14px 16px;font-family:var(--mono);font-size:13.5px;overflow-x:auto;color:#cdd8ea}
+  .rel{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
+  .rel a{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 14px;font-size:14px}
+  footer{border-top:1px solid var(--line);padding:26px 20px;color:var(--muted);font-size:14px}
+  footer .wrap{padding:0;display:flex;flex-wrap:wrap;gap:18px 26px;align-items:center}
+  .pill{display:inline-block;font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:20px;
+    background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+  <a href="/tools/">Tools</a>
+  <span class="pill">LLM-ops</span>
+</nav>
+<div class="wrap">
+  <h1>Will Your Streaming Response Fit Its Latency SLO?</h1>
+  <p class="lede">Break a streamed LLM response into its two real cost centers &mdash; time-to-first-token (TTFT) and per-token generation time &mdash; then project the p50, p90, p95 and p99 total latency and check every percentile against your service-level objective. Nothing is uploaded; all math runs in your browser.</p>
+
+  <section id="tool">
+    <div id="inputs">
+      <h3>Response model</h3>
+      <div class="field">
+        <label for="ttft">Median TTFT &mdash; ms
+          <span class="hint">Time from request send to the first streamed token (p50).</span></label>
+        <input type="number" id="ttft" value="420" min="0" step="10">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="tps">Output speed &mdash; tokens/sec
+            <span class="hint">Sustained decode throughput.</span></label>
+          <input type="number" id="tps" value="65" min="1" step="1">
+        </div>
+        <div class="field">
+          <label for="out">Output tokens
+            <span class="hint">Expected response length.</span></label>
+          <input type="number" id="out" value="600" min="1" step="10">
+        </div>
+      </div>
+
+      <h3>Tail &amp; variance</h3>
+      <div class="field">
+        <label for="mult">Tail multiplier (p99 / p50)
+          <span class="hint">How much slower the worst 1% is vs the median. 1.5&ndash;3&times; is typical under load.</span></label>
+        <input type="range" id="mult" value="2.2" min="1.05" max="5" step="0.05">
+        <div class="kpi"><span class="k">Current</span><span class="v" id="multV">2.20&times;</span></div>
+      </div>
+      <div class="field">
+        <label for="measure">SLO measured at
+          <span class="hint">Which output stage your SLO governs.</span></label>
+        <select id="measure">
+          <option value="ttft">Time to first token (TTFT)</option>
+          <option value="total" selected>Full response (last token)</option>
+        </select>
+      </div>
+
+      <h3>Budget</h3>
+      <div class="field">
+        <label for="slo">Latency SLO &mdash; ms
+          <span class="hint">Your budget ceiling at the target percentile.</span></label>
+        <input type="number" id="slo" value="2500" min="1" step="50">
+      </div>
+      <div class="field">
+        <label for="pct">Target percentile
+          <span class="hint">The percentile the SLO must hold at.</span></label>
+        <select id="pct">
+          <option value="50">p50 (median)</option>
+          <option value="90">p90</option>
+          <option value="95" selected>p95</option>
+          <option value="99">p99</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="results">
+      <div class="verdict" id="verdict">&nbsp;</div>
+
+      <div class="out">
+        <div class="kpi"><span class="k">p50 total latency</span><span class="v" id="p50">&mdash;</span></div>
+        <div class="kpi"><span class="k">Streaming portion</span><span class="v" id="stream">&mdash;</span></div>
+        <div class="kpi"><span class="k">Budget at target pct</span><span class="v" id="budget">&mdash;</span></div>
+        <div class="kpi"><span class="k">Margin</span><span class="v" id="margin">&mdash;</span></div>
+        <div class="bar"><i id="barFill"></i></div>
+      </div>
+
+      <h3>Latency percentiles</h3>
+      <table id="tbl">
+        <thead><tr><th>Pctl</th><th>Total ms</th><th>vs SLO</th><th>Margin</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <div class="out" style="margin-top:16px">
+        <div class="kpi"><span class="k">Max output tokens that still fit SLO</span>
+          <span class="v" id="maxTok">&mdash;</span></div>
+        <div class="kpi"><span class="k">&hellip; at target percentile</span>
+          <span class="v" id="maxTokPct">&mdash;</span></div>
+      </div>
+    </div>
+  </section>
+
+  <h2>How the model works</h2>
+  <div class="prose">
+    <p>A streamed LLM response has two additive components. First is <strong>time-to-first-token</strong> (TTFT): queueing, prompt tokenization and the prefill forward pass before any output appears. Second is the <strong>generation phase</strong>, where tokens are decoded one at a time. The base end-to-end latency is simply:</p>
+    <div class="formula">total_p50 = TTFT_p50 + (output_tokens &divide; tokens_per_second) &times; 1000&nbsp;ms</div>
+    <p>Median numbers alone hide the problem SLOs exist to catch: the tail. Under concurrency, batching contention and cold caches, the slowest requests balloon. Rather than assume a fixed pad, this tool treats total latency as roughly <strong>log-normal</strong> &mdash; the standard shape for positive, right-skewed latency. From your median and a tail multiplier <code>m = p99 / p50</code>, it recovers the distribution's shape parameter <code>&sigma; = ln(m) / z<sub>0.99</sub></code>, where <code>z<sub>0.99</sub> &asymp; 2.326</code> is the 99th-percentile standard normal quantile. Any percentile then follows:</p>
+    <div class="formula">latency(p) = p50 &times; exp(&sigma; &times; z<sub>p</sub>)</div>
+    <p>with <code>z<sub>p</sub></code> the normal quantile for that percentile (z&#8320;.&#8329;&#8320;&asymp;1.282, z&#8320;.&#8329;&#8325;&asymp;1.645). When the SLO is measured at first token, only the TTFT component is scaled; when it governs the full response, the whole total is scaled, since prefill and decode tails correlate under shared load. The tool then compares the latency at your chosen percentile to the budget and reports the <strong>margin</strong> &mdash; negative means you are over budget. Finally it inverts the equation to solve for the largest <code>output_tokens</code> whose target-percentile latency still lands under the SLO, so you can cap <code>max_tokens</code> defensively instead of discovering breaches in production. Everything recomputes live as you type.</p>
+  </div>
+
+  <h2>Related Tools</h2>
+  <div class="rel">
+    <a href="/tools/llm-token-cost-calculator">LLM Token Cost Calculator</a>
+    <a href="/tools/concurrency-throughput-planner">Concurrency &amp; Throughput Planner</a>
+    <a href="/tools/retry-timeout-budget-calculator">Retry &amp; Timeout Budget Calculator</a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="/">claudflow.com</a>
+    <a href="/tools/">All Tools</a>
+    <a href="/tools/llm-token-cost-calculator">Token Cost</a>
+    <span>&copy; 2026 claudflow.com</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  // Standard-normal quantiles (z-scores) for the percentiles we report.
+  var Z = { 50:0, 90:1.28155, 95:1.64485, 99:2.32635 };
+  var Z99 = Z[99];
+
+  var el = function(id){ return document.getElementById(id); };
+  var ids = ["ttft","tps","out","mult","measure","slo","pct"];
+  var fmt = function(ms){
+    if(!isFinite(ms)) return "—";
+    if(ms >= 1000) return (ms/1000).toFixed(ms>=10000?1:2)+" s";
+    return Math.round(ms)+" ms";
+  };
+  var num = function(id, min){
+    var v = parseFloat(el(id).value);
+    if(!isFinite(v)) v = 0;
+    if(min!=null && v<min) v = min;
+    return v;
+  };
+
+  // total latency at percentile p, given a p50 base and log-normal sigma.
+  function atPct(base50, sigma, p){
+    return base50 * Math.exp(sigma * Z[p]);
+  }
+
+  function compute(){
+    var ttft   = num("ttft",0);
+    var tps    = num("tps",1);
+    var outTok = num("out",1);
+    var mult   = num("mult",1.05);
+    var measure= el("measure").value;   // ttft | total
+    var slo    = num("slo",1);
+    var pct    = parseInt(el("pct").value,10);
+
+    el("multV").textContent = mult.toFixed(2)+"×";
+
+    // log-normal shape from tail multiplier m = p99/p50
+    var sigma = Math.log(mult) / Z99;
+
+    var streamMs = (outTok / tps) * 1000;
+    var total50  = ttft + streamMs;
+
+    // base value the SLO governs
+    var base50 = (measure === "ttft") ? ttft : total50;
+
+    // percentile table
+    var rows = [50,90,95,99];
+    var tb = el("tbody");
+    tb.innerHTML = "";
+    rows.forEach(function(p){
+      var val = atPct(base50, sigma, p);
+      // for total-response measure, add the (constant) non-scaled tail? keep simple: full total scales.
+      var over = val - slo;
+      var cls = over <= 0 ? "g-ok" : "g-bad";
+      var mark = over <= 0 ? "✓ pass" : "✗ fail";
+      var star = (p===pct) ? " ←" : "";
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>p"+p+(p===pct?" ★":"")+"</td>"+
+        "<td class='m'>"+fmt(val)+"</td>"+
+        "<td class='"+cls+"'>"+mark+"</td>"+
+        "<td class='"+cls+"'>"+(over<=0?"+":"")+fmt(Math.abs(over)).replace(" ",over<=0?" ":" ")+
+          (over>0?" over":" spare")+"</td>";
+      tb.appendChild(tr);
+    });
+
+    // target-percentile value and margin
+    var targetVal = atPct(base50, sigma, pct);
+    var margin = slo - targetVal;
+    var pass = margin >= 0;
+
+    el("p50").textContent    = fmt(total50);
+    el("stream").textContent = fmt(streamMs) + " ("+Math.round(streamMs/total50*100)+"%)";
+    el("budget").textContent = fmt(slo) + " @ p"+pct;
+    var mEl = el("margin");
+    mEl.textContent = (pass?"+":"−") + fmt(Math.abs(margin));
+    mEl.className = "v " + (pass?"g-ok":"g-bad");
+
+    // budget bar: target latency as a share of the SLO
+    var frac = targetVal / slo;
+    var fill = el("barFill");
+    fill.style.width = Math.min(100, frac*100).toFixed(1)+"%";
+    fill.style.background = frac<=0.75 ? "var(--ok)" : (frac<=1 ? "var(--warn)" : "var(--bad)");
+
+    // verdict
+    var v = el("verdict");
+    v.className = "verdict " + (pass?"pass":"fail");
+    v.textContent = pass
+      ? "✓ PASS — p"+pct+" latency "+fmt(targetVal)+" is within the "+fmt(slo)+" SLO"
+      : "✗ BREACH — p"+pct+" latency "+fmt(targetVal)+" exceeds the "+fmt(slo)+" SLO by "+fmt(-margin);
+
+    // Max output tokens that still fit SLO at the target percentile.
+    // For "total": SLO_p = (ttft + tok/tps*1000) * exp(sigma*z)  => solve tok
+    //   tok = (SLO / exp(sigma*z) - ttft) * tps / 1000
+    // For "ttft": the SLO constrains TTFT only, so output length is unbounded
+    //   by the SLO; report the streaming-side note instead.
+    var maxTokEl = el("maxTok");
+    var maxTokPctEl = el("maxTokPct");
+    if(measure === "ttft"){
+      maxTokEl.textContent = "unbounded by TTFT SLO";
+      maxTokPctEl.textContent = "TTFT "+fmt(atPct(ttft,sigma,pct))+" @ p"+pct;
+    } else {
+      var scale = Math.exp(sigma * Z[pct]);
+      var allowed50 = slo / scale;                 // allowed p50 total
+      var maxStream = allowed50 - ttft;            // ms available for streaming
+      var maxTok = Math.floor(maxStream / 1000 * tps);
+      if(maxTok < 0 || !isFinite(maxTok)){
+        maxTokEl.textContent = "0 (TTFT alone breaches)";
+      } else {
+        maxTokEl.textContent = maxTok.toLocaleString() + " tokens";
+      }
+      maxTokPctEl.textContent = "p"+pct+" · "+fmt(slo)+" ceiling";
+    }
+  }
+
+  ids.forEach(function(id){
+    el(id).addEventListener("input", compute);
+    el(id).addEventListener("change", compute);
+  });
+  compute();
+})();
+</script>
+</body>
+</html>
