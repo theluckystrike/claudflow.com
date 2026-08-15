@@ -293,4 +293,46 @@
         <div class="compare-col">
           <h4>${p1.name} <span style="font-weight:normal;font-size:0.8rem;color:#9ca3af;">(${p1.complexity})</span></h4>
           <p style="margin-bottom:0.5rem;">${p1.desc}</p>
-          <div class="pros-cons"><div class="pros
+          <div class="pros-cons"><div class="pros">✅ ${p1.pros}</div><div class="cons">❌ ${p1.cons}</div></div>
+          <div class="when-use"><strong>🔄 When to use:</strong> ${p1.when}</div>
+          <div class="pseudo">${p1.pseudo}</div>
+          <div class="realworld"><strong>🌍 Real‑world:</strong> ${p1.real}</div>
+        </div>
+        <div class="compare-col">
+          <h4>${p2.name} <span style="font-weight:normal;font-size:0.8rem;color:#9ca3af;">(${p2.complexity})</span></h4>
+          <p style="margin-bottom:0.5rem;">${p2.desc}</p>
+          <div class="pros-cons"><div class="pros">✅ ${p2.pros}</div><div class="cons">❌ ${p2.cons}</div></div>
+          <div class="when-use"><strong>🔄 When to use:</strong> ${p2.when}</div>
+          <div class="pseudo">${p2.pseudo}</div>
+          <div class="realworld"><strong>🌍 Real‑world:</strong> ${p2.real}</div>
+        </div>
+      `;
+    }
+
+    // Comparing a pattern with itself tells you nothing, so block it.
+    function syncCompareState() {
+      const same = sel1.value === sel2.value;
+      compareBtn.disabled = same;
+      compareBtn.title = same ? 'Pick two different patterns' : 'Compare these two patterns';
+    }
+
+    function showCompare() {
+      openCompare(Number(sel1.value), Number(sel2.value));
+      modal.classList.add('open');
+    }
+
+    function hideCompare() {
+      modal.classList.remove('open');
+    }
+
+    sel1.addEventListener('change', syncCompareState);
+    sel2.addEventListener('change', syncCompareState);
+    compareBtn.addEventListener('click', showCompare);
+    closeModal.addEventListener('click', hideCompare);
+    modal.addEventListener('click', function(e) { if (e.target === modal) hideCompare(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') hideCompare(); });
+    syncCompareState();
+  })();
+</script>
+</body>
+</html>
