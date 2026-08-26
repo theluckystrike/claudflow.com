@@ -450,6 +450,8 @@
 
   function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+  function upd(i, field){ return ` onchange="updateStep(${i},'${field}',this.value)"`; }
+
   window.loadPattern = function(name){
     var tpl = PATTERNS[name];
     if(!tpl) return;
@@ -489,20 +491,20 @@
       html += '<div class="chain-step">';
       html += '<div class="step-num">'+(i+1)+'</div>';
       html += '<div class="step-fields">';
-      html += '<input type="text" value="'+esc(s.label)+'" placeholder="Step label" onchange="updateStep('+i+\',\'label\',this.value)">';
+      html += '<input type="text" value="'+esc(s.label)+'" placeholder="Step label"'+upd(i,'label')+'>';
       html += '<div class="field-row">';
-      html += '<select onchange="updateStep('+i+\',\'type\',this.value)">';
+      html += '<select'+upd(i,'type')+'>';
       var types = ['input','prompt','condition','transform','output','loop','parallel'];
       for(var t=0;t<types.length;t++){
         html += '<option value="'+types[t]+'"'+(s.type===types[t]?' selected':'')+'>'+types[t].charAt(0).toUpperCase()+types[t].slice(1)+'</option>';
       }
       html += '</select>';
-      html += '<input type="text" value="'+esc(s.outputFormat)+'" placeholder="Output format" onchange="updateStep('+i+\',\'outputFormat\',this.value)">';
+      html += '<input type="text" value="'+esc(s.outputFormat)+'" placeholder="Output format"'+upd(i,'outputFormat')+'>';
       html += '</div>';
-      html += '<textarea placeholder="Prompt template..." onchange="updateStep('+i+\',\'prompt\',this.value)">'+esc(s.prompt)+'</textarea>';
+      html += '<textarea placeholder="Prompt template..."'+upd(i,'prompt')+'>'+esc(s.prompt)+'</textarea>';
       html += '<div class="field-row">';
-      html += '<input type="text" value="'+esc(s.inputSource)+'" placeholder="Input source (e.g. step1)" onchange="updateStep('+i+\',\'inputSource\',this.value)">';
-      html += '<input type="text" value="'+esc(s.next)+'" placeholder="Next step (e.g. step3)" onchange="updateStep('+i+\',\'next\',this.value)">';
+      html += '<input type="text" value="'+esc(s.inputSource)+'" placeholder="Input source (e.g. step1)"'+upd(i,'inputSource')+'>';
+      html += '<input type="text" value="'+esc(s.next)+'" placeholder="Next step (e.g. step3)"'+upd(i,'next')+'>';
       html += '</div>';
       html += '</div>';
       html += '<button class="step-remove" onclick="removeStep('+i+')">&times;</button>';
