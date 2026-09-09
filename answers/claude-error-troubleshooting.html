@@ -196,6 +196,8 @@
 
     <p>For retryable errors, implement exponential backoff with jitter. Start with a 1-second delay, double it on each retry, and add random jitter to prevent thundering herd effects when multiple clients retry simultaneously. Cap the maximum delay at 60 seconds and the maximum retry count at 5 attempts. For rate limit errors specifically, the API returns a Retry-After header indicating exactly how long to wait before the next request will succeed. Use this value when available instead of estimating.</p>
 
+    <p>One class of failure never reaches this taxonomy at all. When a workflow reaches tools through an MCP server, a tool that fails on its own arguments does not come back as a status code: it comes back as a normal result with an isError flag set, so retry logic keyed on 4xx and 5xx never sees it. A genuine protocol fault, an unknown tool name for instance, arrives instead as a JSON-RPC error object. <a href="https://mcp.zovo.one/guides/mcp-tool-errors-versus-protocol-errors">Which MCP failures belong in which channel</a> covers why sending one down the other's path is what stops the model correcting itself.</p>
+
     <h2>Common Error Patterns in Production</h2>
 
     <p>Several error patterns appear frequently in production AI applications. The most common is context window overflow in long conversations. As conversation history grows, the total token count eventually exceeds the model's context window. The fix is implementing a sliding window that summarizes older messages or truncates the conversation history. The <a href="/guides/prompt-chaining-patterns.html">prompt chaining patterns guide</a> covers the Map-Reduce pattern for handling long inputs.</p>
