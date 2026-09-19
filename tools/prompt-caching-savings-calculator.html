@@ -155,9 +155,9 @@
 
   <h2>How this calculator works</h2>
   <div class="prose">
-    <p>Caching changes the unit economics of repeated LLM calls. Without caching, every request pays the <code>base</code> input rate for the entire prompt — including the large static prefix you resend each time. With caching, that prefix is billed once at the <code>write</code> rate when the cache is filled, then at the much cheaper <code>read</code> rate on every subsequent hit within the time-to-live window.</p>
-    <p>The monthly <strong>no-cache cost</strong> is simply <code>calls × (cached + fresh) × base / 1e6</code>. The <strong>cached cost</strong> splits the prefix into three streams. Let <code>h</code> be the hit rate and <code>R</code> be reuse-per-write (hits served by one fill). Hit calls number <code>calls × h</code>; the number of cold writes is <code>hits / R</code>, since one write amortizes across <code>R</code> reads. So write tokens = <code>(hits / R) × cached</code> billed at the write rate, read tokens = <code>(hits − hits/R) × cached</code> at the read rate, and miss calls = <code>calls × (1 − h)</code> pay the full <code>cached × base</code>. The fresh, turn-specific tokens never cache and always cost <code>calls × fresh × base</code>.</p>
-    <p>Summing those four streams gives the cached total. The savings figure and percentage compare it against the no-cache baseline, and the progress bar visualizes the proportion eliminated. The key insight competitors miss: caching only wins when the <em>read discount on hits</em> outweighs the <em>write premium on fills</em>. A low hit rate or low reuse-per-write can make caching cost more — raise reuse-per-write or hit rate and watch the break-even flip. This is why long-running agent loops and multi-agent fan-out (which hammer the same system prefix thousands of times) see the largest gains, while one-shot calls rarely justify a cache write.</p>
+    <p>Caching changes the unit economics of repeated LLM calls. Without caching, every request pays the <code>base</code> input rate for the entire prompt: including the large static prefix you resend each time. With caching, that prefix is billed once at the <code>write</code> rate when the cache is filled, then at the much cheaper <code>read</code> rate on every subsequent hit within the time-to-live window.</p>
+    <p>The monthly <em>no-cache cost</em> is simply <code>calls × (cached + fresh) × base / 1e6</code>. The <em>cached cost</em> splits the prefix into three streams. Let <code>h</code> be the hit rate and <code>R</code> be reuse-per-write (hits served by one fill). Hit calls number <code>calls × h</code>; the number of cold writes is <code>hits / R</code>, since one write amortizes across <code>R</code> reads. So write tokens = <code>(hits / R) × cached</code> billed at the write rate, read tokens = <code>(hits − hits/R) × cached</code> at the read rate, and miss calls = <code>calls × (1 − h)</code> pay the full <code>cached × base</code>. The fresh, turn-specific tokens never cache and always cost <code>calls × fresh × base</code>.</p>
+    <p>Summing those four streams gives the cached total. The savings figure and percentage compare it against the no-cache baseline, and the progress bar visualizes the proportion eliminated. The key insight competitors miss: caching only wins when the <em>read discount on hits</em> outweighs the <em>write premium on fills</em>. A low hit rate or low reuse-per-write can make caching cost more: raise reuse-per-write or hit rate and watch the break-even flip. This is why long-running agent loops and multi-agent fan-out (which hammer the same system prefix thousands of times) see the largest gains, while one-shot calls rarely justify a cache write.</p>
   </div>
 
   <h2 id="related-h">Related Tools</h2>
@@ -172,7 +172,7 @@
 
 <footer>
   <div><a href="/">claudflow.com</a> · <a href="/tools/">All Tools</a></div>
-  <div>© 2026 claudflow.com — agent cost &amp; orchestration calculators</div>
+  <div>© 2026 claudflow.com: agent cost &amp; orchestration calculators</div>
 </footer>
 
 <script>
@@ -230,7 +230,7 @@
 
     var note=document.getElementById('note');
     if(save>=0){
-      note.innerHTML='Caching cuts <strong>'+pct.toFixed(1)+'%</strong> of input spend — saving '+money(save*12)+' per year at this volume.';
+      note.innerHTML='Caching cuts <strong>'+pct.toFixed(1)+'%</strong> of input spend: saving '+money(save*12)+' per year at this volume.';
     }else{
       note.innerHTML='At this hit rate and reuse, caching costs <strong>'+money(-save)+'</strong> more per month. Raise hit rate or reuse-per-write to break even.';
     }

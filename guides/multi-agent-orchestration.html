@@ -4,22 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Multi-Agent Orchestration — Coordination Pattern Designer &amp; Message Flow Visualizer | ClaudFlow</title>
+  <title>Multi-Agent Orchestration | Coordination Pattern Designer &amp; Message Flow Visualizer | ClaudFlow</title>
   <meta name="description" content="Design multi-agent coordination patterns with a visual message flow builder. Route tasks between Claude agents using supervisor, pipeline, and broadcast topologies. Export orchestration configs. Free, no sign-up.">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Multi-Agent Orchestration — Coordination Pattern Designer & Message Flow Visualizer">
+  <meta property="og:title" content="Multi-Agent Orchestration | Coordination Pattern Designer & Message Flow Visualizer">
   <meta property="og:description" content="Design multi-agent coordination patterns with visual message flow builder. Route tasks between Claude agents using supervisor, pipeline, and broadcast topologies.">
   <meta property="og:url" content="https://claudflow.com/guides/multi-agent-orchestration.html">
   <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
   <meta property="og:site_name" content="Zovo Tools">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Multi-Agent Orchestration — Coordination Pattern Designer & Message Flow Visualizer">
+  <meta name="twitter:title" content="Multi-Agent Orchestration | Coordination Pattern Designer & Message Flow Visualizer">
   <meta name="twitter:description" content="Design multi-agent coordination patterns with visual message flow builder. Route tasks between Claude agents.">
   <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
   <link rel="canonical" href="https://claudflow.com/guides/multi-agent-orchestration.html">
   <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/multi-agent-orchestration.html">
   <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/multi-agent-orchestration.html">
-  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow | AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <link rel="stylesheet" href="/assets/style.css">
   <script type="application/ld+json">
   {
@@ -329,7 +329,7 @@
 
     <h2>Agent Role Design Principles</h2>
 
-    <p>Each agent in your orchestration should have exactly one responsibility. The single-responsibility principle from software engineering applies directly to agent design. A security reviewer agent should only analyze security vulnerabilities. A style checker agent should only evaluate code style. When agents try to do multiple things, their system prompts become bloated, their outputs become unfocused, and debugging becomes impossible because you cannot tell which aspect of the agent's multifaceted role caused a particular output.</p>
+    <p>Each agent in your orchestration should have exactly one responsibility. The single-responsibility principle from software engineering applies directly to agent design. A security reviewer agent should only analyze security vulnerabilities. A style checker agent should only evaluate code style. When agents try to do multiple things, their system prompts become bloated, their outputs become unfocused, and debugging becomes impossible because you cannot tell which aspect of the agent's varied role caused a particular output.</p>
 
     <p>The system prompt for each agent should be as short as possible while still providing clear instructions. In multi-agent systems, system prompts are paid for on every single request to every single agent. If you have five agents each with 1,000-token system prompts, that is 5,000 tokens of overhead per orchestration run before any actual work happens. Compress system prompts to their essential instructions. Use structured formats instead of prose. Remove examples that duplicate what the model already knows. A well-designed agent system prompt often fits in 200 to 400 tokens.</p>
 
@@ -439,7 +439,7 @@
     <div class="footer-inner">
         <div class="footer-brand">Zovo Tools</div>
         <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
-        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime &mdash; $99 once, free forever &rarr;</a>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime  | $99 once, free forever &rarr;</a>
         <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=guides-multi-agent-orchestration">Zovo</a> &middot; 47/500 founding spots</div>
     </div>
 </footer>
@@ -448,30 +448,30 @@
     <div class="zovo-network-inner">
         <h3 class="zovo-network-title">Explore More Tools</h3>
         <div class="zovo-network-links">
-            <a href="https://abwex.com">ABWex — A/B Testing</a>
-            <a href="https://b2berp.com">B2BERP — Business Tools</a>
-            <a href="https://bugbountyreality.com">BugBountyReality — Security</a>
-            <a href="https://claudkit.com">ClaudKit — API Tools</a>
-            <a href="https://dismissticket.com">DismissTicket — Support</a>
-            <a href="https://enhio.com">Enhio — Text Tools</a>
-            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
-            <a href="https://gen8x.com">Gen8X — Color Tools</a>
-            <a href="https://gpt0x.com">GPT0X — AI Models</a>
-            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
-            <a href="https://ingredientcalculator.com">IngredientCalc — Recipes</a>
-            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
-            <a href="https://kappafy.com">Kappafy — JSON</a>
-            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
-            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
-            <a href="https://krzen.com">Krzen — Image Tools</a>
-            <a href="https://lochbot.com">LochBot — Security</a>
-            <a href="https://lockml.com">LockML — ML Security</a>
-            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=guides-multi-agent-orchestration">ML0X — ML Basics</a>
-            <a href="https://ml3x.com">ML3X — Matrix Math</a>
-            <a href="https://pictureeditor.net">PictureEditor — Image Editing</a>
-            <a href="https://recipetool.net">RecipeTool — Cooking</a>
-            <a href="https://viryd.com">Viryd — Dev Tools</a>
-            <a href="https://tg.zovo.one/">Tiny Telegram Tools — Telegram Bots</a>
+            <a href="https://abwex.com">ABWex: A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP: Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality: Security</a>
+            <a href="https://claudkit.com">ClaudKit: API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket: Support</a>
+            <a href="https://enhio.com">Enhio: Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot: Timestamps</a>
+            <a href="https://gen8x.com">Gen8X: Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X: AI Models</a>
+            <a href="https://heytensor.com">HeyTensor: ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc: Recipes</a>
+            <a href="https://invokebot.com">InvokeBot: Webhooks</a>
+            <a href="https://kappafy.com">Kappafy: JSON</a>
+            <a href="https://kappakit.com">KappaKit: Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM: LLM Costs</a>
+            <a href="https://krzen.com">Krzen: Image Tools</a>
+            <a href="https://lochbot.com">LochBot: Security</a>
+            <a href="https://lockml.com">LockML: ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=guides-multi-agent-orchestration">ML0X: ML Basics</a>
+            <a href="https://ml3x.com">ML3X: Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor: Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool: Cooking</a>
+            <a href="https://viryd.com">Viryd: Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools: Telegram Bots</a>
         </div>
     </div>
 </nav>
@@ -479,11 +479,11 @@
 <div class="pow-strip">
   <div class="pow-strip-inner">
     <span class="pow-label">By the same builder:</span>
-    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub — theluckystrike</a>
-    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative — Grammar AI</a>
-    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder — Dev Blog</a>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub: theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative: Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder: Dev Blog</a>
     <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
-    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=guides-multi-agent-orchestration" rel="nofollow">Zovo — AI Dev Tools</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=guides-multi-agent-orchestration" rel="nofollow">Zovo: AI Dev Tools</a>
   </div>
 </div>
 

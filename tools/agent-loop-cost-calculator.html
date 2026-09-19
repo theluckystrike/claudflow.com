@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Agent Loop Cost Calculator — Estimate Multi-Turn Agent Expenses | claudflow.com</title>
+  <title>Agent Loop Cost Calculator | Estimate Multi-Turn Agent Expenses | claudflow.com</title>
   <meta name="description" content="Calculate total tokens, cumulative cost, and optimal iteration limit for multi-turn AI agent loops. Supports Claude Opus, Sonnet, Haiku, GPT-4, GPT-4o-mini.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://claudflow.com/tools/agent-loop-cost-calculator">
@@ -213,26 +213,26 @@
 <body>
 <div class="container">
   <header>
-    <h1>🔄 Agent Loop Cost Calculator</h1>
+    <h1> Agent Loop Cost Calculator</h1>
     <p>Multi-turn expense estimator · accumulating context</p>
   </header>
 
   <div class="card">
     <div class="grid-2">
       <div class="input-group">
-        <label for="toolsPerLoop">🔧 Tools/actions per iteration</label>
+        <label for="toolsPerLoop"> Tools/actions per iteration</label>
         <input type="number" id="toolsPerLoop" min="1" max="50" value="3" step="1">
       </div>
       <div class="input-group">
-        <label for="tokensPerTool">📝 Avg tokens per tool call (input+output)</label>
+        <label for="tokensPerTool"> Avg tokens per tool call (input+output)</label>
         <input type="number" id="tokensPerTool" min="10" max="50000" value="800" step="10">
       </div>
       <div class="input-group">
-        <label for="loopIterations">🔁 Expected loop iterations (1–50)</label>
+        <label for="loopIterations"> Expected loop iterations (1–50)</label>
         <input type="number" id="loopIterations" min="1" max="50" value="10" step="1">
       </div>
       <div class="input-group">
-        <label for="modelSelect">🧠 Model</label>
+        <label for="modelSelect"> Model</label>
         <select id="modelSelect">
           <option value="opus" data-input="15" data-output="75">Claude Opus ($15/$75)</option>
           <option value="sonnet" data-input="3" data-output="15" selected>Claude Sonnet ($3/$15)</option>
@@ -242,17 +242,17 @@
         </select>
       </div>
       <div class="input-group">
-        <label for="systemPrompt">📄 System prompt size (tokens)</label>
+        <label for="systemPrompt"> System prompt size (tokens)</label>
         <input type="number" id="systemPrompt" min="0" max="100000" value="500" step="10">
       </div>
     </div>
 
     <!-- aggregated stats -->
     <div class="stat-row" id="statsPanel">
-      <div class="stat-item"><span class="label">Total tokens</span><div class="value" id="totalTokens">—</div></div>
-      <div class="stat-item"><span class="label">Total cost (USD)</span><div class="value" id="totalCost">—</div></div>
-      <div class="stat-item"><span class="label">Cost / iteration</span><div class="value" id="costPerIteration">—</div></div>
-      <div class="stat-item"><span class="label">Optimal iteration limit</span><div class="value" id="optimalLimit">—</div></div>
+      <div class="stat-item"><span class="label">Total tokens</span><div class="value" id="totalTokens">-</div></div>
+      <div class="stat-item"><span class="label">Total cost (USD)</span><div class="value" id="totalCost">-</div></div>
+      <div class="stat-item"><span class="label">Cost / iteration</span><div class="value" id="costPerIteration">-</div></div>
+      <div class="stat-item"><span class="label">Optimal iteration limit</span><div class="value" id="optimalLimit">-</div></div>
     </div>
 
     <!-- chart -->

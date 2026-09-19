@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Multi-Agent Pipeline Designer — Visual Workflow Builder | claudflow.com</title>
+  <title>Multi-Agent Pipeline Designer | Visual Workflow Builder | claudflow.com</title>
   <meta name="description" content="Design multi-agent pipelines visually: add agents, connect with arrows, define schemas, set execution order. Generate config JSON, cost & time estimates. Free interactive tool by claudflow.com.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://claudflow.com/tools/multi-agent-pipeline-designer">
@@ -302,14 +302,14 @@
 <body>
 <div class="container">
   <header>
-    <h1>⚙️ Multi-Agent Pipeline Designer</h1>
+    <h1>Multi-Agent Pipeline Designer</h1>
     <div class="toolbar">
       <div class="preset-group">
-        <button data-preset="research">📋 Research → Analyze → Summarize</button>
-        <button data-preset="generate">✍️ Generate → Review → Refine</button>
-        <button data-preset="etl">🗂️ Extract → Transform → Load</button>
+        <button data-preset="research"> Research → Analyze → Summarize</button>
+        <button data-preset="generate"> Generate → Review → Refine</button>
+        <button data-preset="etl"> Extract → Transform → Load</button>
       </div>
-      <button id="addAgentBtn" class="accent">➕ Add Agent</button>
+      <button id="addAgentBtn" class="accent"> Add Agent</button>
     </div>
   </header>
 
@@ -317,28 +317,28 @@
     <!-- Canvas -->
     <div class="pipeline-canvas">
       <div id="flowchartContainer" class="flowchart">
-        <div class="empty-state" id="emptyState">✨ No agents yet. Click "Add Agent" or use a preset template.</div>
+        <div class="empty-state" id="emptyState"> No agents yet. Click "Add Agent" or use a preset template.</div>
       </div>
     </div>
 
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="panel-section">
-        <h3>🔗 Add Connection</h3>
+        <h3> Add Connection</h3>
         <div style="display:flex; flex-direction: column; gap:0.4rem;">
-          <select id="sourceSelect" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;"><option value="">— source —</option></select>
-          <select id="targetSelect" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;"><option value="">— target —</option></select>
+          <select id="sourceSelect" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;"><option value="">- source -</option></select>
+          <select id="targetSelect" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;"><option value="">- target -</option></select>
           <select id="connectionType" style="background:#1e293b; border:1px solid #334155; border-radius:40px; padding:0.4rem 0.8rem; color:#e2e8f0;">
             <option value="sequential">Sequential</option>
             <option value="parallel">Parallel</option>
             <option value="conditional">Conditional</option>
           </select>
-          <button id="addConnectionBtn" style="margin-top:0.3rem;">➕ Add Connection</button>
+          <button id="addConnectionBtn" style="margin-top:0.3rem;"> Add Connection</button>
         </div>
       </div>
 
       <div class="panel-section">
-        <h3>📊 Stats & Estimates</h3>
+        <h3>Stats & Estimates</h3>
         <div class="stats-grid">
           <div class="stat-item"><div class="stat-label">Total agents</div><div class="stat-value" id="agentCount">0</div></div>
           <div class="stat-item"><div class="stat-label">Connections</div><div class="stat-value" id="connectionCount">0</div></div>
@@ -348,9 +348,9 @@
       </div>
 
       <div class="panel-section">
-        <h3>📄 Pipeline Config JSON</h3>
+        <h3> Pipeline Config JSON</h3>
         <div class="config-json" id="configJson">{} </div>
-        <button id="copyJsonBtn" style="margin-top:0.4rem; width:100%;">📋 Copy JSON</button>
+        <button id="copyJsonBtn" style="margin-top:0.4rem; width:100%;"> Copy JSON</button>
       </div>
     </div>
   </div>
@@ -455,8 +455,8 @@
     function render() {
       // Update selects
       const agentOptions = agents.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-      sourceSelect.innerHTML = '<option value="">— source —</option>' + agentOptions;
-      targetSelect.innerHTML = '<option value="">— target —</option>' + agentOptions;
+      sourceSelect.innerHTML = '<option value="">- source -</option>' + agentOptions;
+      targetSelect.innerHTML = '<option value="">- target -</option>' + agentOptions;
 
       // Build flowchart
       let html = '';
@@ -467,7 +467,7 @@
           html += `<div class="agent-node" data-agent-id="${agent.id}">
             <div class="agent-header">
               <span class="agent-name">🧠 ${agent.name}</span>
-              <span class="agent-role">${agent.role || '—'}</span>
+              <span class="agent-role">${agent.role || '-'}</span>
             </div>
             <div class="agent-meta">
               <span>⚡ ${agent.model}</span>

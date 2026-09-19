@@ -102,19 +102,19 @@
 </nav>
 <div class="wrap">
   <h1>Will Your Streaming Response Fit Its Latency SLO?</h1>
-  <p class="lede">Break a streamed LLM response into its two real cost centers &mdash; time-to-first-token (TTFT) and per-token generation time &mdash; then project the p50, p90, p95 and p99 total latency and check every percentile against your service-level objective. Nothing is uploaded; all math runs in your browser.</p>
+  <p class="lede">Break a streamed LLM response into its two real cost centers  | time-to-first-token (TTFT) and per-token generation time  | then project the p50, p90, p95 and p99 total latency and check every percentile against your service-level objective. Nothing is uploaded; all math runs in your browser.</p>
 
   <section id="tool">
     <div id="inputs">
       <h3>Response model</h3>
       <div class="field">
-        <label for="ttft">Median TTFT &mdash; ms
+        <label for="ttft">Median TTFT  | ms
           <span class="hint">Time from request send to the first streamed token (p50).</span></label>
         <input type="number" id="ttft" value="420" min="0" step="10">
       </div>
       <div class="row">
         <div class="field">
-          <label for="tps">Output speed &mdash; tokens/sec
+          <label for="tps">Output speed  | tokens/sec
             <span class="hint">Sustained decode throughput.</span></label>
           <input type="number" id="tps" value="65" min="1" step="1">
         </div>
@@ -128,7 +128,7 @@
       <h3>Tail &amp; variance</h3>
       <div class="field">
         <label for="mult">Tail multiplier (p99 / p50)
-          <span class="hint">How much slower the worst 1% is vs the median. 1.5&ndash;3&times; is typical under load.</span></label>
+          <span class="hint">How much slower the worst 1% is vs the median. 1.5 - 3&times; is typical under load.</span></label>
         <input type="range" id="mult" value="2.2" min="1.05" max="5" step="0.05">
         <div class="kpi"><span class="k">Current</span><span class="v" id="multV">2.20&times;</span></div>
       </div>
@@ -143,7 +143,7 @@
 
       <h3>Budget</h3>
       <div class="field">
-        <label for="slo">Latency SLO &mdash; ms
+        <label for="slo">Latency SLO  | ms
           <span class="hint">Your budget ceiling at the target percentile.</span></label>
         <input type="number" id="slo" value="2500" min="1" step="50">
       </div>
@@ -163,10 +163,10 @@
       <div class="verdict" id="verdict">&nbsp;</div>
 
       <div class="out">
-        <div class="kpi"><span class="k">p50 total latency</span><span class="v" id="p50">&mdash;</span></div>
-        <div class="kpi"><span class="k">Streaming portion</span><span class="v" id="stream">&mdash;</span></div>
-        <div class="kpi"><span class="k">Budget at target pct</span><span class="v" id="budget">&mdash;</span></div>
-        <div class="kpi"><span class="k">Margin</span><span class="v" id="margin">&mdash;</span></div>
+        <div class="kpi"><span class="k">p50 total latency</span><span class="v" id="p50"> - </span></div>
+        <div class="kpi"><span class="k">Streaming portion</span><span class="v" id="stream"> - </span></div>
+        <div class="kpi"><span class="k">Budget at target pct</span><span class="v" id="budget"> - </span></div>
+        <div class="kpi"><span class="k">Margin</span><span class="v" id="margin"> - </span></div>
         <div class="bar"><i id="barFill"></i></div>
       </div>
 
@@ -178,20 +178,20 @@
 
       <div class="out" style="margin-top:16px">
         <div class="kpi"><span class="k">Max output tokens that still fit SLO</span>
-          <span class="v" id="maxTok">&mdash;</span></div>
-        <div class="kpi"><span class="k">&hellip; at target percentile</span>
-          <span class="v" id="maxTokPct">&mdash;</span></div>
+          <span class="v" id="maxTok"> - </span></div>
+        <div class="kpi"><span class="k">... at target percentile</span>
+          <span class="v" id="maxTokPct"> - </span></div>
       </div>
     </div>
   </section>
 
   <h2>How the model works</h2>
   <div class="prose">
-    <p>A streamed LLM response has two additive components. First is <strong>time-to-first-token</strong> (TTFT): queueing, prompt tokenization and the prefill forward pass before any output appears. Second is the <strong>generation phase</strong>, where tokens are decoded one at a time. The base end-to-end latency is simply:</p>
+    <p>A streamed LLM response has two additive components. First is <em>time-to-first-token</em> (TTFT): queueing, prompt tokenization and the prefill forward pass before any output appears. Second is the <em>generation phase</em>, where tokens are decoded one at a time. The base end-to-end latency is simply:</p>
     <div class="formula">total_p50 = TTFT_p50 + (output_tokens &divide; tokens_per_second) &times; 1000&nbsp;ms</div>
-    <p>Median numbers alone hide the problem SLOs exist to catch: the tail. Under concurrency, batching contention and cold caches, the slowest requests balloon. Rather than assume a fixed pad, this tool treats total latency as roughly <strong>log-normal</strong> &mdash; the standard shape for positive, right-skewed latency. From your median and a tail multiplier <code>m = p99 / p50</code>, it recovers the distribution's shape parameter <code>&sigma; = ln(m) / z<sub>0.99</sub></code>, where <code>z<sub>0.99</sub> &asymp; 2.326</code> is the 99th-percentile standard normal quantile. Any percentile then follows:</p>
+    <p>Median numbers alone hide the problem SLOs exist to catch: the tail. Under concurrency, batching contention and cold caches, the slowest requests balloon. Rather than assume a fixed pad, this tool treats total latency as roughly <em>log-normal</em>  | the standard shape for positive, right-skewed latency. From your median and a tail multiplier <code>m = p99 / p50</code>, it recovers the distribution's shape parameter <code>&sigma; = ln(m) / z<sub>0.99</sub></code>, where <code>z<sub>0.99</sub> &asymp; 2.326</code> is the 99th-percentile standard normal quantile. Any percentile then follows:</p>
     <div class="formula">latency(p) = p50 &times; exp(&sigma; &times; z<sub>p</sub>)</div>
-    <p>with <code>z<sub>p</sub></code> the normal quantile for that percentile (z&#8320;.&#8329;&#8320;&asymp;1.282, z&#8320;.&#8329;&#8325;&asymp;1.645). When the SLO is measured at first token, only the TTFT component is scaled; when it governs the full response, the whole total is scaled, since prefill and decode tails correlate under shared load. The tool then compares the latency at your chosen percentile to the budget and reports the <strong>margin</strong> &mdash; negative means you are over budget. Finally it inverts the equation to solve for the largest <code>output_tokens</code> whose target-percentile latency still lands under the SLO, so you can cap <code>max_tokens</code> defensively instead of discovering breaches in production. Everything recomputes live as you type.</p>
+    <p>with <code>z<sub>p</sub></code> the normal quantile for that percentile (z&#8320;.&#8329;&#8320;&asymp;1.282, z&#8320;.&#8329;&#8325;&asymp;1.645). When the SLO is measured at first token, only the TTFT component is scaled; when it governs the full response, the whole total is scaled, since prefill and decode tails correlate under shared load. The tool then compares the latency at your chosen percentile to the budget and reports the <em>margin</em>  | negative means you are over budget. Finally it inverts the equation to solve for the largest <code>output_tokens</code> whose target-percentile latency still lands under the SLO, so you can cap <code>max_tokens</code> defensively instead of discovering breaches in production. Everything recomputes live as you type.</p>
   </div>
 
   <h2>Related Tools</h2>
@@ -223,7 +223,7 @@
   var el = function(id){ return document.getElementById(id); };
   var ids = ["ttft","tps","out","mult","measure","slo","pct"];
   var fmt = function(ms){
-    if(!isFinite(ms)) return "—";
+    if(!isFinite(ms)) return "-";
     if(ms >= 1000) return (ms/1000).toFixed(ms>=10000?1:2)+" s";
     return Math.round(ms)+" ms";
   };
@@ -302,8 +302,8 @@
     var v = el("verdict");
     v.className = "verdict " + (pass?"pass":"fail");
     v.textContent = pass
-      ? "✓ PASS — p"+pct+" latency "+fmt(targetVal)+" is within the "+fmt(slo)+" SLO"
-      : "✗ BREACH — p"+pct+" latency "+fmt(targetVal)+" exceeds the "+fmt(slo)+" SLO by "+fmt(-margin);
+      ? "✓ PASS: p"+pct+" latency "+fmt(targetVal)+" is within the "+fmt(slo)+" SLO"
+      : "✗ BREACH: p"+pct+" latency "+fmt(targetVal)+" exceeds the "+fmt(slo)+" SLO by "+fmt(-margin);
 
     // Max output tokens that still fit SLO at the target percentile.
     // For "total": SLO_p = (ttft + tok/tps*1000) * exp(sigma*z)  => solve tok

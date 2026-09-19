@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Context Window Budget Planner — Allocate Tokens Wisely | claudflow</title>
+  <title>Context Window Budget Planner | Allocate Tokens Wisely | claudflow</title>
   <meta name="description" content="Interactive planner to allocate LLM context window tokens. Real-time pie chart, cost estimation, use-case presets for chatbot, RAG, code generation, data extraction.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://claudflow.com/tools/context-window-budget-planner">
@@ -284,14 +284,14 @@
 <body>
 <div class="container">
   <header>
-    <h1>🧠 Context Window Budget Planner</h1>
-    <div class="subhead">Allocate tokens wisely — optimize cost & performance</div>
+    <h1> Context Window Budget Planner</h1>
+    <div class="subhead">Allocate tokens wisely: optimize cost & performance</div>
   </header>
 
   <div class="planner-grid">
     <!-- LEFT: Controls -->
     <div class="card">
-      <h2><span>⚙️</span> Budget allocation</h2>
+      <h2><span></span> Budget allocation</h2>
       <div class="model-selector" id="modelSelector">
         <button class="model-btn" data-tokens="4096">4K</button>
         <button class="model-btn" data-tokens="8192">8K</button>
@@ -305,11 +305,11 @@
       </div>
 
       <div class="preset-area">
-        <span style="color:#94a3b8; font-size:0.85rem; width:100%; margin-bottom:0.2rem;">📌 Use case presets</span>
-        <button class="preset-btn" data-preset="chatbot">💬 Chatbot</button>
-        <button class="preset-btn" data-preset="rag">📚 RAG</button>
-        <button class="preset-btn" data-preset="codegen">🧑‍💻 Code generation</button>
-        <button class="preset-btn" data-preset="extraction">📊 Data extraction</button>
+        <span style="color:#94a3b8; font-size:0.85rem; width:100%; margin-bottom:0.2rem;"> Use case presets</span>
+        <button class="preset-btn" data-preset="chatbot"> Chatbot</button>
+        <button class="preset-btn" data-preset="rag"> RAG</button>
+        <button class="preset-btn" data-preset="codegen">‍ Code generation</button>
+        <button class="preset-btn" data-preset="extraction"> Data extraction</button>
       </div>
 
       <div class="stats" id="statsPanel">
@@ -322,7 +322,7 @@
 
     <!-- RIGHT: Chart -->
     <div class="card">
-      <h2><span>📊</span> Allocation pie</h2>
+      <h2><span></span> Allocation pie</h2>
       <div class="chart-wrapper">
         <canvas id="pieChart" width="300" height="300"></canvas>
       </div>

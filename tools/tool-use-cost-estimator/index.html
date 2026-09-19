@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Tool Use Cost Estimator — Calculate Function Calling</title>
+  <title>Tool Use Cost Estimator | Calculate Function Calling</title>
   <meta name="description" content="Estimate token & cost overhead of tool definitions, function calling, and schema size. Get recommendations for tool_choice, optimal tool count, and...">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://claudflow.com/tools/tool-use-cost-estimator">
@@ -255,7 +255,7 @@
     }
   </style>
 
-    <meta property="og:title" content="Tool Use Cost Estimator — Calculate Function Calling">
+    <meta property="og:title" content="Tool Use Cost Estimator | Calculate Function Calling">
     <meta property="og:description" content="Estimate token & cost overhead of tool definitions, function calling, and schema size. Get recommendations for tool_choice, optimal tool count, and...">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://claudflow.com/tools/tool-use-cost-estimator">
@@ -264,7 +264,7 @@
 <body>
 <div class="container">
   <header>
-    <h1>⚙️ Tool Use Cost Estimator <span>function calling</span></h1>
+    <h1>Tool Use Cost Estimator <span>function calling</span></h1>
     <div class="subhead">Measure token overhead & cost of tool definitions vs. conversation content</div>
   </header>
 
@@ -308,39 +308,39 @@
 
     <div class="stat-grid" id="statsGrid">
       <div class="stat-card">
-        <div class="value" id="defOverhead">--</div>
+        <div class="value" id="defOverhead">-</div>
         <div class="label">Tool def overhead (tokens)</div>
       </div>
       <div class="stat-card">
-        <div class="value" id="totalToolTokens">--</div>
+        <div class="value" id="totalToolTokens">-</div>
         <div class="label">Total tool‑related tokens</div>
       </div>
       <div class="stat-card cost">
-        <div class="value" id="costDefs">--</div>
+        <div class="value" id="costDefs">-</div>
         <div class="label">Cost of definitions</div>
       </div>
       <div class="stat-card cost">
-        <div class="value" id="costContent">--</div>
+        <div class="value" id="costContent">-</div>
         <div class="label">Cost of conversation content</div>
       </div>
       <div class="stat-card overhead">
-        <div class="value" id="percentOverhead">--</div>
+        <div class="value" id="percentOverhead">-</div>
         <div class="label">% overhead (def vs content)</div>
       </div>
       <div class="stat-card">
-        <div class="value" id="totalCost">--</div>
+        <div class="value" id="totalCost">-</div>
         <div class="label">Total estimated cost</div>
       </div>
     </div>
 
     <div class="recommend-box" id="recommendBox">
-      <h3>📊 Recommendations</h3>
+      <h3>Recommendations</h3>
       <ul id="recommendList">
         <li>Adjust inputs to see live recommendations.</li>
       </ul>
     </div>
     <div class="footnote">
-      ⚡ Schema auto‑estimate: base overhead + parameter count. Descriptions shorter = fewer tokens.
+       Schema auto‑estimate: base overhead + parameter count. Descriptions shorter = fewer tokens.
     </div>
   </div>
 
@@ -424,7 +424,7 @@
       const costPerMillionIn = p.costIn;
       const costPerMillionOut = p.costOut;
 
-      // cost of definitions (input tokens) — tool definitions are part of input
+      // cost of definitions (input tokens): tool definitions are part of input
       const costDefsVal = (toolDefOverhead / 1_000_000) * costPerMillionIn;
       // cost of content: we treat content as input + output? For simplicity: content tokens as input (prompt) + output (results)
       // but tool results are also output tokens. We'll split: content input ~ contentTokens * 0.6, output ~ contentTokens * 0.4 + result tokens
@@ -465,7 +465,7 @@
       } else if (nTools > 10) {
         recs.push(`📌 ${nTools} tools is acceptable. Keep descriptions concise to save tokens.`);
       } else {
-        recs.push(`📌 Tool count (${nTools}) is lean — good for low overhead.`);
+        recs.push(`📌 Tool count (${nTools}) is lean: good for low overhead.`);
       }
       // schema optimization
       if (schemaSize > 80) {
@@ -500,7 +500,7 @@
 <div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
 <p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
 <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers: perfect grammar in any language, instantly.</p>
 </div>
 </body>
 </html>

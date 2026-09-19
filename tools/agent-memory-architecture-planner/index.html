@@ -250,16 +250,16 @@
 <div class="container">
   <!-- Header -->
   <div class="flex-between" style="margin-bottom: 0.5rem;">
-    <h1>🧠 Agent Memory <span class="accent">Architecture Planner</span> <small>claudflow</small></h1>
+    <h1> Agent Memory <span class="accent">Architecture Planner</span> <small>claudflow</small></h1>
     <span class="badge orange">v2.0</span>
   </div>
-  <p style="color:#94a3b8; margin-bottom: 1.5rem;">Design memory tiers for your AI agent — working, episodic, semantic, procedural.</p>
+  <p style="color:#94a3b8; margin-bottom: 1.5rem;">Design memory tiers for your AI agent: working, episodic, semantic, procedural.</p>
 
   <!-- Inputs -->
   <div class="card">
     <div class="grid-2">
       <div class="form-group">
-        <label>🤖 Agent type</label>
+        <label> Agent type</label>
         <select id="agentType">
           <option value="customer-support">Customer support</option>
           <option value="coding-assistant">Coding assistant</option>
@@ -269,19 +269,19 @@
         </select>
       </div>
       <div class="form-group">
-        <label>🔄 Avg session turns</label>
+        <label> Avg session turns</label>
         <input type="number" id="sessionTurns" value="12" min="1" max="200" step="1">
       </div>
       <div class="form-group">
-        <label>📅 Sessions per day</label>
+        <label> Sessions per day</label>
         <input type="number" id="sessionsPerDay" value="80" min="1" max="50000" step="1">
       </div>
       <div class="form-group">
-        <label>👥 Unique users</label>
+        <label> Unique users</label>
         <input type="number" id="uniqueUsers" value="500" min="1" max="1000000" step="1">
       </div>
       <div class="form-group">
-        <label>📆 Data retention (days)</label>
+        <label> Data retention (days)</label>
         <input type="number" id="retentionDays" value="30" min="1" max="365" step="1">
       </div>
       <div class="form-group" style="display: flex; align-items: flex-end;">
@@ -293,13 +293,13 @@
   <!-- 4 memory tiers + recommended architecture -->
   <div class="grid-2" style="margin-top: 0.5rem;">
     <div class="card">
-      <h3 style="display: flex; gap: 0.8rem; flex-wrap: wrap;">📊 Memory tiers</h3>
+      <h3 style="display: flex; gap: 0.8rem; flex-wrap: wrap;">Memory tiers</h3>
       <div id="tierStats" style="margin-top: 0.8rem;">
         <!-- filled by JS -->
       </div>
     </div>
     <div class="card">
-      <h3>📋 Recommended architecture by agent</h3>
+      <h3> Recommended architecture by agent</h3>
       <div id="archTable"></div>
     </div>
   </div>
@@ -307,18 +307,18 @@
   <!-- Monthly cost breakdown + scaling chart -->
   <div class="grid-2">
     <div class="card">
-      <h3>💰 Monthly storage cost breakdown</h3>
+      <h3> Monthly storage cost breakdown</h3>
       <div id="costBreakdown" style="margin-top: 0.5rem;"></div>
     </div>
     <div class="card">
-      <h3>📈 Scaling: monthly cost vs users</h3>
+      <h3> Scaling - monthly cost vs users</h3>
       <canvas id="costChart" width="400" height="200"></canvas>
     </div>
   </div>
 
   <!-- Decision flowchart SVG -->
   <div class="card">
-    <h3>🧭 Decision flowchart: when to add each memory tier</h3>
+    <h3> Decision flowchart - when to add each memory tier</h3>
     <div class="flowchart" style="margin-top: 0.8rem; text-align: center;">
       <svg viewBox="0 0 600 280" style="width:100%; max-width:600px;">
         <rect x="10" y="10" width="130" height="40" rx="20" fill="#1f2a3f" stroke="#f97316" stroke-width="2"/>
@@ -367,7 +367,7 @@
 
   <!-- Footer -->
   <div class="footer">
-    © 2025 claudflow.com — Agent Memory Architecture Planner. All estimates indicative.
+    © 2025 claudflow.com: Agent Memory Architecture Planner. All estimates indicative.
   </div>
 </div>
 
@@ -480,7 +480,7 @@
           <tr><td>Semantic</td><td>${rec.semantic}</td></tr>
           <tr><td>Procedural</td><td>${rec.procedural}</td></tr>
         </table>
-        <p style="margin-top:0.6rem; font-size:0.8rem; color:#94a3b8;">Based on agent type: <strong>${agent.replace('-',' ')}</strong></p>
+        <p style="margin-top:0.6rem; font-size:0.8rem; color:#94a3b8;">Based on agent type: <em>${agent.replace('-',' ')}</em></p>
       `;
 
       // --- Monthly cost breakdown ---
@@ -585,7 +585,7 @@
 <div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
 <p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
 <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers: perfect grammar in any language, instantly.</p>
 </div>
 <script src="/kit/cta.js" data-mt-cta data-tool="handsofflinks" data-href="https://handsofflinks.com/" data-text="You can automate nearly every part of a build except the links, because links have always meant cold email. Hands Off Links takes the other road. It publishes real technical assets to public platforms under your own accounts and earns the links from those. One-time licence, from 99 dollars." data-action="See how it works" data-placement="inline" data-source="claudflow" data-medium="cta" data-campaign="handsofflinks"></script>
 

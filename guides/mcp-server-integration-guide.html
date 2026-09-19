@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://claudflow.com/guides/mcp-server-integration-guide.html">
   <link rel="alternate" hreflang="en" href="https://claudflow.com/guides/mcp-server-integration-guide.html">
   <link rel="alternate" hreflang="x-default" href="https://claudflow.com/guides/mcp-server-integration-guide.html">
-  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow | AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -639,7 +639,7 @@
   </nav>
 
   <header class="article-header">
-    <h1>MCP Server Integration Guide — Connect Claude to Any Data Source</h1>
+    <h1>MCP Server Integration Guide - Connect Claude to Any Data Source</h1>
     <div class="article-meta">
       <span>May 28, 2026</span>
       <span>By <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=guides-mcp-server-integration-guide">Michael Lip</a></span>
@@ -662,15 +662,15 @@
   </div>
 
   <h2 id="what-is-mcp">What Is MCP and Why It Matters</h2>
-  <p>The <strong>Model Context Protocol (MCP)</strong> is an open standard that gives Claude a live connection to external systems — databases, APIs, file servers, and custom tools — without embedding data directly into the context window. Instead of copy-pasting a CSV or writing a long prompt describing your database schema, you configure an MCP server once and Claude can query it on demand.</p>
-  <p>MCP follows a client-server architecture. The <strong>MCP client</strong> (built into Claude Desktop and compatible hosts) sends requests over a local transport (stdio or SSE). The <strong>MCP server</strong> is a small process you run that exposes three primitives:</p>
+  <p>The <em>Model Context Protocol (MCP)</em> is an open standard that gives Claude a live connection to external systems: databases, APIs, file servers, and custom tools: without embedding data directly into the context window. Instead of copy-pasting a CSV or writing a long prompt describing your database schema, you configure an MCP server once and Claude can query it on demand.</p>
+  <p>MCP follows a client-server architecture. The <em>MCP client</em> (built into Claude Desktop and compatible hosts) sends requests over a local transport (stdio or SSE). The <em>MCP server</em> is a small process you run that exposes three primitives:</p>
   <ul>
-    <li><strong>Tools</strong> — callable functions (query a database, POST to an API, list files)</li>
-    <li><strong>Resources</strong> — file-like data Claude can read (a schema, a config, a document)</li>
-    <li><strong>Prompts</strong> — reusable conversation templates the server exposes for specific workflows</li>
+    <li><strong>Tools</strong>: callable functions (query a database, POST to an API, list files)</li>
+    <li><strong>Resources</strong>: file-like data Claude can read (a schema, a config, a document)</li>
+    <li><strong>Prompts</strong>: reusable conversation templates the server exposes for specific workflows</li>
   </ul>
   <div class="key-takeaway">
-    <strong>Key insight:</strong> MCP lets Claude act as a dynamic agent over live data rather than a static summarizer of pasted content. A single configured MCP server can replace dozens of copy-paste operations per day.
+    <strong>Key insight</strong>: MCP lets Claude act as a dynamic agent over live data rather than a static summarizer of pasted content. A single configured MCP server can replace dozens of copy-paste operations per day.
   </div>
 
   <h2 id="source-types">Three Integration Categories</h2>
@@ -688,19 +688,19 @@
         <td><strong>Database</strong> <span class="badge badge-db">DB</span></td>
         <td>PostgreSQL, MySQL, SQLite, MongoDB</td>
         <td>@modelcontextprotocol/server-postgres, mcp-server-sqlite</td>
-        <td>Low — connection string only</td>
+        <td>Low: connection string only</td>
       </tr>
       <tr>
         <td><strong>REST API</strong> <span class="badge badge-api">API</span></td>
         <td>GitHub, Notion, Slack, custom services</td>
         <td>@modelcontextprotocol/server-github, custom TypeScript/Python</td>
-        <td>Medium — needs auth config</td>
+        <td>Medium: needs auth config</td>
       </tr>
       <tr>
         <td><strong>Filesystem</strong> <span class="badge badge-fs">FS</span></td>
         <td>Local files, project directories, S3</td>
         <td>@modelcontextprotocol/server-filesystem, mcp-server-s3</td>
-        <td>Low — path config only</td>
+        <td>Low: path config only</td>
       </tr>
     </tbody>
   </table>
@@ -726,32 +726,32 @@
       <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1rem;">What type of data source do you want to connect Claude to?</p>
       <div class="source-grid">
         <div class="source-card" data-source="postgres" onclick="selectSource(this)">
-          <span class="source-icon">🐘</span>
+          <span class="source-icon"></span>
           <div class="source-name">PostgreSQL</div>
           <div class="source-desc">SQL database</div>
         </div>
         <div class="source-card" data-source="sqlite" onclick="selectSource(this)">
-          <span class="source-icon">🗄️</span>
+          <span class="source-icon"></span>
           <div class="source-name">SQLite</div>
           <div class="source-desc">Local database</div>
         </div>
         <div class="source-card" data-source="mysql" onclick="selectSource(this)">
-          <span class="source-icon">🐬</span>
+          <span class="source-icon"></span>
           <div class="source-name">MySQL / MariaDB</div>
           <div class="source-desc">SQL database</div>
         </div>
         <div class="source-card" data-source="rest-api" onclick="selectSource(this)">
-          <span class="source-icon">🔌</span>
+          <span class="source-icon"></span>
           <div class="source-name">REST API</div>
           <div class="source-desc">HTTP endpoints</div>
         </div>
         <div class="source-card" data-source="github" onclick="selectSource(this)">
-          <span class="source-icon">🐙</span>
+          <span class="source-icon"></span>
           <div class="source-name">GitHub</div>
           <div class="source-desc">Repos &amp; issues</div>
         </div>
         <div class="source-card" data-source="filesystem" onclick="selectSource(this)">
-          <span class="source-icon">📁</span>
+          <span class="source-icon"></span>
           <div class="source-name">Filesystem</div>
           <div class="source-desc">Local files</div>
         </div>
@@ -773,7 +773,7 @@
     <!-- Panel 3: Config & Test -->
     <div class="wizard-panel" id="panel-3">
       <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.75rem;">Add this snippet to your <code>claude_desktop_config.json</code> inside the <code>mcpServers</code> object, then restart Claude Desktop.</p>
-      <div class="config-output" id="config-out">— config will appear here —</div>
+      <div class="config-output" id="config-out">- config will appear here -</div>
       <button class="copy-btn" onclick="copyConfig()">Copy JSON</button>
 
       <div style="margin-top:1.75rem;">
@@ -796,17 +796,17 @@
 
   <h2 id="database-guide">Database Integrations in Depth</h2>
   <h3>PostgreSQL</h3>
-  <p>The official <code>@modelcontextprotocol/server-postgres</code> package exposes <strong>query</strong> and <strong>list_tables</strong> tools plus schema resources. Claude can write and execute SQL, inspect table schemas, and analyze query results in a single conversation turn.</p>
+  <p>The official <code>@modelcontextprotocol/server-postgres</code> package exposes <em>query</em> and <em>list_tables</em> tools plus schema resources. Claude can write and execute SQL, inspect table schemas, and analyze query results in a single conversation turn.</p>
   <pre><code><span style="color:#6e7681"># Install (one-time)</span>
 <span style="color:#a5d6ff">npm install -g @modelcontextprotocol/server-postgres</span>
 
 <span style="color:#6e7681"># Test locally</span>
 <span style="color:#a5d6ff">npx @modelcontextprotocol/server-postgres \
   "postgresql://readonly_user:pass@localhost:5432/mydb"</span></code></pre>
-  <p>Always use a <strong>read-only database user</strong> for the MCP connection. Create one with <code>GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_user;</code> and revoke all write permissions.</p>
+  <p>Always use a <em>read-only database user</em> for the MCP connection. Create one with <code>GRANT SELECT ON ALL TABLES IN SCHEMA public TO mcp_user;</code> and revoke all write permissions.</p>
 
   <h3>SQLite</h3>
-  <p>SQLite needs no network config — just a path to the <code>.db</code> file. It is ideal for local development, embedded analytics, and offline workflows. The server auto-detects foreign keys and indexes, making schema exploration especially clean.</p>
+  <p>SQLite needs no network config: just a path to the <code>.db</code> file. It is ideal for local development, embedded analytics, and offline workflows. The server auto-detects foreign keys and indexes, making schema exploration especially clean.</p>
 
   <h3>MySQL / MariaDB</h3>
   <p>Use the community <code>mcp-server-mysql</code> package. Connection strings follow the standard <code>mysql://user:pass@host:3306/dbname</code> format. Enable <code>ssl: true</code> in the config for any non-localhost connection.</p>
@@ -815,11 +815,11 @@
   <p>Connecting Claude to a REST API requires either an off-the-shelf MCP server (GitHub, Slack, Notion all have official ones) or a custom server you write using the MCP TypeScript or Python SDK. A custom server for a simple CRUD API is under 80 lines of code.</p>
 
   <div class="key-takeaway">
-    <strong>Pattern:</strong> For OpenAPI-documented APIs, use the <code>mcp-openapi</code> community package. Point it at your swagger.json and it auto-generates tools for every endpoint — no handwriting required.
+    <strong>Pattern</strong>: For OpenAPI-documented APIs, use the <code>mcp-openapi</code> community package. Point it at your swagger.json and it auto-generates tools for every endpoint: no handwriting required.
   </div>
 
   <h3>GitHub Integration</h3>
-  <p>The <code>@modelcontextprotocol/server-github</code> package requires a personal access token. It exposes tools for listing repos, reading files, searching code, creating issues, and commenting on PRs. Set the token as an environment variable — never inline it in the config JSON.</p>
+  <p>The <code>@modelcontextprotocol/server-github</code> package requires a personal access token. It exposes tools for listing repos, reading files, searching code, creating issues, and commenting on PRs. Set the token as an environment variable: never inline it in the config JSON.</p>
 
   <h3>Writing a Custom API Server (TypeScript)</h3>
   <pre><code><span style="color:#79c0ff">import</span> { McpServer } <span style="color:#79c0ff">from</span> <span style="color:#a5d6ff">"@modelcontextprotocol/sdk/server/mcp.js"</span>;
@@ -839,7 +839,7 @@ server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <
 <span style="color:#79c0ff">await</span> server.connect(<span style="color:#79c0ff">new</span> StdioServerTransport());</code></pre>
 
   <h2 id="filesystem-guide">Filesystem and File Server Integrations</h2>
-  <p>The <code>@modelcontextprotocol/server-filesystem</code> package gives Claude read/write access to specified directories. Configure it with an explicit <strong>allowed paths list</strong> — never pass <code>/</code> or your home directory root. The server enforces path containment so Claude cannot traverse outside the allowed list.</p>
+  <p>The <code>@modelcontextprotocol/server-filesystem</code> package gives Claude read/write access to specified directories. Configure it with an explicit <em>allowed paths list</em>: never pass <code>/</code> or your home directory root. The server enforces path containment so Claude cannot traverse outside the allowed list.</p>
   <pre><code><span style="color:#6e7681">// Good: scoped to one project directory</span>
 <span style="color:#a5d6ff">"allowedPaths"</span>: [<span style="color:#a5d6ff">"/Users/you/projects/my-app"</span>]
 
@@ -875,7 +875,7 @@ server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <
       <tr>
         <td><code>Tool list empty</code></td>
         <td>Server started but no tools registered</td>
-        <td>Check the server version — older packages may need an upgrade</td>
+        <td>Check the server version: older packages may need an upgrade</td>
       </tr>
       <tr>
         <td><code>Permission denied</code></td>
@@ -892,10 +892,10 @@ server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <
 
   <div class="further-reading">
     <h3>Related Guides</h3>
-    <a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration — Coordination Pattern Designer</a>
-    <a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation — 7 Patterns</a>
-    <a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns — Interactive Chain Builder</a>
-    <a href="/research/agent-pattern-library.html">Agent Pattern Library — 12 Agentic AI Design Patterns</a>
+    <a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration: Coordination Pattern Designer</a>
+    <a href="/guides/claude-code-workflow-automation.html">Claude Code Workflow Automation: 7 Patterns</a>
+    <a href="/guides/prompt-chaining-patterns.html">Prompt Chaining Patterns: Interactive Chain Builder</a>
+    <a href="/research/agent-pattern-library.html">Agent Pattern Library: 12 Agentic AI Design Patterns</a>
   </div>
 </main>
 
@@ -905,7 +905,7 @@ server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <
   <div class="footer-inner">
     <div class="footer-brand">Zovo Tools</div>
     <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
-    <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+    <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime: $99 once, free forever &rarr;</a>
     <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=guides-mcp-server-integration-guide">Zovo</a> &middot; 47/500 founding spots</div>
   </div>
 </footer>
@@ -914,30 +914,30 @@ server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <
     <div class="zovo-network-inner">
         <h3 class="zovo-network-title">Explore More Tools</h3>
         <div class="zovo-network-links">
-            <a href="https://abwex.com">ABWex — A/B Testing</a>
-            <a href="https://b2berp.com">B2BERP — Business Tools</a>
-            <a href="https://bugbountyreality.com">BugBountyReality — Security</a>
-            <a href="https://claudkit.com">ClaudKit — API Tools</a>
-            <a href="https://dismissticket.com">DismissTicket — Support</a>
-            <a href="https://enhio.com">Enhio — Text Tools</a>
-            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
-            <a href="https://gen8x.com">Gen8X — Color Tools</a>
-            <a href="https://gpt0x.com">GPT0X — AI Models</a>
-            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
-            <a href="https://ingredientcalculator.com">IngredientCalc — Recipes</a>
-            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
-            <a href="https://kappafy.com">Kappafy — JSON</a>
-            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
-            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
-            <a href="https://krzen.com">Krzen — Image Tools</a>
-            <a href="https://lochbot.com">LochBot — Security</a>
-            <a href="https://lockml.com">LockML — ML Security</a>
-            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=guides-mcp-server-integration-guide">ML0X — ML Basics</a>
-            <a href="https://ml3x.com">ML3X — Matrix Math</a>
-            <a href="https://pictureeditor.net">PictureEditor — Image Editing</a>
-            <a href="https://recipetool.net">RecipeTool — Cooking</a>
-            <a href="https://viryd.com">Viryd — Dev Tools</a>
-            <a href="https://tg.zovo.one/">Tiny Telegram Tools — Telegram Bots</a>
+            <a href="https://abwex.com">ABWex: A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP: Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality: Security</a>
+            <a href="https://claudkit.com">ClaudKit: API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket: Support</a>
+            <a href="https://enhio.com">Enhio: Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot: Timestamps</a>
+            <a href="https://gen8x.com">Gen8X: Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X: AI Models</a>
+            <a href="https://heytensor.com">HeyTensor: ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc: Recipes</a>
+            <a href="https://invokebot.com">InvokeBot: Webhooks</a>
+            <a href="https://kappafy.com">Kappafy: JSON</a>
+            <a href="https://kappakit.com">KappaKit: Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM: LLM Costs</a>
+            <a href="https://krzen.com">Krzen: Image Tools</a>
+            <a href="https://lochbot.com">LochBot: Security</a>
+            <a href="https://lockml.com">LockML: ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=guides-mcp-server-integration-guide">ML0X: ML Basics</a>
+            <a href="https://ml3x.com">ML3X: Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor: Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool: Cooking</a>
+            <a href="https://viryd.com">Viryd: Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools: Telegram Bots</a>
         </div>
     </div>
 </nav>
@@ -945,11 +945,11 @@ server.tool(<span style="color:#a5d6ff">"get_user"</span>, { id: z.string() }, <
 <div class="pow-strip">
   <div class="pow-strip-inner">
     <span class="pow-label">By the same builder:</span>
-    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub — theluckystrike</a>
-    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative — Grammar AI</a>
-    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder — Dev Blog</a>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub: theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative: Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder: Dev Blog</a>
     <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
-    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=guides-mcp-server-integration-guide" rel="nofollow">Zovo — AI Dev Tools</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=guides-mcp-server-integration-guide" rel="nofollow">Zovo: AI Dev Tools</a>
   </div>
 </div>
 
@@ -1042,7 +1042,7 @@ function buildConnFields() {
   const meta = SOURCE_META[selectedSource];
   if (!meta) return;
   const container = document.getElementById('conn-fields');
-  let html = `<p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">Fill in connection details for <strong style="color:#fff">${meta.label}</strong>. Secrets will be referenced as environment variables in the generated config.</p>`;
+  let html = `<p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:1.25rem;">Fill in connection details for <strong style="color:#fff">${meta.label}</em>. Secrets will be referenced as environment variables in the generated config.</p>`;
   const fields = meta.fields;
   for (let i = 0; i < fields.length; i += 2) {
     html += `<div class="tool-row">`;
@@ -1267,7 +1267,7 @@ function runTestSim() {
     { cls: 'muted',   text: `[00:00.580] Requesting resource list...`, delay: 2700 },
     { cls: 'success', text: `[00:00.620] Resources: schema://main, config://server`, delay: 2950 },
     { cls: 'success', text: `[00:00.635] All checks passed. Server is ready.`, delay: 3200 },
-    { cls: 'info',    text: `[00:00.636] — Connection test complete. No errors detected. —`, delay: 3400 },
+    { cls: 'info',    text: `[00:00.636]: Connection test complete. No errors detected. -`, delay: 3400 },
   ];
 
   lines.forEach(({ cls, text, delay }) => {

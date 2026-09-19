@@ -126,8 +126,8 @@ footer a{color:var(--acc);text-decoration:none;margin:0 8px}
   <p>where <code>B</code> is the tasks handled per batch invocation. Orchestration is never free, so we discount capacity by the overhead fraction <code>o</code> to get effective capacity <code>C_eff = capacity &times; (1 - o)</code>. This overhead captures the scheduler, message routing, retries, and serialization that steal time from useful work in real multi-agent pipelines.</p>
   <p>The system can only sustain whatever the slower side allows, so actual sustained <code>throughput = min(arrival_rate, C_eff)</code>. Utilization is <code>&rho; = arrival_rate / C_eff</code>. When <code>&rho; &lt; 1</code> the pipeline keeps up; as <code>&rho;</code> approaches 1, queueing explodes.</p>
   <h3>Queue wait estimate</h3>
-  <p>We approximate the mean time a task waits before an agent picks it up using an M/M/c-style heavy-traffic factor: <code>wait &asymp; (&rho; / (1 - &rho;)) &times; (L / W)</code> seconds. This is intentionally conservative — it climbs sharply once utilization passes ~85%, which is exactly where adding workers or trimming latency pays off most. If <code>&rho; &ge; 1</code> the queue is unstable and grows without bound, so we flag it instead of printing a finite number.</p>
-  <p>The marginal-worker hint compares current effective capacity against capacity with one extra worker, telling you the incremental tasks/sec a new agent slot buys — useful when each concurrent agent has a real dollar cost. Unlike generic throughput calculators, this tool folds orchestration overhead and batch size directly into the capacity term, so the number reflects an agent fleet rather than an idealized CPU.</p>
+  <p>We approximate the mean time a task waits before an agent picks it up using an M/M/c-style heavy-traffic factor: <code>wait &asymp; (&rho; / (1 - &rho;)) &times; (L / W)</code> seconds. This is intentionally conservative: it climbs sharply once utilization passes ~85%, which is exactly where adding workers or trimming latency pays off most. If <code>&rho; &ge; 1</code> the queue is unstable and grows without bound, so we flag it instead of printing a finite number.</p>
+  <p>The marginal-worker hint compares current effective capacity against capacity with one extra worker, telling you the incremental tasks/sec a new agent slot buys: useful when each concurrent agent has a real dollar cost. Unlike generic throughput calculators, this tool folds orchestration overhead and batch size directly into the capacity term, so the number reflects an agent fleet rather than an idealized CPU.</p>
 </section>
 
 <section class="rel">
@@ -142,7 +142,7 @@ footer a{color:var(--acc);text-decoration:none;margin:0 8px}
 
 <footer>
   <a href="/">Home</a> · <a href="/tools/">All Tools</a><br>
-  © 2026 claudflow.com — built for agent builders.
+  © 2026 claudflow.com: built for agent builders.
 </footer>
 
 <script>
@@ -196,7 +196,7 @@ footer a{color:var(--acc);text-decoration:none;margin:0 8px}
       var need=Math.ceil(A*L/(B*(1-o)));
       msg='⚠️ Overloaded: arrivals exceed effective capacity, so the queue grows without bound. You need at least <b>'+need+' workers</b> at this latency to keep up.';
     } else if(rho>=0.85){
-      msg='⚡ Running hot at '+fmt(rho*100,0)+'% utilization. The pipeline keeps up, but queue wait spikes with any traffic burst — add a worker or shave latency for safety margin.';
+      msg='⚡ Running hot at '+fmt(rho*100,0)+'% utilization. The pipeline keeps up, but queue wait spikes with any traffic burst: add a worker or shave latency for safety margin.';
     } else if(A===0){
       msg='ℹ️ No incoming tasks set. Showing pure capacity: this fleet could finish up to <b>'+fmt(cEff*win,1)+' tasks'+winLabel+'</b> if kept busy.';
     } else {

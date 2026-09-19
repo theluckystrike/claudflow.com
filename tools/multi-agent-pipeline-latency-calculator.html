@@ -138,10 +138,10 @@
   </section>
 
   <h2>How the latency model works</h2>
-  <p>Every stage in a multi-agent pipeline contributes a <b>per-stage latency</b> computed as <code>base_ms + (tokens / throughput) × 1000</code>, where <code>throughput</code> is tokens per second for that agent's model. The base time absorbs queueing, tool calls, and time-to-first-token; the token term captures generation length. You enter these per stage so the math reflects your real workload, not a generic benchmark.</p>
-  <p>The <b>sequential total</b> is the naive sum: every stage waits for the previous one to finish, plus one orchestration handoff between each pair of stages. This is the latency you get from a simple chain where each agent's output feeds the next. Formally, <code>T_seq = Σ stage_i + (n − 1) × overhead</code>.</p>
-  <p>The <b>parallel total</b> models concurrency. Stages that share a group label can run at the same time, bounded by your <i>max concurrent agents</i> limit. Within a group we use a greedy longest-processing-time bin-packing pass: the heaviest stages are assigned to the least-loaded of the available worker slots, and the group's duration becomes the busiest slot. Groups still run in order, so the pipeline total is the sum of each group's packed duration plus one handoff between groups. When a group has more stages than workers, the calculator shows how the queue serializes the overflow — the same effect you see when ten subagents fan out onto three concurrent connections.</p>
-  <p>The <b>critical path</b> is the longest single chain of work that cannot be parallelized away. The calculator flags the stage with the largest individual latency as your bottleneck: shaving time there, or splitting it into a faster model, moves the whole pipeline more than optimizing any cheaper stage. Speed-up is simply <code>T_seq / T_par</code> — a number above 1 means concurrency is buying you wall-clock time, while a value near 1 means your stages are too serially dependent to benefit from more workers. Use it to decide whether adding agents or shrinking the bottleneck is the better next move.</p>
+  <p>Every stage in a multi-agent pipeline contributes a <em>per-stage latency</em> computed as <code>base_ms + (tokens / throughput) × 1000</code>, where <code>throughput</code> is tokens per second for that agent's model. The base time absorbs queueing, tool calls, and time-to-first-token; the token term captures generation length. You enter these per stage so the math reflects your real workload, not a generic benchmark.</p>
+  <p>The <em>sequential total</em> is the naive sum: every stage waits for the previous one to finish, plus one orchestration handoff between each pair of stages. This is the latency you get from a simple chain where each agent's output feeds the next. Formally, <code>T_seq = Σ stage_i + (n − 1) × overhead</code>.</p>
+  <p>The <em>parallel total</em> models concurrency. Stages that share a group label can run at the same time, bounded by your <i>max concurrent agents</i> limit. Within a group we use a greedy longest-processing-time bin-packing pass: the heaviest stages are assigned to the least-loaded of the available worker slots, and the group's duration becomes the busiest slot. Groups still run in order, so the pipeline total is the sum of each group's packed duration plus one handoff between groups. When a group has more stages than workers, the calculator shows how the queue serializes the overflow: the same effect you see when ten subagents fan out onto three concurrent connections.</p>
+  <p>The <em>critical path</em> is the longest single chain of work that cannot be parallelized away. The calculator flags the stage with the largest individual latency as your bottleneck: shaving time there, or splitting it into a faster model, moves the whole pipeline more than optimizing any cheaper stage. Speed-up is simply <code>T_seq / T_par</code>: a number above 1 means concurrency is buying you wall-clock time, while a value near 1 means your stages are too serially dependent to benefit from more workers. Use it to decide whether adding agents or shrinking the bottleneck is the better next move.</p>
 
   <section class="rel">
     <h2>Related Tools</h2>
@@ -155,7 +155,7 @@
 
 <footer>
   <div><a href="/">Home</a> · <a href="/tools/">All Tools</a></div>
-  <div style="margin-top:8px">© 2026 claudflow.com — built by <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tools-multi-agent-pipeline-latency-calculator">Michael Lip</a></div>
+  <div style="margin-top:8px">© 2026 claudflow.com: built by <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tools-multi-agent-pipeline-latency-calculator">Michael Lip</a></div>
 </footer>
 
 <script>
@@ -238,7 +238,7 @@
       var pct = seq>0 ? (lat[maxI]/seq*100) : 0;
       bn.innerHTML = 'Bottleneck stage: <b>'+esc(stages[maxI].name||('Stage '+(maxI+1)))+'</b> at '+
         fmt(lat[maxI])+' ('+pct.toFixed(0)+'% of sequential time). '+
-        (spd>1.15 ? 'Concurrency is helping — speed-up '+spd.toFixed(2)+'×.'
+        (spd>1.15 ? 'Concurrency is helping: speed-up '+spd.toFixed(2)+'×.'
                   : 'Stages are mostly serial; faster models on the bottleneck will help more than adding workers.');
     } else { bn.innerHTML='Add a stage to begin.'; }
 

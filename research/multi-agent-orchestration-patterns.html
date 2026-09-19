@@ -4,27 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Multi-Agent Orchestration — 8 Patterns | ClaudFlow</title>
+  <title>Multi-Agent Orchestration | 8 Patterns | ClaudFlow</title>
   <meta name="description" content="8 multi-agent orchestration patterns: fan-out, pipeline, supervisor, consensus, blackboard, event-driven, map-reduce, hierarchy. Diagrams and code.">
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Multi-Agent Orchestration — 8 Patterns | ClaudFlow">
+  <meta property="og:title" content="Multi-Agent Orchestration | 8 Patterns | ClaudFlow">
   <meta property="og:description" content="Explore 8 proven multi-agent orchestration patterns with animated Canvas diagrams, code templates, and real-world use cases. Interactive pattern selector included.">
   <meta property="og:url" content="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
   <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
   <meta property="og:site_name" content="Zovo Tools">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Multi-Agent Orchestration — 8 Patterns | ClaudFlow">
+  <meta name="twitter:title" content="Multi-Agent Orchestration | 8 Patterns | ClaudFlow">
   <meta name="twitter:description" content="8 proven multi-agent orchestration patterns with animated Canvas diagrams, code templates, and use cases.">
   <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
   <link rel="canonical" href="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
   <link rel="alternate" hreflang="en" href="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
   <link rel="alternate" hreflang="x-default" href="https://claudflow.com/research/multi-agent-orchestration-patterns.html">
-  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow | AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "Multi-Agent Orchestration — 8 Patterns",
+    "headline": "Multi-Agent Orchestration: 8 Patterns",
     "description": "Explore 8 proven multi-agent orchestration patterns: fan-out, pipeline, supervisor, consensus, blackboard, event-driven, map-reduce, and hierarchy. Animated Canvas diagrams, code templates, and use cases for each pattern.",
     "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
     "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
@@ -59,7 +59,7 @@
         "name": "What is multi-agent orchestration?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Multi-agent orchestration is the coordination of multiple AI agents — each with a defined role and toolset — toward a shared goal. An orchestrator decomposes a complex task, routes subtasks to specialized agents, collects results, and synthesizes the final output. Orchestration patterns differ in how agents communicate: some use a central dispatcher (supervisor), others communicate peer-to-peer (consensus), and others share a common data store (blackboard)."
+          "text": "Multi-agent orchestration is the coordination of multiple AI agents: each with a defined role and toolset: toward a shared goal. An orchestrator decomposes a complex task, routes subtasks to specialized agents, collects results, and synthesizes the final output. Orchestration patterns differ in how agents communicate: some use a central dispatcher (supervisor), others communicate peer-to-peer (consensus), and others share a common data store (blackboard)."
         }
       },
       {
@@ -67,7 +67,7 @@
         "name": "When should I use a fan-out vs a pipeline pattern?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Use fan-out when subtasks are independent and can run in parallel — it minimizes wall-clock time but requires a merge step. Use pipeline when each stage depends on the output of the previous stage, and the bottleneck is computation depth rather than breadth. Fan-out excels at parallel research or content generation; pipeline excels at sequential transformation chains like ETL, code review, or document processing."
+          "text": "Use fan-out when subtasks are independent and can run in parallel: it minimizes wall-clock time but requires a merge step. Use pipeline when each stage depends on the output of the previous stage, and the bottleneck is computation depth rather than breadth. Fan-out excels at parallel research or content generation; pipeline excels at sequential transformation chains like ETL, code review, or document processing."
         }
       },
       {
@@ -75,7 +75,7 @@
         "name": "How does the supervisor pattern differ from a hierarchy pattern?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "In the supervisor pattern there is one level of orchestration: a single supervisor routes tasks to worker agents and aggregates their outputs. In the hierarchy pattern there are multiple levels — a top-level orchestrator delegates to mid-level supervisors, each of which coordinates its own set of workers. Hierarchy is appropriate when the task space is large enough that a single supervisor would face a context or throughput bottleneck."
+          "text": "In the supervisor pattern there is one level of orchestration: a single supervisor routes tasks to worker agents and aggregates their outputs. In the hierarchy pattern there are multiple levels: a top-level orchestrator delegates to mid-level supervisors, each of which coordinates its own set of workers. Hierarchy is appropriate when the task space is large enough that a single supervisor would face a context or throughput bottleneck."
         }
       },
       {
@@ -83,7 +83,7 @@
         "name": "What is the consensus pattern used for?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "The consensus pattern runs N independent agents on the same task and uses a voting or synthesis step to reconcile their outputs. It is used for high-stakes decisions where individual agent errors are unacceptable — security audits, medical triage, legal document review. The cost is N times the token spend of a single-agent approach, so it is reserved for tasks where accuracy outweighs cost."
+          "text": "The consensus pattern runs N independent agents on the same task and uses a voting or synthesis step to reconcile their outputs. It is used for high-stakes decisions where individual agent errors are unacceptable: security audits, medical triage, legal document review. The cost is N times the token spend of a single-agent approach, so it is reserved for tasks where accuracy outweighs cost."
         }
       },
       {
@@ -91,7 +91,7 @@
         "name": "Which orchestration pattern is best for Claude multi-agent systems?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "The best pattern depends on task structure. For broad research with parallel sub-queries use fan-out. For step-by-step transformation use pipeline. For routing between specialists use supervisor. For high-accuracy critical decisions use consensus. For knowledge-sharing across many long-running agents use blackboard. Most production systems combine patterns — for example, a supervisor that fans out to parallel workers whose outputs feed into a pipeline."
+          "text": "The best pattern depends on task structure. For broad research with parallel sub-queries use fan-out. For step-by-step transformation use pipeline. For routing between specialists use supervisor. For high-accuracy critical decisions use consensus. For knowledge-sharing across many long-running agents use blackboard. Most production systems combine patterns: for example, a supervisor that fans out to parallel workers whose outputs feed into a pipeline."
         }
       }
     ]
@@ -474,7 +474,7 @@
   </nav>
 
   <header class="article-header">
-    <h1>Multi-Agent Orchestration Patterns — 8 Proven Architectures</h1>
+    <h1>Multi-Agent Orchestration Patterns - 8 Proven Architectures</h1>
     <div class="article-meta">
       <span>May 28, 2026</span>
       <span>By <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=research-multi-agent-orchestration-patterns">Michael Lip</a></span>
@@ -486,7 +486,7 @@
     <h4>In This Article</h4>
     <ol>
       <li><a href="#why-patterns">Why Architecture Patterns Matter for Multi-Agent Systems</a></li>
-      <li><a href="#pattern-selector">Interactive Pattern Selector — 8 Architectures with Diagrams</a></li>
+      <li><a href="#pattern-selector">Interactive Pattern Selector: 8 Architectures with Diagrams</a></li>
       <li><a href="#pattern-comparison">Side-by-Side Pattern Comparison</a></li>
       <li><a href="#combining">Combining Patterns in Production</a></li>
       <li><a href="#pitfalls">Common Orchestration Pitfalls</a></li>
@@ -495,12 +495,12 @@
   </div>
 
   <h2 id="why-patterns">Why Architecture Patterns Matter for Multi-Agent Systems</h2>
-  <p>A single Claude agent can handle a surprising range of tasks, but it hits hard limits: context window saturation, lack of parallelism, and the inability to simultaneously hold the role of specialist and orchestrator. Multi-agent systems break through these limits — but only if the <strong>coordination architecture</strong> is chosen deliberately.</p>
-  <p>The wrong pattern is expensive in every dimension. A fan-out where a pipeline was needed produces incoherent outputs that require expensive re-runs. A supervisor where a simple pipeline would suffice adds latency overhead and doubles the token cost. An ad-hoc architecture with no clear topology is the worst outcome — unpredictable, hard to debug, and impossible to scale.</p>
+  <p>A single Claude agent can handle a surprising range of tasks, but it hits hard limits: context window saturation, lack of parallelism, and the inability to simultaneously hold the role of specialist and orchestrator. Multi-agent systems break through these limits: but only if the <em>coordination architecture</em> is chosen deliberately.</p>
+  <p>The wrong pattern is expensive in every dimension. A fan-out where a pipeline was needed produces incoherent outputs that require expensive re-runs. A supervisor where a simple pipeline would suffice adds latency overhead and doubles the token cost. An ad-hoc architecture with no clear topology is the worst outcome: unpredictable, hard to debug, and impossible to scale.</p>
   <p>The eight patterns below cover the full space of multi-agent coordination. Each has a well-defined topology, characteristic latency and cost profile, and a class of tasks it is optimally suited for.</p>
 
   <div class="key-takeaway">
-    <strong>Research finding:</strong> An analysis of 80 open-source multi-agent repositories found that 73% use one of these eight patterns as their primary topology, with the remaining 27% being combinations of two or more patterns.
+    <strong>Research finding</strong>: An analysis of 80 open-source multi-agent repositories found that 73% use one of these eight patterns as their primary topology, with the remaining 27% being combinations of two or more patterns.
   </div>
 
   <h2 id="pattern-selector">Interactive Pattern Selector</h2>
@@ -564,18 +564,18 @@
   <h2 id="combining">Combining Patterns in Production</h2>
   <p>Most production systems layer two or three patterns. The most common combinations observed in open-source repositories are:</p>
   <ul>
-    <li><strong>Supervisor + Fan-Out:</strong> The supervisor decides which tasks can run in parallel, then fans them out. Workers return to the supervisor for synthesis. Used in research assistants and multi-source data gathering.</li>
-    <li><strong>Pipeline + Map-Reduce:</strong> Early pipeline stages normalize and chunk input data; the map-reduce stage processes all chunks in parallel and reduces them into a final report. Used in document processing and large codebase analysis.</li>
-    <li><strong>Hierarchy + Blackboard:</strong> Top-level orchestrator decomposes the task and writes partial results to a shared blackboard; lower-level agents read from the blackboard and post their contributions. Used in long-running autonomous agents and research workflows.</li>
-    <li><strong>Event-Driven + Supervisor:</strong> Events trigger the supervisor, which dispatches specialist agents. The supervisor posts results back as new events. Used in monitoring, alert response, and continuous integration pipelines.</li>
+    <li><strong>Supervisor + Fan-Out</strong>: The supervisor decides which tasks can run in parallel, then fans them out. Workers return to the supervisor for synthesis. Used in research assistants and multi-source data gathering.</li>
+    <li><strong>Pipeline + Map-Reduce</strong>: Early pipeline stages normalize and chunk input data; the map-reduce stage processes all chunks in parallel and reduces them into a final report. Used in document processing and large codebase analysis.</li>
+    <li><strong>Hierarchy + Blackboard</strong>: Top-level orchestrator decomposes the task and writes partial results to a shared blackboard; lower-level agents read from the blackboard and post their contributions. Used in long-running autonomous agents and research workflows.</li>
+    <li><strong>Event-Driven + Supervisor</strong>: Events trigger the supervisor, which dispatches specialist agents. The supervisor posts results back as new events. Used in monitoring, alert response, and continuous integration pipelines.</li>
   </ul>
 
   <h2 id="pitfalls">Common Orchestration Pitfalls</h2>
   <h3>Context Propagation Failures</h3>
-  <p>The most common failure mode in any multi-agent system is losing context between handoffs. Each agent receives only a slice of the original task, and critical constraints or user preferences embedded in the original request fail to propagate downstream. Fix this by including a <strong>shared context block</strong> in every agent prompt — a concise summary of the user goal, constraints, and key decisions made so far.</p>
+  <p>The most common failure mode in any multi-agent system is losing context between handoffs. Each agent receives only a slice of the original task, and critical constraints or user preferences embedded in the original request fail to propagate downstream. Fix this by including a <em>shared context block</em> in every agent prompt: a concise summary of the user goal, constraints, and key decisions made so far.</p>
 
   <h3>Infinite Retry Loops</h3>
-  <p>Supervisor and event-driven patterns are prone to retry loops when an agent repeatedly fails a task. Always implement a <strong>max_retries</strong> parameter and a dead-letter queue where failed tasks are stored for human review rather than retried indefinitely.</p>
+  <p>Supervisor and event-driven patterns are prone to retry loops when an agent repeatedly fails a task. Always implement a <em>max_retries</em> parameter and a dead-letter queue where failed tasks are stored for human review rather than retried indefinitely.</p>
 
   <h3>Result Fanout Without Merge Strategy</h3>
   <p>Fan-out and map-reduce patterns require an explicit merge strategy defined before the fan-out begins. Without it, the merge agent must infer how to reconcile conflicting outputs, which produces inconsistent results. Define merge criteria upfront: concatenation, voting, scoring, or hierarchical priority.</p>
@@ -595,15 +595,15 @@
   </ol>
 
   <div class="key-takeaway">
-    <strong>Rule of thumb:</strong> Start with the simplest pattern that works. Pipeline and supervisor cover 60% of real-world use cases. Add fan-out or map-reduce when parallel execution becomes a measurable bottleneck. Reserve consensus and hierarchy for genuinely complex scenarios — they are expensive to build and run.
+    <strong>Rule of thumb</strong>: Start with the simplest pattern that works. Pipeline and supervisor cover 60% of real-world use cases. Add fan-out or map-reduce when parallel execution becomes a measurable bottleneck. Reserve consensus and hierarchy for genuinely complex scenarios: they are expensive to build and run.
   </div>
 
   <div class="further-reading">
     <h3>Related Research</h3>
-    <a href="/research/agent-pattern-library.html">Agent Pattern Library — 12 Agentic AI Design Patterns</a>
-    <a href="/research/ai-workflow-architectures.html">AI Workflow Architectures — Analysis of 100 Open-Source Repos</a>
-    <a href="/guides/mcp-server-integration-guide.html">MCP Server Integration Guide — Connect Claude to Any Data Source</a>
-    <a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration — Coordination Pattern Designer</a>
+    <a href="/research/agent-pattern-library.html">Agent Pattern Library: 12 Agentic AI Design Patterns</a>
+    <a href="/research/ai-workflow-architectures.html">AI Workflow Architectures: Analysis of 100 Open-Source Repos</a>
+    <a href="/guides/mcp-server-integration-guide.html">MCP Server Integration Guide: Connect Claude to Any Data Source</a>
+    <a href="/guides/multi-agent-orchestration.html">Multi-Agent Orchestration: Coordination Pattern Designer</a>
   </div>
 </main>
 
@@ -613,7 +613,7 @@
   <div class="footer-inner">
     <div class="footer-brand">Zovo Tools</div>
     <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
-    <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever &rarr;</a>
+    <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime: $99 once, free forever &rarr;</a>
     <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=research-multi-agent-orchestration-patterns">Zovo</a> &middot; 47/500 founding spots</div>
   </div>
 </footer>
@@ -622,30 +622,30 @@
     <div class="zovo-network-inner">
         <h3 class="zovo-network-title">Explore More Tools</h3>
         <div class="zovo-network-links">
-            <a href="https://abwex.com">ABWex — A/B Testing</a>
-            <a href="https://b2berp.com">B2BERP — Business Tools</a>
-            <a href="https://bugbountyreality.com">BugBountyReality — Security</a>
-            <a href="https://claudkit.com">ClaudKit — API Tools</a>
-            <a href="https://dismissticket.com">DismissTicket — Support</a>
-            <a href="https://enhio.com">Enhio — Text Tools</a>
-            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
-            <a href="https://gen8x.com">Gen8X — Color Tools</a>
-            <a href="https://gpt0x.com">GPT0X — AI Models</a>
-            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
-            <a href="https://ingredientcalculator.com">IngredientCalc — Recipes</a>
-            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
-            <a href="https://kappafy.com">Kappafy — JSON</a>
-            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
-            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
-            <a href="https://krzen.com">Krzen — Image Tools</a>
-            <a href="https://lochbot.com">LochBot — Security</a>
-            <a href="https://lockml.com">LockML — ML Security</a>
-            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=research-multi-agent-orchestration-patterns">ML0X — ML Basics</a>
-            <a href="https://ml3x.com">ML3X — Matrix Math</a>
-            <a href="https://pictureeditor.net">PictureEditor — Image Editing</a>
-            <a href="https://recipetool.net">RecipeTool — Cooking</a>
-            <a href="https://viryd.com">Viryd — Dev Tools</a>
-            <a href="https://tg.zovo.one/">Tiny Telegram Tools — Telegram Bots</a>
+            <a href="https://abwex.com">ABWex: A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP: Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality: Security</a>
+            <a href="https://claudkit.com">ClaudKit: API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket: Support</a>
+            <a href="https://enhio.com">Enhio: Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot: Timestamps</a>
+            <a href="https://gen8x.com">Gen8X: Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X: AI Models</a>
+            <a href="https://heytensor.com">HeyTensor: ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc: Recipes</a>
+            <a href="https://invokebot.com">InvokeBot: Webhooks</a>
+            <a href="https://kappafy.com">Kappafy: JSON</a>
+            <a href="https://kappakit.com">KappaKit: Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM: LLM Costs</a>
+            <a href="https://krzen.com">Krzen: Image Tools</a>
+            <a href="https://lochbot.com">LochBot: Security</a>
+            <a href="https://lockml.com">LockML: ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=research-multi-agent-orchestration-patterns">ML0X: ML Basics</a>
+            <a href="https://ml3x.com">ML3X: Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor: Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool: Cooking</a>
+            <a href="https://viryd.com">Viryd: Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools: Telegram Bots</a>
         </div>
     </div>
 </nav>
@@ -653,11 +653,11 @@
 <div class="pow-strip">
   <div class="pow-strip-inner">
     <span class="pow-label">By the same builder:</span>
-    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub — theluckystrike</a>
-    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative — Grammar AI</a>
-    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder — Dev Blog</a>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub: theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative: Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder: Dev Blog</a>
     <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
-    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=research-multi-agent-orchestration-patterns" rel="nofollow">Zovo — AI Dev Tools</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=research-multi-agent-orchestration-patterns" rel="nofollow">Zovo: AI Dev Tools</a>
   </div>
 </div>
 
@@ -719,7 +719,7 @@ final = merge(results, "Comprehensive MCP overview")`
   pipeline: {
     name: 'Pipeline',
     tagline: 'Sequential transformation chain',
-    desc: 'Each stage receives the previous stage\'s output as its input. Stages specialise in one transformation — extraction, analysis, formatting, validation. The chain runs serially; each stage can call tools or sub-agents.',
+    desc: 'Each stage receives the previous stage\'s output as its input. Stages specialise in one transformation: extraction, analysis, formatting, validation. The chain runs serially; each stage can call tools or sub-agents.',
     latency: 'High (serial)', cost: 'Low', complexity: 'Very Low', accuracy: 'High',
     uses: ['Document ingestion → analysis → report generation', 'Code diff → review → fix suggestions → PR comment', 'Raw data → normalise → classify → export', 'Customer query → intent → retrieval → answer → QA gate'],
     code: `import anthropic
@@ -919,7 +919,7 @@ agent_run(bb, "reporter", reads=["analysis"], writes="final_report")`
   event: {
     name: 'Event-Driven',
     tagline: 'Reactive agents triggered by events',
-    desc: 'Agents subscribe to event channels. When an event fires — a file change, a webhook, a timer, a threshold breach — the matching agent activates. Agents can emit new events, creating reactive chains with no central coordinator.',
+    desc: 'Agents subscribe to event channels. When an event fires: a file change, a webhook, a timer, a threshold breach: the matching agent activates. Agents can emit new events, creating reactive chains with no central coordinator.',
     latency: 'Very Low', cost: 'Low', complexity: 'Medium', accuracy: 'Medium',
     uses: ['CI/CD pipeline integration (on push, on PR)', 'Monitoring and alert response automation', 'Real-time data stream processing', 'Webhook-triggered content generation'],
     code: `import anthropic
@@ -1004,7 +1004,7 @@ async def map_agent(chunk_text: str, idx: int,
         model="claude-opus-4-6",
         max_tokens=512,
         system=f"Process this text chunk. {instruction} "
-               "Be concise — your output feeds a reduce step.",
+               "Be concise: your output feeds a reduce step.",
         messages=[{"role": "user", "content": chunk_text}]
     )
     return resp.content[0].text

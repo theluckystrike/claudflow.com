@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>How to Build an AI Workflow Without Code</title>
-  <meta name="description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed — just drag, connect, and run.">
+  <meta name="description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed: just drag, connect, and run.">
   <meta property="og:type" content="article">
   <meta property="og:title" content="How to Build an AI Workflow Without Code">
   <meta property="og:description" content="Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed.">
@@ -19,14 +19,14 @@
   <link rel="canonical" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
   <link rel="alternate" hreflang="en" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
   <link rel="alternate" hreflang="x-default" href="https://claudflow.com/blog/build-ai-workflow-without-code.html">
-  <link rel="alternate" type="application/atom+xml" title="ClaudFlow — AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow | AI Workflow Builder Blog Feed" href="/blog/feed.xml">
   <link rel="stylesheet" href="/assets/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "How to Build an AI Workflow Without Code",
-    "description": "Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed — just drag, connect, and run.",
+    "description": "Step-by-step guide to creating AI prompt chains using a visual workflow builder. No programming needed: just drag, connect, and run.",
     "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
     "publisher": { "@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com" },
     "datePublished": "2026-04-02",
@@ -45,7 +45,7 @@
       <li><a href="/about.html">About</a></li>
     </ul>
       <div class="nav-right">
-      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro ✦</a>
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro</a>
       <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=blog-build-ai-workflow-without-code" class="nav-zovo">Zovo Tools</a>
     </div>
   </nav>
@@ -55,7 +55,7 @@
     <p style="color:var(--text-muted);margin-bottom:0.5rem;">April 2, 2026</p>
     <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:2rem;">By <a href="/about.html" style="color:var(--accent);">Michael Lip</a></p>
 
-    <p>You do not need to be a programmer to build sophisticated AI workflows. The idea of "prompt chaining" — where the output of one AI prompt feeds into the next — sounds technical, but the concept is as simple as following a recipe. Each step has a specific input, a specific instruction, and a specific output that the next step uses.</p>
+    <p>You do not need to be a programmer to build sophisticated AI workflows. The idea of "prompt chaining": where the output of one AI prompt feeds into the next: sounds technical, but the concept is as simple as following a recipe. Each step has a specific input, a specific instruction, and a specific output that the next step uses.</p>
 
     <p>In this tutorial, you will build a complete content creation workflow from scratch using <a href="/">ClaudFlow's visual builder</a>. By the end, you will have a reusable pipeline that takes a topic and produces a polished blog post with SEO metadata.</p>
 
@@ -73,7 +73,7 @@
 
     <p>Each step gets a specialized prompt that is optimized for that specific sub-task. The result is dramatically better than a single monolithic prompt because each step can focus on doing one thing well.</p>
 
-    <h2>Step 1: Define Your Input</h2>
+    <h2>Step 1 - Define Your Input</h2>
 
     <p>Every workflow starts with an Input block. This is where the user provides the raw material. For our blog post pipeline, the input is the topic, target audience, desired tone, and any keywords to include.</p>
 
@@ -87,7 +87,7 @@ Word count: [target length]</code></pre>
 
     <p>This structured input means anyone on your team can use the workflow without needing to understand how the prompts work internally.</p>
 
-    <h2>Step 2: Add the Outline Generator</h2>
+    <h2>Step 2 - Add the Outline Generator</h2>
 
     <p>Click "AI Prompt" to add a prompt block. Double-click it, label it "Generate Outline", and write a prompt that takes the topic brief and produces a structured outline:</p>
 
@@ -104,7 +104,7 @@ Topic Brief:
 
     <p>Now connect the Input block to this Prompt block by dragging from the bottom port of Input to the top port of the Prompt block. You have just created your first connection.</p>
 
-    <h2>Step 3: The Draft Writer</h2>
+    <h2>Step 3 - The Draft Writer</h2>
 
     <p>Add another AI Prompt block labeled "Write Draft". This prompt takes the outline and produces the actual content:</p>
 
@@ -122,7 +122,7 @@ Outline:
 
     <p>Connect the Outline block to this Draft block. The chain is growing.</p>
 
-    <h2>Step 4: Add Quality Control</h2>
+    <h2>Step 4 - Add Quality Control</h2>
 
     <p>This is where workflows get interesting. Add a Condition block labeled "Quality Check". This represents a decision point:</p>
 
@@ -137,7 +137,7 @@ If any fail: flag for revision</code></pre>
 
     <p>In a manual workflow, you would read the draft and decide whether it needs revision. In an automated pipeline, this condition block would actually evaluate the text and route it accordingly. If you need ready-made prompts for any of these steps, the <a href="https://claudhq.com">ClaudHQ prompt library</a> has tested templates for writing, editing, and analysis tasks.</p>
 
-    <h2>Step 5: SEO Optimization</h2>
+    <h2>Step 5 - SEO Optimization</h2>
 
     <p>Add a Transform block labeled "SEO Metadata" that generates the technical elements:</p>
 
@@ -150,7 +150,7 @@ If any fail: flag for revision</code></pre>
 
     <p>Connect the Condition block to this Transform block.</p>
 
-    <h2>Step 6: Final Output</h2>
+    <h2>Step 6 - Final Output</h2>
 
     <p>Add an Output block labeled "Published Post" that represents the final deliverable. Connect the SEO block to it. Your complete workflow now has six blocks forming a clear pipeline from topic to published post.</p>
 
@@ -167,9 +167,9 @@ If any fail: flag for revision</code></pre>
     <p>The blog post pipeline is just one example. The same pattern works for any multi-step task:</p>
 
     <ul>
-      <li><strong>Code review:</strong> Input (diff) to Bug Analysis to Security Scan to Merge Findings to Fix Suggestions to Review Report</li>
-      <li><strong>Customer support:</strong> Input (ticket) to Classify Intent to Generate Response to Tone Check to Send</li>
-      <li><strong>Data analysis:</strong> Input (dataset) to Clean Data to Statistical Summary to Insight Generation to Report</li>
+      <li><strong>Code review</strong>: Input (diff) to Bug Analysis to Security Scan to Merge Findings to Fix Suggestions to Review Report</li>
+      <li><strong>Customer support</strong>: Input (ticket) to Classify Intent to Generate Response to Tone Check to Send</li>
+      <li><strong>Data analysis</strong>: Input (dataset) to Clean Data to Statistical Summary to Insight Generation to Report</li>
     </ul>
 
     <p>Try loading the pre-built "Code Review" and "Data Analysis" examples in ClaudFlow to see these patterns in action. Each one can be customized for your specific tools and requirements.</p>
@@ -196,7 +196,7 @@ If any fail: flag for revision</code></pre>
     <div class="footer-inner">
         <div class="footer-brand">Zovo Tools</div>
         <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
-        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever →</a>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime: $99 once, free forever →</a>
         <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=blog-build-ai-workflow-without-code">Zovo</a> · 47/500 founding spots</div>
     </div>
 </footer>
@@ -205,30 +205,30 @@ If any fail: flag for revision</code></pre>
     <div class="zovo-network-inner">
         <h3 class="zovo-network-title">Explore More Tools</h3>
         <div class="zovo-network-links">
-            <a href="https://abwex.com">ABWex — A/B Testing</a>
-            <a href="https://b2berp.com">B2BERP — Business Tools</a>
-            <a href="https://bugbountyreality.com">BugBountyReality — Security</a>
-            <a href="https://claudkit.com">ClaudKit — API Tools</a>
-            <a href="https://dismissticket.com">DismissTicket — Support</a>
-            <a href="https://enhio.com">Enhio — Text Tools</a>
-            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
-            <a href="https://gen8x.com">Gen8X — Color Tools</a>
-            <a href="https://gpt0x.com">GPT0X — AI Models</a>
-            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
-            <a href="https://ingredientcalculator.com">IngredientCalc — Recipes</a>
-            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
-            <a href="https://kappafy.com">Kappafy — JSON</a>
-            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
-            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
-            <a href="https://krzen.com">Krzen — Image Tools</a>
-            <a href="https://lochbot.com">LochBot — Security</a>
-            <a href="https://lockml.com">LockML — ML Security</a>
-            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=blog-build-ai-workflow-without-code">ML0X — ML Basics</a>
-            <a href="https://ml3x.com">ML3X — Matrix Math</a>
-            <a href="https://pictureeditor.net">PictureEditor — Image Editing</a>
-            <a href="https://recipetool.net">RecipeTool — Cooking</a>
-            <a href="https://viryd.com">Viryd — Dev Tools</a>
-            <a href="https://tg.zovo.one/">Tiny Telegram Tools — Telegram Bots</a>
+            <a href="https://abwex.com">ABWex: A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP: Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality: Security</a>
+            <a href="https://claudkit.com">ClaudKit: API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket: Support</a>
+            <a href="https://enhio.com">Enhio: Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot: Timestamps</a>
+            <a href="https://gen8x.com">Gen8X: Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X: AI Models</a>
+            <a href="https://heytensor.com">HeyTensor: ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc: Recipes</a>
+            <a href="https://invokebot.com">InvokeBot: Webhooks</a>
+            <a href="https://kappafy.com">Kappafy: JSON</a>
+            <a href="https://kappakit.com">KappaKit: Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM: LLM Costs</a>
+            <a href="https://krzen.com">Krzen: Image Tools</a>
+            <a href="https://lochbot.com">LochBot: Security</a>
+            <a href="https://lockml.com">LockML: ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=blog-build-ai-workflow-without-code">ML0X: ML Basics</a>
+            <a href="https://ml3x.com">ML3X: Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor: Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool: Cooking</a>
+            <a href="https://viryd.com">Viryd: Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools: Telegram Bots</a>
         </div>
     </div>
 </nav>
@@ -236,21 +236,21 @@ If any fail: flag for revision</code></pre>
 <div class="pow-strip">
   <div class="pow-strip-inner">
     <span class="pow-label">By the same builder:</span>
-    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub — theluckystrike</a>
-    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative — Grammar AI</a>
-    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder — Dev Blog</a>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub: theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative: Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder: Dev Blog</a>
     <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
-    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=blog-build-ai-workflow-without-code" rel="nofollow">Zovo — AI Dev Tools</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=blog-build-ai-workflow-without-code" rel="nofollow">Zovo: AI Dev Tools</a>
   </div>
 </div>
 
 <section style="margin-top:48px;padding:24px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">
 <h2 style="font-size:18px;margin-bottom:16px;">Related Tools</h2>
 <ul style="list-style:none;padding:0;display:grid;gap:8px;">
-<li><a href="/guides/claude-code-workflow-automation.html" style="color:#3b82f6;text-decoration:none;">Claude Code Workflow Automation — 7 Patterns for Faster Development</a></li>
-<li><a href="/research/ai-workflow-architectures.html" style="color:#3b82f6;text-decoration:none;">AI Workflow Architectures — 100 Agent Repo Patterns</a></li>
+<li><a href="/guides/claude-code-workflow-automation.html" style="color:#3b82f6;text-decoration:none;">Claude Code Workflow Automation: 7 Patterns for Faster Development</a></li>
+<li><a href="/research/ai-workflow-architectures.html" style="color:#3b82f6;text-decoration:none;">AI Workflow Architectures: 100 Agent Repo Patterns</a></li>
 <li><a href="/blog/ai-prompt-chaining-advanced.html" style="color:#3b82f6;text-decoration:none;">AI Prompt Chaining: Advanced Techniques for Complex Tasks</a></li>
-<li><a href="/research/workflow-automation-patterns.html" style="color:#3b82f6;text-decoration:none;">Workflow Automation Patterns — 30 Common Patterns for AI Pipelines</a></li>
+<li><a href="/research/workflow-automation-patterns.html" style="color:#3b82f6;text-decoration:none;">Workflow Automation Patterns: 30 Common Patterns for AI Pipelines</a></li>
 </ul>
 </section>
 

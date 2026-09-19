@@ -69,7 +69,7 @@ ul{padding-left:20px}
 </nav>
 <main>
 <h1>Estimate Token Spend When AI Agents Retry on Failure</h1>
-<p class="intro">When an agent step can fail and retry, your real cost is a probability-weighted sum across attempts — not just one call. Enter your error rate, retry limit, and per-attempt tokens to see the expected cost, attempt count, and worst case.</p>
+<p class="intro">When an agent step can fail and retry, your real cost is a probability-weighted sum across attempts: not just one call. Enter your error rate, retry limit, and per-attempt tokens to see the expected cost, attempt count, and worst case.</p>
 
 <section id="tool">
   <div class="grid">
@@ -108,7 +108,7 @@ ul{padding-left:20px}
 </section>
 
 <h2>How the retry cost model works</h2>
-<p>A naive estimate multiplies one call's cost by your task count. That undercounts any pipeline where a failed attempt is retried, because every retry consumes the full input and output tokens again. This calculator computes the <strong>expected number of attempts per task</strong> as a finite geometric series, then scales tokens and price by it.</p>
+<p>A naive estimate multiplies one call's cost by your task count. That undercounts any pipeline where a failed attempt is retried, because every retry consumes the full input and output tokens again. This calculator computes the <em>expected number of attempts per task</em> as a finite geometric series, then scales tokens and price by it.</p>
 
 <div class="formula">
 Let <code>p</code> = failure probability per attempt, <code>R</code> = max retries.<br>
@@ -117,16 +117,16 @@ Expected tokens = attempts × (input + output) per attempt.<br>
 Final-failure probability = <code>p^(R+1)</code> (every attempt failed).
 </div>
 
-<p>The series captures the diminishing likelihood of each successive retry: the second attempt only runs with probability <code>p</code>, the third with <code>p²</code>, and so on. As <code>p</code> approaches 0 the expected attempts approach exactly 1; as <code>p</code> approaches 1 it approaches <code>R+1</code>, the hard ceiling. Because attempts are bounded by the retry limit, the geometric sum is finite even at high error rates — that bound is what makes the worst-case column meaningful for budgeting.</p>
+<p>The series captures the diminishing likelihood of each successive retry: the second attempt only runs with probability <code>p</code>, the third with <code>p²</code>, and so on. As <code>p</code> approaches 0 the expected attempts approach exactly 1; as <code>p</code> approaches 1 it approaches <code>R+1</code>, the hard ceiling. Because attempts are bounded by the retry limit, the geometric sum is finite even at high error rates: that bound is what makes the worst-case column meaningful for budgeting.</p>
 
-<p>Two figures matter most for an orchestration budget. The <strong>expected cost</strong> tells you the average bill once retries are amortized over many tasks. The <strong>worst-case cost</strong> assumes every task exhausts all <code>R+1</code> attempts — the ceiling your concurrency and rate-limit headroom must survive during an incident. The <strong>final-failure rate</strong> (<code>p^(R+1)</code>) is the share of tasks that still fail after all retries; those need a dead-letter path, human escalation, or a fallback model, and they are pure sunk cost since they consumed every attempt without producing a usable result. Tune the retry limit against this number: raising <code>R</code> shrinks final failures but inflates worst-case spend, so the right setting balances reliability against the tail of your token bill.</p>
+<p>Two figures matter most for an orchestration budget. The <em>expected cost</em> tells you the average bill once retries are amortized over many tasks. The <em>worst-case cost</em> assumes every task exhausts all <code>R+1</code> attempts: the ceiling your concurrency and rate-limit headroom must survive during an incident. The <em>final-failure rate</em> (<code>p^(R+1)</code>) is the share of tasks that still fail after all retries; those need a dead-letter path, human escalation, or a fallback model, and they are pure sunk cost since they consumed every attempt without producing a usable result. Tune the retry limit against this number: raising <code>R</code> shrinks final failures but inflates worst-case spend, so the right setting balances reliability against the tail of your token bill.</p>
 
 <section>
 <h2>Related Tools</h2>
 <ul>
-  <li><a href="/tools/agent-loop-cost-calculator">Agent Loop Cost Calculator</a> — multi-step reasoning loop spend.</li>
-  <li><a href="/tools/agent-cost-per-task-calculator">Agent Cost Per Task Calculator</a> — unit economics of a single agent run.</li>
-  <li><a href="/tools/tool-use-cost-estimator">Tool-Use Cost Estimator</a> — token overhead of function-calling round trips.</li>
+  <li><a href="/tools/agent-loop-cost-calculator">Agent Loop Cost Calculator</a>: multi-step reasoning loop spend.</li>
+  <li><a href="/tools/agent-cost-per-task-calculator">Agent Cost Per Task Calculator</a>: unit economics of a single agent run.</li>
+  <li><a href="/tools/tool-use-cost-estimator">Tool-Use Cost Estimator</a>: token overhead of function-calling round trips.</li>
 </ul>
 </section>
 </main>
@@ -194,7 +194,7 @@ Final-failure probability = <code>p^(R+1)</code> (every attempt failed).
       '</strong> of '+fmtNum(Math.round(tasks))+
       ' tasks still fail after all retries (need a fallback path). '+
       'Naive single-call estimate: '+fmtMoney(naiveCost)+
-      ' — retries add '+fmtMoney(expCost-naiveCost)+' on average.';
+      ': retries add '+fmtMoney(expCost-naiveCost)+' on average.';
   }
 
   ids.forEach(function(i){el[i].addEventListener('input',compute);});

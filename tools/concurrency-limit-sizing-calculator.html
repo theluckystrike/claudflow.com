@@ -109,8 +109,8 @@
 <div class="wrap">
   <h1>How Many Concurrent Workers Fit Under Your LLM Rate Limits?</h1>
   <p class="intro">
-    Provider rate limits are enforced as token buckets on <strong>requests per minute (RPM)</strong> and
-    <strong>tokens per minute (TPM)</strong>. Push too many parallel workers and you get a wall of
+    Provider rate limits are enforced as token buckets on <em>requests per minute (RPM)</em> and
+    <em>tokens per minute (TPM)</em>. Push too many parallel workers and you get a wall of
     <code>429</code> retries; too few and you leave throughput on the table. Enter your request profile
     and account limits below to size the maximum safe concurrency, see which limit is the bottleneck,
     and estimate the 429/queue-wait risk if you over-provision.
@@ -146,10 +146,10 @@
       <div class="field">
         <label for="safety">Safety utilization</label>
         <select id="safety">
-          <option value="1">100% — run right at the limit</option>
-          <option value="0.9" selected>90% — recommended headroom</option>
-          <option value="0.8">80% — conservative</option>
-          <option value="0.7">70% — bursty / spiky traffic</option>
+          <option value="1">100%: run right at the limit</option>
+          <option value="0.9" selected>90%: recommended headroom</option>
+          <option value="0.8">80%: conservative</option>
+          <option value="0.7">70%: bursty / spiky traffic</option>
         </select>
         <span class="hint">Fraction of the limit you actually target.</span>
       </div>
@@ -161,7 +161,7 @@
       <div class="field">
         <label for="cache">Cached input fraction</label>
         <select id="cache">
-          <option value="0" selected>0% — no prompt caching</option>
+          <option value="0" selected>0%: no prompt caching</option>
           <option value="0.25">25% cached</option>
           <option value="0.5">50% cached</option>
           <option value="0.75">75% cached</option>
@@ -188,14 +188,14 @@ rpsFromRPM   = (RPM * s) / 60
 rpsFromTPM   = (TPM * s) / tokensPerReq / 60
 sustainRPS   = min(rpsFromRPM, rpsFromTPM)      // the bottleneck</pre>
     <p>
-      The second half is <strong>Little's Law</strong>: for a stable system the average number of
+      The second half is <em>Little's Law</em>: for a stable system the average number of
       requests <em>in flight</em> equals arrival rate times the time each spends in the system
       (<code>L = &lambda; &times; W</code>). Here <code>W</code> is your mean latency, and the maximum
       arrival rate you can safely feed is <code>sustainRPS</code>, so the safe concurrency is
       <code>maxWorkers = floor(sustainRPS &times; latency)</code>. Adding workers beyond that number does
-      not increase completed throughput — it only grows the queue, and once the token bucket empties the
+      not increase completed throughput: it only grows the queue, and once the token bucket empties the
       provider returns <code>429</code>. Cached input tokens are weighted at roughly 0.25&times; because
-      most providers bill and rate-limit cache reads at a discount. The <strong>429/queue-wait risk</strong>
+      most providers bill and rate-limit cache reads at a discount. The <em>429/queue-wait risk</em>
       is estimated from the overshoot ratio <code>planned / maxWorkers</code>: each excess worker's requests
       must wait for bucket refill, so expected added wait &approx; <code>(overshoot - 1) &times; latency</code>,
       and risk rises steeply as you exceed the ceiling. Sizing to 80–90% utilization absorbs latency
@@ -239,7 +239,7 @@ sustainRPS   = min(rpsFromRPM, rpsFromTPM)      // the bottleneck</pre>
   }
 
   function fmt(n){
-    if(!isFinite(n)) return "—";
+    if(!isFinite(n)) return "-";
     if(n >= 1000) return n.toLocaleString("en-US",{maximumFractionDigits:0});
     if(n >= 100) return n.toFixed(0);
     if(n >= 10) return n.toFixed(1);
@@ -306,7 +306,7 @@ sustainRPS   = min(rpsFromRPM, rpsFromTPM)      // the bottleneck</pre>
 
     var verdict;
     if(bottleneck === "none"){
-      verdict = "No limits entered — set an RPM and/or TPM limit to size concurrency.";
+      verdict = "No limits entered: set an RPM and/or TPM limit to size concurrency.";
     } else if(planned <= maxWorkers){
       verdict = "Your planned <strong>" + fmt(planned) + " workers</strong> stay under the safe ceiling of <strong>" +
         maxWorkers + "</strong>. Bottleneck is the <strong>" + bottleneck +

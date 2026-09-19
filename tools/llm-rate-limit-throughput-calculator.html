@@ -139,9 +139,9 @@ footer a{color:var(--acc);text-decoration:none;margin-right:16px}
 
     <div class="out" id="out" aria-live="polite">
       <div class="big">
-        <div class="stat"><div class="n" id="oTasks">—</div><div class="l">Tasks / minute (safe)</div></div>
-        <div class="stat"><div class="n" id="oConc">—</div><div class="l">Max concurrency</div></div>
-        <div class="stat"><div class="n" id="oBind">—</div><div class="l">Binding limit</div></div>
+        <div class="stat"><div class="n" id="oTasks">-</div><div class="l">Tasks / minute (safe)</div></div>
+        <div class="stat"><div class="n" id="oConc">-</div><div class="l">Max concurrency</div></div>
+        <div class="stat"><div class="n" id="oBind">-</div><div class="l">Binding limit</div></div>
       </div>
       <table>
         <thead><tr><th>Constraint</th><th class="r">Capacity (tasks/min)</th><th class="r">% of limit used</th></tr></thead>
@@ -153,12 +153,12 @@ footer a{color:var(--acc);text-decoration:none;margin-right:16px}
 
   <section class="prose">
     <h2>How the throughput is calculated</h2>
-    <p>Every LLM provider enforces two independent ceilings: a <strong>requests-per-minute (RPM)</strong> cap and a <strong>tokens-per-minute (TPM)</strong> cap. Your real throughput is whichever runs out first. This tool computes both capacities in the same unit — <em>tasks per minute</em> — so the bottleneck is obvious instead of hidden behind raw 429 errors.</p>
+    <p>Every LLM provider enforces two independent ceilings: a <em>requests-per-minute (RPM)</em> cap and a <em>tokens-per-minute (TPM)</em> cap. Your real throughput is whichever runs out first. This tool computes both capacities in the same unit: <em>tasks per minute</em>: so the bottleneck is obvious instead of hidden behind raw 429 errors.</p>
     <h3>The formula</h3>
     <p>First it derives the token cost of one task. Input tokens are split into cached and fresh: <code>billable_in = in × (1 − cached%)</code>, since prompt-cache reads barely touch your TPM budget. Then <code>tokens_per_task = (billable_in + out) × calls</code>.</p>
     <p>Two independent capacities follow, each multiplied by an effective limit after headroom (<code>eff = limit × (1 − headroom%)</code>):</p>
     <p><code>rpm_capacity = eff_RPM ÷ calls</code> &nbsp;and&nbsp; <code>tpm_capacity = eff_TPM ÷ tokens_per_task</code>.</p>
-    <p>The achievable rate is <code>tasks_per_min = min(rpm_capacity, tpm_capacity)</code>, and the <strong>binding limit</strong> is whichever produced that minimum. A third ceiling matters in practice: latency. With a per-call wall time of <code>L</code> seconds and <code>N</code> calls per task, a single worker finishes <code>60 ÷ (N × L)</code> tasks per minute, so the <strong>concurrency</strong> needed to actually reach the rate-limit ceiling is <code>ceil(tasks_per_min ÷ tasks_per_worker)</code>. If you launch more workers than that, you only generate 429s; fewer, and you leave quota on the table.</p>
+    <p>The achievable rate is <code>tasks_per_min = min(rpm_capacity, tpm_capacity)</code>, and the <em>binding limit</em> is whichever produced that minimum. A third ceiling matters in practice: latency. With a per-call wall time of <code>L</code> seconds and <code>N</code> calls per task, a single worker finishes <code>60 ÷ (N × L)</code> tasks per minute, so the <em>concurrency</em> needed to actually reach the rate-limit ceiling is <code>ceil(tasks_per_min ÷ tasks_per_worker)</code>. If you launch more workers than that, you only generate 429s; fewer, and you leave quota on the table.</p>
     <h3>Why it matters for agent pipelines</h3>
     <p>Multi-agent and tool-loop workloads multiply calls per task, so a job that looks RPM-safe at 1 call quietly becomes TPM-bound at 6 calls with long contexts. The percent-of-limit columns show exactly how much of each ceiling a balanced run consumes, letting you right-size worker pools, batch windows, and retry budgets before paying for throughput you can't legally use.</p>
   </section>
@@ -175,7 +175,7 @@ footer a{color:var(--acc);text-decoration:none;margin-right:16px}
 <footer>
   <a href="/">Home</a>
   <a href="/tools/">All Tools</a>
-  <div style="margin-top:10px">© 2026 claudflow.com — built for AI agent &amp; orchestration teams.</div>
+  <div style="margin-top:10px">© 2026 claudflow.com: built for AI agent &amp; orchestration teams.</div>
 </footer>
 
 <script>
@@ -225,7 +225,7 @@ footer a{color:var(--acc);text-decoration:none;margin-right:16px}
     if(conc<1 && isFinite(conc)) conc=1;
 
     oTasks.textContent=fmt(tasks);
-    oConc.textContent=isFinite(conc)?conc.toLocaleString():"—";
+    oConc.textContent=isFinite(conc)?conc.toLocaleString():"-";
     oBind.innerHTML='<span class="bind '+bindCls+'">'+bind+'</span>';
 
     // rows
@@ -237,7 +237,7 @@ footer a{color:var(--acc);text-decoration:none;margin-right:16px}
     data.forEach(function(d){
       var tr=document.createElement("tr");
       tr.innerHTML="<td>"+d.n+"</td><td class='r'>"+fmt(d.cap)+
-        "</td><td class='r'>"+(isFinite(d.used)?Math.round(d.used)+"%":"—")+"</td>";
+        "</td><td class='r'>"+(isFinite(d.used)?Math.round(d.used)+"%":"-")+"</td>";
       rows.appendChild(tr);
     });
     var lr=document.createElement("tr");
@@ -250,10 +250,10 @@ footer a{color:var(--acc);text-decoration:none;margin-right:16px}
       msg.textContent="Enter non-zero limits and per-task tokens to see capacity.";
     }else if(bind==="TPM"){
       msg.className="msg warn";
-      msg.textContent="TPM-bound: long contexts cap you at ~"+fmt(tasks)+" tasks/min. Trim context, enable prompt caching, or request a TPM raise — adding workers won't help.";
+      msg.textContent="TPM-bound: long contexts cap you at ~"+fmt(tasks)+" tasks/min. Trim context, enable prompt caching, or request a TPM raise: adding workers won't help.";
     }else{
       msg.className="msg ok";
-      msg.textContent="RPM-bound: run ~"+(isFinite(conc)?conc:"—")+" concurrent workers to reach ~"+fmt(tasks)+" tasks/min. More requests, not bigger ones, raise throughput.";
+      msg.textContent="RPM-bound: run ~"+(isFinite(conc)?conc:"-")+" concurrent workers to reach ~"+fmt(tasks)+" tasks/min. More requests, not bigger ones, raise throughput.";
     }
   }
 

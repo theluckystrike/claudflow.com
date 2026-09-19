@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Prompt Chain Builder — Design Sequential Prompt</title>
+  <title>Prompt Chain Builder | Design Sequential Prompt</title>
   <meta name="description" content="Build, visualize, and estimate sequential prompt chains with variable passing, conditional branches, token & cost estimation. Interactive tool by...">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://claudflow.com/tools/prompt-chain-builder">
@@ -299,7 +299,7 @@
     .modal-card .btn { margin-right: 0.5rem; }
   </style>
 
-    <meta property="og:title" content="Prompt Chain Builder — Design Sequential Prompt">
+    <meta property="og:title" content="Prompt Chain Builder | Design Sequential Prompt">
     <meta property="og:description" content="Build, visualize, and estimate sequential prompt chains with variable passing, conditional branches, token & cost estimation. Interactive tool by...">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://claudflow.com/tools/prompt-chain-builder">
@@ -308,13 +308,13 @@
 <body>
 <div class="container">
   <header>
-    <h1>⛓️ Prompt Chain Builder</h1>
+    <h1> Prompt Chain Builder</h1>
     <div class="subhead">Design sequential workflows · variables · conditionals · token & cost estimation</div>
   </header>
 
   <!-- Toolbar: examples + add step -->
   <div class="flex-row mb-1">
-    <button class="btn btn-primary" id="addStepBtn">➕ Add Step</button>
+    <button class="btn btn-primary" id="addStepBtn"> Add Step</button>
     <span style="color:#94a3b8; margin:0 0.5rem;">|</span>
     <span style="color:#94a3b8; font-size:0.9rem;">Load example:</span>
     <span class="example-badge" data-example="summarize">Summarize → Translate → Format</span>
@@ -325,23 +325,23 @@
   <div class="grid-2col">
     <!-- Left: Steps panel -->
     <div class="card">
-      <h2>📋 Chain Steps</h2>
+      <h2> Chain Steps</h2>
       <div id="stepsContainer" class="step-list">
         <!-- dynamic steps -->
       </div>
       <div style="font-size:0.8rem; color:#94a3b8; margin-top:0.5rem;">
-        <span>💡 Use <code>{{variable}}</code> in prompt templates. Define output variables below each step.</span>
+        <span> Use <code>{{variable}}</code> in prompt templates. Define output variables below each step.</span>
       </div>
     </div>
 
     <!-- Right: Config + Preview + Estimates -->
     <div>
       <div class="card" style="margin-bottom:1.5rem;">
-        <h2>⚙️ Chain Config (JSON)</h2>
+        <h2>Chain Config (JSON)</h2>
         <div id="configDisplay" class="config-box">{ "steps": [] }</div>
         <div class="token-estimate">
-          <span>🔤 Total tokens: <strong id="tokenEstimate">0</strong></span>
-          <span>💰 Cost (est): <strong id="costEstimate">$0.0000</strong></span>
+          <span> Total tokens: <strong id="tokenEstimate">0</strong></span>
+          <span> Cost (est): <strong id="costEstimate">$0.0000</strong></span>
         </div>
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
           <button class="btn btn-sm btn-outline" id="refreshConfigBtn">⟳ Refresh config</button>
@@ -349,11 +349,11 @@
       </div>
 
       <div class="card">
-        <h2>▶️ Execution preview (sample data)</h2>
+        <h2>▶ Execution preview (sample data)</h2>
         <div id="previewContainer" class="preview-box">
           <div style="color:#94a3b8;">Add steps and click refresh to simulate</div>
         </div>
-        <button class="btn btn-sm btn-outline mt-2" id="runPreviewBtn">▶️ Run preview</button>
+        <button class="btn btn-sm btn-outline mt-2" id="runPreviewBtn">▶ Run preview</button>
       </div>
     </div>
   </div>
@@ -365,7 +365,7 @@
 <!-- Modal for add/edit step -->
 <div id="stepModal" class="modal-overlay">
   <div class="modal-card">
-    <h3 id="modalTitle">✏️ Add Step</h3>
+    <h3 id="modalTitle"> Add Step</h3>
     <input type="text" id="stepNameInput" placeholder="Step name (e.g. Summarize)">
     <textarea id="promptInput" placeholder="Prompt template with {{variable}} ...">{{input}}</textarea>
     <select id="modelSelect">
@@ -378,7 +378,7 @@
     <input type="text" id="conditionInput" placeholder="Condition: if output contains ... (optional)">
     <input type="number" id="conditionTargetInput" placeholder="Condition: go to step # (1-based)" min="1" step="1">
     <div class="flex-row">
-      <button class="btn btn-primary" id="saveStepBtn">💾 Save step</button>
+      <button class="btn btn-primary" id="saveStepBtn"> Save step</button>
       <button class="btn btn-outline" id="cancelModalBtn">Cancel</button>
     </div>
     <p style="color:#94a3b8; font-size:0.7rem; margin-top:0.8rem;">Leave condition empty for no branch.</p>
@@ -453,7 +453,7 @@
       }
       let html = '';
       steps.forEach((s, idx) => {
-        const vars = s.outputVars.length ? s.outputVars.join(', ') : '—';
+        const vars = s.outputVars.length ? s.outputVars.join(', ') : '-';
         const cond = s.condition ? `if "${s.condition}" → step ${s.conditionTarget}` : 'none';
         html += `
           <div class="step-item">
@@ -658,7 +658,7 @@
 <script src="/kit/cta.js" data-mt-cta data-tool="handsofflinks" data-href="https://handsofflinks.com/" data-text="You can automate nearly every part of a build except the links, because links have always meant cold email. Hands Off Links takes the other road. It publishes real technical assets to public platforms under your own accounts and earns the links from those. One-time licence, from 99 dollars." data-action="See how it works" data-placement="inline" data-source="claudflow" data-medium="cta" data-campaign="handsofflinks"></script>
 
     <footer style="text-align:center;padding:2rem 1rem;margin-top:2rem;border-top:1px solid #334155;color:#94a3b8;font-size:0.85rem;">
-        <p>&copy; 2025 claudflow.com &mdash; Free online tool. No data stored.</p>
+        <p>&copy; 2025 claudflow.com  | Free online tool. No data stored.</p>
     </footer>
 <div style="margin:20px auto;max-width:728px;text-align:center">
 <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -667,7 +667,7 @@
 <div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
 <p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
 <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers: perfect grammar in any language, instantly.</p>
 </div>
 </body>
 </html>

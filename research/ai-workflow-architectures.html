@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Workflow Architectures — 100 Agent Repo Patterns | ClaudFlow</title>
+<title>AI Workflow Architectures | 100 Agent Repo Patterns | ClaudFlow</title>
 <meta name="description" content="Analysis of architecture patterns across 100 open-source AI agent repositories: chain, DAG, loop, tree, event-driven, and reactive. Repo counts, star averages, use cases, and complexity ratings.">
 <link rel="canonical" href="https://claudflow.com/research/ai-workflow-architectures.html">
 <link rel="alternate" hreflang="en" href="https://claudflow.com/research/ai-workflow-architectures.html">
 <link rel="alternate" hreflang="x-default" href="https://claudflow.com/research/ai-workflow-architectures.html">
 <meta property="og:type" content="article">
-<meta property="og:title" content="AI Workflow Architectures — 100 Agent Repo Patterns">
+<meta property="og:title" content="AI Workflow Architectures | 100 Agent Repo Patterns">
 <meta property="og:description" content="Architecture patterns across 100 open-source AI agent repos: chain, DAG, loop, tree, event-driven, and reactive patterns.">
 <meta property="og:url" content="https://claudflow.com/research/ai-workflow-architectures.html">
 <meta property="og:site_name" content="Zovo Tools">
 <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AI Workflow Architectures — 100 Agent Repo Patterns">
+<meta name="twitter:title" content="AI Workflow Architectures | 100 Agent Repo Patterns">
 <meta name="twitter:description" content="Architecture patterns across 100 open-source AI agent repos: chain, DAG, loop, tree, event-driven, and reactive.">
 <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
 <link rel="stylesheet" href="/assets/style.css">
@@ -44,7 +44,7 @@
       "name": "What is the most common architecture pattern for AI agent workflows?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The chain (sequential) pattern is the most common, used by 35% of the 100 repositories analyzed. It processes tasks in a linear sequence: A then B then C. Its popularity stems from simplicity — it is the easiest to implement, debug, and reason about. Examples include Haystack (24.8K stars) and basic LangChain pipelines. The second most common is the DAG pattern (25%), followed by loop/iterative (18%)."
+        "text": "The chain (sequential) pattern is the most common, used by 35% of the 100 repositories analyzed. It processes tasks in a linear sequence: A then B then C. Its popularity stems from simplicity: it is the easiest to implement, debug, and reason about. Examples include Haystack (24.8K stars) and basic LangChain pipelines. The second most common is the DAG pattern (25%), followed by loop/iterative (18%)."
       }
     },
     {
@@ -52,7 +52,7 @@
       "name": "When should I use a DAG architecture instead of a chain?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Use a DAG (directed acyclic graph) when your workflow has steps that can run in parallel because they do not depend on each other. For example, if you need to extract entities AND analyze sentiment from the same text, a DAG lets both run simultaneously. DAGs are also better when you have conditional branching — where the output of one step determines which subsequent steps to run. Use a chain when every step depends on the previous one (e.g., summarize then translate)."
+        "text": "Use a DAG (directed acyclic graph) when your workflow has steps that can run in parallel because they do not depend on each other. For example, if you need to extract entities AND analyze sentiment from the same text, a DAG lets both run simultaneously. DAGs are also better when you have conditional branching: where the output of one step determines which subsequent steps to run. Use a chain when every step depends on the previous one (e.g., summarize then translate)."
       }
     },
     {
@@ -105,7 +105,7 @@
       <li><a href="/about.html">About</a></li>
     </ul>
       <div class="nav-right">
-      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro ✦</a>
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro</a>
       <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=research-ai-workflow-architectures" class="nav-zovo">Zovo Tools</a>
     </div>
   </nav>
@@ -114,8 +114,8 @@
   <div class="hero">
     <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a> <span>/</span> <a href="/research/">Research</a> <span>/</span> <span>AI Workflow Architectures</span></nav>
     <span class="research-badge">Original Research</span>
-    <h1>AI Workflow Architectures — Patterns from 100 Open Source AI Agent Repos</h1>
-    <p>An analysis of architecture patterns across 100 open-source AI agent and workflow repositories on GitHub, sourced from two API queries (ai+agent+workflow+framework and llm+pipeline+orchestration). Each repo categorized by execution pattern: chain, DAG, loop, tree, event-driven, or reactive — with star counts, languages, and complexity ratings.</p>
+    <h1>AI Workflow Architectures - Patterns from 100 Open Source AI Agent Repos</h1>
+    <p>An analysis of architecture patterns across 100 open-source AI agent and workflow repositories on GitHub, sourced from two API queries (ai+agent+workflow+framework and llm+pipeline+orchestration). Each repo categorized by execution pattern: chain, DAG, loop, tree, event-driven, or reactive: with star counts, languages, and complexity ratings.</p>
     <p style="font-size:0.85rem;color:var(--text-muted);">By <a href="/about.html">Michael Lip</a> · Updated April 2026</p>
   </div>
 
@@ -198,10 +198,10 @@
 
   <section style="max-width:800px;margin:2rem auto;line-height:1.7;">
     <h2>Key Findings</h2>
-    <p>The chain (sequential) pattern dominates with 35% of repositories, confirming that most AI workflows start simple. However, the DAG pattern has the highest average star count (2,410 stars/repo), suggesting that developers gravitate toward more capable frameworks as they scale. The loop pattern, used by 18% of repos, is critical for agentic AI — every ReAct agent, code generation loop, and quality refinement cycle uses iterative architecture. Event-driven architectures (12%) are emerging as the preferred pattern for production systems that need real-time processing.</p>
+    <p>The chain (sequential) pattern dominates with 35% of repositories, confirming that most AI workflows start simple. However, the DAG pattern has the highest average star count (2,410 stars/repo), suggesting that developers gravitate toward more capable frameworks as they scale. The loop pattern, used by 18% of repos, is critical for agentic AI: every ReAct agent, code generation loop, and quality refinement cycle uses iterative architecture. Event-driven architectures (12%) are emerging as the preferred pattern for production systems that need real-time processing.</p>
 
     <h2>Language and Ecosystem Trends</h2>
-    <p>Python commands 58% of the ecosystem, but TypeScript (22%) is growing fastest — driven by visual workflow builders (PySpur) and web-first agent platforms. Go (8%) and Rust (5%) are carving niches in performance-critical orchestration (rocketride-server, GraphBit, tokio-prompt-orchestrator). The most notable trend is the convergence of patterns: top frameworks like Haystack and PySpur support multiple architectures (chain + DAG + loop) within a single framework, letting developers choose the right pattern per workflow step rather than per project.</p>
+    <p>Python commands 58% of the ecosystem, but TypeScript (22%) is growing fastest: driven by visual workflow builders (PySpur) and web-first agent platforms. Go (8%) and Rust (5%) are carving niches in performance-critical orchestration (rocketride-server, GraphBit, tokio-prompt-orchestrator). The most notable trend is the convergence of patterns: top frameworks like Haystack and PySpur support multiple architectures (chain + DAG + loop) within a single framework, letting developers choose the right pattern per workflow step rather than per project.</p>
   </section>
 
   <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
@@ -209,12 +209,12 @@
 
     <details>
       <summary>What is the most common architecture pattern for AI agent workflows?</summary>
-      <p>The chain (sequential) pattern is the most common, used by 35% of the 100 repositories analyzed. It processes tasks in a linear sequence: A then B then C. Its popularity stems from simplicity — it is the easiest to implement, debug, and reason about. Examples include Haystack (24.8K stars) and basic LangChain pipelines. The second most common is the DAG pattern (25%), followed by loop/iterative (18%).</p>
+      <p>The chain (sequential) pattern is the most common, used by 35% of the 100 repositories analyzed. It processes tasks in a linear sequence: A then B then C. Its popularity stems from simplicity: it is the easiest to implement, debug, and reason about. Examples include Haystack (24.8K stars) and basic LangChain pipelines. The second most common is the DAG pattern (25%), followed by loop/iterative (18%).</p>
     </details>
 
     <details>
       <summary>When should I use a DAG architecture instead of a chain?</summary>
-      <p>Use a DAG (directed acyclic graph) when your workflow has steps that can run in parallel because they do not depend on each other. For example, if you need to extract entities AND analyze sentiment from the same text, a DAG lets both run simultaneously. DAGs are also better when you have conditional branching — where the output of one step determines which subsequent steps to run. Use a chain when every step depends on the previous one (e.g., summarize then translate).</p>
+      <p>Use a DAG (directed acyclic graph) when your workflow has steps that can run in parallel because they do not depend on each other. For example, if you need to extract entities AND analyze sentiment from the same text, a DAG lets both run simultaneously. DAGs are also better when you have conditional branching: where the output of one step determines which subsequent steps to run. Use a chain when every step depends on the previous one (e.g., summarize then translate).</p>
     </details>
 
     <details>
@@ -240,7 +240,7 @@
     <div class="footer-inner">
         <div class="footer-brand">Zovo Tools</div>
         <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
-        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime — $99 once, free forever →</a>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime: $99 once, free forever →</a>
         <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=research-ai-workflow-architectures">Zovo</a> · 47/500 founding spots</div>
     </div>
 </footer>
@@ -249,30 +249,30 @@
     <div class="zovo-network-inner">
         <h3 class="zovo-network-title">Explore More Tools</h3>
         <div class="zovo-network-links">
-            <a href="https://abwex.com">ABWex — A/B Testing</a>
-            <a href="https://b2berp.com">B2BERP — Business Tools</a>
-            <a href="https://bugbountyreality.com">BugBountyReality — Security</a>
-            <a href="https://claudkit.com">ClaudKit — API Tools</a>
-            <a href="https://dismissticket.com">DismissTicket — Support</a>
-            <a href="https://enhio.com">Enhio — Text Tools</a>
-            <a href="https://epochpilot.com">EpochPilot — Timestamps</a>
-            <a href="https://gen8x.com">Gen8X — Color Tools</a>
-            <a href="https://gpt0x.com">GPT0X — AI Models</a>
-            <a href="https://heytensor.com">HeyTensor — ML Tools</a>
-            <a href="https://ingredientcalculator.com">IngredientCalc — Recipes</a>
-            <a href="https://invokebot.com">InvokeBot — Webhooks</a>
-            <a href="https://kappafy.com">Kappafy — JSON</a>
-            <a href="https://kappakit.com">KappaKit — Dev Toolkit</a>
-            <a href="https://kickllm.com">KickLLM — LLM Costs</a>
-            <a href="https://krzen.com">Krzen — Image Tools</a>
-            <a href="https://lochbot.com">LochBot — Security</a>
-            <a href="https://lockml.com">LockML — ML Security</a>
-            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=research-ai-workflow-architectures">ML0X — ML Basics</a>
-            <a href="https://ml3x.com">ML3X — Matrix Math</a>
-            <a href="https://pictureeditor.net">PictureEditor — Image Editing</a>
-            <a href="https://recipetool.net">RecipeTool — Cooking</a>
-            <a href="https://viryd.com">Viryd — Dev Tools</a>
-            <a href="https://tg.zovo.one/">Tiny Telegram Tools — Telegram Bots</a>
+            <a href="https://abwex.com">ABWex: A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP: Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality: Security</a>
+            <a href="https://claudkit.com">ClaudKit: API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket: Support</a>
+            <a href="https://enhio.com">Enhio: Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot: Timestamps</a>
+            <a href="https://gen8x.com">Gen8X: Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X: AI Models</a>
+            <a href="https://heytensor.com">HeyTensor: ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc: Recipes</a>
+            <a href="https://invokebot.com">InvokeBot: Webhooks</a>
+            <a href="https://kappafy.com">Kappafy: JSON</a>
+            <a href="https://kappakit.com">KappaKit: Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM: LLM Costs</a>
+            <a href="https://krzen.com">Krzen: Image Tools</a>
+            <a href="https://lochbot.com">LochBot: Security</a>
+            <a href="https://lockml.com">LockML: ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=research-ai-workflow-architectures">ML0X: ML Basics</a>
+            <a href="https://ml3x.com">ML3X: Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor: Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool: Cooking</a>
+            <a href="https://viryd.com">Viryd: Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools: Telegram Bots</a>
         </div>
     </div>
 </nav>
@@ -280,11 +280,11 @@
 <div class="pow-strip">
   <div class="pow-strip-inner">
     <span class="pow-label">By the same builder:</span>
-    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub — theluckystrike</a>
-    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative — Grammar AI</a>
-    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder — Dev Blog</a>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub: theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative: Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder: Dev Blog</a>
     <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
-    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=research-ai-workflow-architectures" rel="nofollow">Zovo — AI Dev Tools</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=research-ai-workflow-architectures" rel="nofollow">Zovo: AI Dev Tools</a>
   </div>
 </div>
 
@@ -311,9 +311,9 @@ function downloadData(format) {
 <h2 style="font-size:18px;margin-bottom:16px;">Related Tools</h2>
 <ul style="list-style:none;padding:0;display:grid;gap:8px;">
 <li><a href="/blog/build-ai-workflow-without-code.html" style="color:#3b82f6;text-decoration:none;">How to Build an AI Workflow Without Code</a></li>
-<li><a href="/research/workflow-automation-patterns.html" style="color:#3b82f6;text-decoration:none;">Workflow Automation Patterns — 30 Common Patterns for AI Pipelines</a></li>
+<li><a href="/research/workflow-automation-patterns.html" style="color:#3b82f6;text-decoration:none;">Workflow Automation Patterns: 30 Common Patterns for AI Pipelines</a></li>
 <li><a href="/blog/ai-prompt-chaining-advanced.html" style="color:#3b82f6;text-decoration:none;">AI Prompt Chaining: Advanced Techniques for Complex Tasks</a></li>
-<li><a href="/guides/claude-code-workflow-automation.html" style="color:#3b82f6;text-decoration:none;">Claude Code Workflow Automation — 7 Patterns for Faster Development</a></li>
+<li><a href="/guides/claude-code-workflow-automation.html" style="color:#3b82f6;text-decoration:none;">Claude Code Workflow Automation: 7 Patterns for Faster Development</a></li>
 </ul>
 </section>
 

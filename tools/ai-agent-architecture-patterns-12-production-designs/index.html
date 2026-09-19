@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Agent Architecture Patterns — 12 Production Designs</title>
+  <title>AI Agent Architecture Patterns | 12 Production Designs</title>
   <meta name="description" content="Interactive reference: 12 production-grade AI agent patterns with diagrams, pseudocode, pros/cons, filters & side-by-side comparison.">
   <link rel="canonical" href="https://claudflow.com/agent-architecture-patterns">
   <!-- Structured data (JSON-LD) -->
@@ -12,7 +12,7 @@
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "AI Agent Architecture Patterns — 12 Production Designs",
+    "headline": "AI Agent Architecture Patterns: 12 Production Designs",
     "description": "Interactive reference showing 12 agent architecture patterns: ReAct, Plan-and-Execute, Tool-Use, Multi-Agent, Supervisor, Hierarchical, Debate, Reflection, Memory-Augmented, RAG Agent, Code Agent, Research Agent.",
     "author": {
       "@type": "Organization",
@@ -153,7 +153,7 @@
     <span>AI Agent Architecture Patterns</span>
   </div>
 
-  <h1>🧠 AI Agent Architecture Patterns — 12 Production Designs</h1>
+  <h1> AI Agent Architecture Patterns - 12 Production Designs</h1>
   <div class="subhead">Interactive reference · Filter by complexity · Compare any two patterns</div>
 
   <!-- Filter + compare controls -->
@@ -190,7 +190,7 @@
   <!-- Comparison modal -->
   <div class="compare-modal" id="compareModal">
     <div class="compare-panel">
-      <h3>⚖️ Pattern Comparison</h3>
+      <h3> Pattern Comparison</h3>
       <div class="compare-grid" id="compareContent"></div>
       <button class="close-modal" id="closeModal">Close</button>
     </div>
@@ -235,10 +235,10 @@
           </div>
           <div class="diagram-box">${svg}</div>
           <div class="desc">${p.desc}</div>
-          <div class="when-use"><strong>🔄 When to use:</strong> ${p.when}</div>
+          <div class="when-use"><strong>🔄 When to use</strong>: ${p.when}</div>
           <div class="pros-cons"><div class="pros">✅ ${p.pros}</div><div class="cons">❌ ${p.cons}</div></div>
           <div class="pseudo">${p.pseudo}</div>
-          <div class="realworld"><strong>🌍 Real‑world:</strong> ${p.real}</div>
+          <div class="realworld"><strong>🌍 Real‑world</strong>: ${p.real}</div>
         `;
         grid.appendChild(card);
       });
@@ -295,17 +295,17 @@
           <h4>${p1.name} <span style="font-weight:normal;font-size:0.8rem;color:#9ca3af;">(${p1.complexity})</span></h4>
           <p style="margin-bottom:0.5rem;">${p1.desc}</p>
           <div class="pros-cons"><div class="pros">✅ ${p1.pros}</div><div class="cons">❌ ${p1.cons}</div></div>
-          <div class="when-use"><strong>🔄 When to use:</strong> ${p1.when}</div>
+          <div class="when-use"><strong>🔄 When to use</strong>: ${p1.when}</div>
           <div class="pseudo">${p1.pseudo}</div>
-          <div class="realworld"><strong>🌍 Real‑world:</strong> ${p1.real}</div>
+          <div class="realworld"><strong>🌍 Real‑world</strong>: ${p1.real}</div>
         </div>
         <div class="compare-col">
           <h4>${p2.name} <span style="font-weight:normal;font-size:0.8rem;color:#9ca3af;">(${p2.complexity})</span></h4>
           <p style="margin-bottom:0.5rem;">${p2.desc}</p>
           <div class="pros-cons"><div class="pros">✅ ${p2.pros}</div><div class="cons">❌ ${p2.cons}</div></div>
-          <div class="when-use"><strong>🔄 When to use:</strong> ${p2.when}</div>
+          <div class="when-use"><strong>🔄 When to use</strong>: ${p2.when}</div>
           <div class="pseudo">${p2.pseudo}</div>
-          <div class="realworld"><strong>🌍 Real‑world:</strong> ${p2.real}</div>
+          <div class="realworld"><strong>🌍 Real‑world</strong>: ${p2.real}</div>
         </div>
       `;
     }

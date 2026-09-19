@@ -98,7 +98,7 @@
 </head>
 <body>
 <div class="container">
-  <h1>🧠 Self-Consistency Majority Vote</h1>
+  <h1> Self-Consistency Majority Vote</h1>
   <div class="subhead">Interactive calculator · binomial majority vote · cost‑accuracy optimization</div>
 
   <!-- inputs -->
@@ -127,21 +127,21 @@
   <!-- main results -->
   <div class="grid-2">
     <div class="card">
-      <h2>📈 Majority accuracy (current N)</h2>
+      <h2> Majority accuracy (current N)</h2>
       <div class="stat" id="majorityDisplay">0.0000</div>
       <div style="margin-top: 0.5rem; font-size:0.9rem; color:#aaa;">P(majority correct) = <span id="binomDetail"></span></div>
       <canvas id="accChart" height="200"></canvas>
       <p style="font-size:0.75rem; color:#777;">Accuracy vs N for baseline p=0.5, 0.7, 0.8 (your p: <span id="pRefChart">0.70</span>)</p>
     </div>
     <div class="card">
-      <h2>🎯 Required N for targets</h2>
+      <h2> Required N for targets</h2>
       <div id="requiredNList">
-        <div>90%: <span id="req90">—</span></div>
-        <div>95%: <span id="req95">—</span></div>
-        <div>99%: <span id="req99">—</span></div>
+        <div>90%: <span id="req90">-</span></div>
+        <div>95%: <span id="req95">-</span></div>
+        <div>99%: <span id="req99">-</span></div>
       </div>
       <div class="highlight" style="margin-top:1rem;">
-        <strong>⚡ Optimal N</strong> (marginal gain < 0.5%): <span id="optimalN">—</span>
+        <strong> Optimal N</strong> (marginal gain < 0.5%): <span id="optimalN">-</span>
       </div>
     </div>
   </div>
@@ -149,17 +149,17 @@
   <!-- cost table + comparison -->
   <div class="grid-2">
     <div class="card">
-      <h2>💰 Cost‑accuracy table</h2>
+      <h2> Cost‑accuracy table</h2>
       <div class="table-wrap"><table id="costTable"><thead><tr><th>N</th><th>Accuracy</th><th>Total cost</th><th>Cost / add. acc. pt</th></tr></thead><tbody id="costTableBody"></tbody></table></div>
     </div>
     <div class="card">
-      <h2>⚖️ Comparison & break‑even</h2>
+      <h2> Comparison & break‑even</h2>
       <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <div><span class="badge badge-green">SC N=10 p=0.7</span> acc: <span id="sc10acc">—</span></div>
-        <div><span class="badge badge-yellow">CoT N=1 p=0.85</span> acc: <span id="cot1acc">—</span></div>
+        <div><span class="badge badge-green">SC N=10 p=0.7</span> acc: <span id="sc10acc">-</span></div>
+        <div><span class="badge badge-yellow">CoT N=1 p=0.85</span> acc: <span id="cot1acc">-</span></div>
       </div>
-      <div style="margin-top:0.8rem;"><strong>Break‑even N</strong> (cost‑adjusted): <span id="breakEvenN">—</span> <span style="font-size:0.8rem; color:#aaa;">(when SC accuracy ≥ CoT accuracy given cost)</span></div>
-      <div style="margin-top:0.5rem; font-size:0.9rem;">Marginal gain per sample: <span id="marginalGain">—</span></div>
+      <div style="margin-top:0.8rem;"><strong>Break‑even N</strong> (cost‑adjusted): <span id="breakEvenN">-</span> <span style="font-size:0.8rem; color:#aaa;">(when SC accuracy ≥ CoT accuracy given cost)</span></div>
+      <div style="margin-top:0.5rem; font-size:0.9rem;">Marginal gain per sample: <span id="marginalGain">-</span></div>
     </div>
   </div>
 
@@ -273,7 +273,7 @@
         const totalCost = (n * cost);
         const addCostPt = (n === 1) ? 0 : (totalCost - (n-2)*cost) / ((acc - prevAccCost)*100);
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${n}</td><td>${(acc*100).toFixed(2)}%</td><td>$${totalCost.toFixed(3)}</td><td>${n===1 ? '—' : '$'+addCostPt.toFixed(4)}</td>`;
+        tr.innerHTML = `<td>${n}</td><td>${(acc*100).toFixed(2)}%</td><td>$${totalCost.toFixed(3)}</td><td>${n===1 ? '-' : '$'+addCostPt.toFixed(4)}</td>`;
         costTableBody.appendChild(tr);
         prevAccCost = acc;
       }
@@ -375,7 +375,7 @@
 <div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
 <p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
 <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers: perfect grammar in any language, instantly.</p>
 </div>
 <script src="/kit/cta.js" data-mt-cta data-tool="handsofflinks" data-href="https://handsofflinks.com/" data-text="You can automate nearly every part of a build except the links, because links have always meant cold email. Hands Off Links takes the other road. It publishes real technical assets to public platforms under your own accounts and earns the links from those. One-time licence, from 99 dollars." data-action="See how it works" data-placement="inline" data-source="claudflow" data-medium="cta" data-campaign="handsofflinks"></script>
 

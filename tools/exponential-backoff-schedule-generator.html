@@ -181,14 +181,14 @@
   <div class="prose">
     <p>Exponential backoff spaces out retries so a struggling service isn't hammered by a stampede of clients. The un-jittered delay for attempt <code>n</code> (1-indexed) is a capped geometric series:</p>
     <div class="formula">delay(n) = min(base &times; multiplier<sup>(n&minus;1)</sup>, cap)</div>
-    <p>Raw exponential growth alone creates a <em>thundering herd</em>: every client that failed at the same instant retries at the same instant. <strong>Jitter</strong> breaks that synchronization. This tool implements the four canonical strategies from the AWS Architecture Blog:</p>
+    <p>Raw exponential growth alone creates a <em>thundering herd</em>: every client that failed at the same instant retries at the same instant. <em>Jitter</em> breaks that synchronization. This tool implements the four canonical strategies from the AWS Architecture Blog:</p>
     <ul>
-      <li><strong>None</strong> &mdash; deterministic <code>delay(n)</code>, easiest to reason about but herd-prone.</li>
-      <li><strong>Full jitter</strong> &mdash; <code>random(0, delay(n))</code>. Maximum spread, lowest contention.</li>
-      <li><strong>Equal jitter</strong> &mdash; <code>delay/2 + random(0, delay/2)</code>. Keeps a floor while still spreading.</li>
-      <li><strong>Decorrelated</strong> &mdash; <code>min(cap, random(base, prev&times;3))</code>, where each delay depends on the previous one for a smoother, self-widening walk.</li>
+      <li><strong>None</strong>  | deterministic <code>delay(n)</code>, easiest to reason about but herd-prone.</li>
+      <li><strong>Full jitter</strong>  | <code>random(0, delay(n))</code>. Maximum spread, lowest contention.</li>
+      <li><strong>Equal jitter</strong>  | <code>delay/2 + random(0, delay/2)</code>. Keeps a floor while still spreading.</li>
+      <li><strong>Decorrelated</strong>  | <code>min(cap, random(base, prev&times;3))</code>, where each delay depends on the previous one for a smoother, self-widening walk.</li>
     </ul>
-    <p>The <strong>success-odds model</strong> assumes each attempt fails independently with probability <code>p</code>. The chance that <em>at least one</em> of <code>k</code> attempts succeeds is <code>1 &minus; p<sup>k</sup></code>, and the expected number of attempts before a success (bounded by your max) is <code>&Sigma; p<sup>(i&minus;1)</sup></code>. Use these to decide whether adding another retry is worth the extra worst-case latency: the marginal success gain shrinks geometrically while your worst-case wait keeps climbing. Best-case total wait assumes the minimum jittered delay each round; worst-case assumes the maximum. For deterministic mode both collapse to the same number. All math runs locally in your browser &mdash; nothing is sent anywhere.</p>
+    <p>The <em>success-odds model</em> assumes each attempt fails independently with probability <code>p</code>. The chance that <em>at least one</em> of <code>k</code> attempts succeeds is <code>1 &minus; p<sup>k</sup></code>, and the expected number of attempts before a success (bounded by your max) is <code>&Sigma; p<sup>(i&minus;1)</sup></code>. Use these to decide whether adding another retry is worth the extra worst-case latency: the marginal success gain shrinks geometrically while your worst-case wait keeps climbing. Best-case total wait assumes the minimum jittered delay each round; worst-case assumes the maximum. For deterministic mode both collapse to the same number. All math runs locally in your browser  | nothing is sent anywhere.</p>
   </div>
 
   <h2>Related Tools</h2>
@@ -207,7 +207,7 @@
     <a href="/tools/">All Tools</a>
     <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tools-exponential-backoff-schedule-generator">About</a>
   </div>
-  <div style="margin-top:8px">© 2026 claudflow.com — built by <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tools-exponential-backoff-schedule-generator">Michael Lip</a></div>
+  <div style="margin-top:8px">© 2026 claudflow.com: built by <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tools-exponential-backoff-schedule-generator">Michael Lip</a></div>
 </footer>
 
 <script>
@@ -348,7 +348,7 @@
 "}",
 
       aws:
-"// AWS SDK v3 — @aws-sdk/util-retry\n" +
+"// AWS SDK v3: @aws-sdk/util-retry\n" +
 "import { StandardRetryStrategy } from \"@aws-sdk/util-retry\";\n\n" +
 "const strategy = new StandardRetryStrategy(\n" +
 "  async () => " + att + ",  // maxAttempts\n" +

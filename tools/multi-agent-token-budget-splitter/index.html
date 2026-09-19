@@ -123,7 +123,7 @@
 <body>
 <div class="container">
   <header>
-    <h1>⚡ Multi-Agent Token Budget <span style="color:#e2e8f0;">Splitter</span> <small>claudflow</small></h1>
+    <h1> Multi-Agent Token Budget <span style="color:#e2e8f0;">Splitter</span> <small>claudflow</small></h1>
     <div class="subhead">Allocate budget · compare topologies · optimize pipeline cost</div>
   </header>
 
@@ -131,7 +131,7 @@
   <div class="card">
     <div class="grid-2">
       <div>
-        <label>💰 Budget type</label>
+        <label> Budget type</label>
         <select id="budgetType"><option value="token">Token budget (monthly)</option><option value="dollar">$ budget (monthly)</option></select>
         <div style="margin-top:0.6rem;"><label id="budgetLabel">Total monthly token budget</label><input type="number" id="totalBudget" value="1000000" step="10000" min="1000"></div>
         <div id="modelSelectWrap" style="display:none; margin-top:0.6rem;"><label>Model (price per 1M tokens)</label>
@@ -139,11 +139,11 @@
         </div>
       </div>
       <div>
-        <label>🤖 Number of agents (1–20)</label>
+        <label> Number of agents (1–20)</label>
         <input type="number" id="numAgents" value="4" min="1" max="20">
-        <label style="margin-top:0.6rem;">📨 Inter-agent overhead</label>
+        <label style="margin-top:0.6rem;"> Inter-agent overhead</label>
         <div class="flex-row"><span>avg tokens/message</span><input type="number" id="avgTokensPerMsg" value="50" min="0" style="width:100px;"> <span>avg messages/task</span><input type="number" id="avgMsgsPerTask" value="6" min="0" style="width:80px;"></div>
-        <label style="margin-top:0.6rem;">📅 Tasks per month (for cost calc)</label>
+        <label style="margin-top:0.6rem;"> Tasks per month (for cost calc)</label>
         <input type="number" id="tasksPerMonth" value="500" min="1">
       </div>
     </div>
@@ -152,7 +152,7 @@
   <!-- Agent roles -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
-      <h3>🧑‍💻 Agent roles & token allocation</h3>
+      <h3>‍ Agent roles & token allocation</h3>
       <button id="syncAgentsBtn" class="btn-outline" style="width:auto;">↻ sync to agent count</button>
     </div>
     <div id="agentRolesContainer"></div>
@@ -161,27 +161,27 @@
 
   <!-- Compute -->
   <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem;">
-    <button id="computeBtn" style="flex:2; padding:1rem; font-size:1.2rem;">⚙️ Compute Budget Split</button>
+    <button id="computeBtn" style="flex:2; padding:1rem; font-size:1.2rem;"> Compute Budget Split</button>
     <button id="resetDefaultBtn" class="btn-outline" style="flex:1;">Reset defaults</button>
   </div>
 
   <!-- Results: stats + pie + flow -->
   <div class="grid-2">
     <div class="card">
-      <h3>📊 Budget allocation pie</h3>
+      <h3>Budget allocation pie</h3>
       <canvas id="pieChart" width="300" height="300"></canvas>
       <div id="pieLegend" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem;"></div>
     </div>
     <div class="card">
-      <h3>🔁 Token flow diagram (flat example)</h3>
-      <div class="svg-container" id="tokenFlowSvg"><svg viewBox="0 0 320 140" style="width:100%; height:auto;"><text x="10" y="30" fill="#f97316" font-size="12">⚡ orchestrator</text><text x="10" y="60" fill="#94a3b8" font-size="10">→ worker1 (30%)</text><text x="10" y="80" fill="#94a3b8" font-size="10">→ worker2 (30%)</text><text x="10" y="100" fill="#94a3b8" font-size="10">→ worker3 (20%)</text><text x="10" y="120" fill="#94a3b8" font-size="10">→ worker4 (20%)</text></svg></div>
+      <h3> Token flow diagram (flat example)</h3>
+      <div class="svg-container" id="tokenFlowSvg"><svg viewBox="0 0 320 140" style="width:100%; height:auto;"><text x="10" y="30" fill="#f97316" font-size="12"> orchestrator</text><text x="10" y="60" fill="#94a3b8" font-size="10">→ worker1 (30%)</text><text x="10" y="80" fill="#94a3b8" font-size="10">→ worker2 (30%)</text><text x="10" y="100" fill="#94a3b8" font-size="10">→ worker3 (20%)</text><text x="10" y="120" fill="#94a3b8" font-size="10">→ worker4 (20%)</text></svg></div>
       <p style="font-size:0.8rem; color:#94a3b8;">Flat topology: orchestrator + N workers (allocation weighted).</p>
     </div>
   </div>
 
   <!-- Topology comparison -->
   <div class="card">
-    <h3>📐 Topology comparison (flat · hierarchical · pipeline)</h3>
+    <h3> Topology comparison (flat · hierarchical · pipeline)</h3>
     <div style="overflow-x:auto;"><table id="topologyTable">
       <thead><tr><th>Topology</th><th>Total tokens/task</th><th>Max parallel tasks</th><th>Cost/task ($)</th><th>Monthly tasks (budget)</th></tr></thead>
       <tbody id="topologyBody"></tbody>
@@ -190,19 +190,19 @@
 
   <!-- tasks/month curve -->
   <div class="card">
-    <h3>📈 Tasks/month vs agent count (flat topology)</h3>
+    <h3> Tasks/month vs agent count (flat topology)</h3>
     <canvas id="curveCanvas" width="600" height="250"></canvas>
   </div>
 
   <!-- recommendation -->
   <div class="card" id="recommendationCard">
-    <h3>🧠 Recommendation</h3>
+    <h3> Recommendation</h3>
     <div id="recommendationText" style="background:#1e293b; border-radius:20px; padding:1rem;">Based on budget and overhead, <span class="orange">pipeline</span> topology yields lowest cost per task for your configuration.</div>
   </div>
 
   <!-- FAQ (schema already included) -->
   <div class="card">
-    <h3>❓ FAQ</h3>
+    <h3>FAQ</h3>
     <ul style="list-style: none; color:#cbd5e1;">
       <li><strong class="orange">How is inter-agent overhead calculated?</strong> Overhead = avg messages per task × avg tokens per message. Added to total tokens per task.</li>
       <li><strong class="orange">Which topology uses least tokens?</strong> Pipeline typically uses fewest tokens because each agent only sees previous output, reducing context.</li>
@@ -483,7 +483,7 @@
 <div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
 <p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
 <a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers: perfect grammar in any language, instantly.</p>
 </div>
 </body>
 </html>
