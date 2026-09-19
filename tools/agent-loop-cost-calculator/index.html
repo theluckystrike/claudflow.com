@@ -2,456 +2,421 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Agent Loop Cost Calculator — Estimate Multi-Turn Agent</title>
-  <meta name="description" content="Calculate total tokens, cumulative cost, and optimal iteration limit for multi-turn AI agent loops. Supports Claude Opus, Sonnet, Haiku, GPT-4...">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Agent Loop Cost Calculator, Multi-Turn Token &amp; Cost Simulator | ClaudFlow</title>
+  <meta name="description" content="Simulate multi-turn agent cost turn by turn: accumulating context, prompt-caching break-even, and retry risk, computed in your browser from Claude list rates.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://claudflow.com/tools/agent-loop-cost-calculator">
-  <!-- JSON-LD FAQ -->
+  <link rel="canonical" href="https://claudflow.com/tools/agent-loop-cost-calculator/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Agent Loop Cost Calculator, Multi-Turn Token &amp; Cost Simulator">
+  <meta property="og:description" content="Turn-by-turn agent cost simulation with prompt-caching break-even and retry risk, computed in your browser.">
+  <meta property="og:url" content="https://claudflow.com/tools/agent-loop-cost-calculator/">
+  <meta property="og:site_name" content="Zovo Tools">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="stylesheet" href="/assets/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "How does the agent loop cost calculator work?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "It simulates multi-turn agent interactions where context accumulates each iteration. You provide tools per loop, tokens per tool call, loop count, model pricing, and system prompt size. The calculator computes total tokens, cumulative cost, per-iteration cost, and suggests an optimal iteration limit based on cost/value ratio."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Which models are supported?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Claude Opus, Claude Sonnet, Claude Haiku, GPT-4, and GPT-4o-mini. Each has distinct input/output token pricing."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is the optimal iteration limit?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "The limit is where the marginal cost per additional iteration exceeds 20% of the total cost so far, indicating diminishing returns."
-        }
-      }
-    ]
+    "@type": "WebApplication",
+    "name": "Agent Loop Cost Calculator",
+    "url": "https://claudflow.com/tools/agent-loop-cost-calculator/",
+    "description": "Browser-based simulator for multi-turn AI agent costs: accumulating context per turn, prompt-caching break-even, and retry risk.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
   }
   </script>
-  <!-- Chart.js CDN (lightweight) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    .tool-wrap { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    .tool-wrap .intro { color: var(--text-muted); margin-bottom: 2rem; max-width: 640px; }
+    h1.page-title { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .tool-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; }
+    .field-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem 1.25rem; }
+    .field label { display: block; font-size: 0.82rem; color: var(--text); margin-bottom: 0.3rem; font-weight: 500; }
+    .field input, .field select {
+      width: 100%; padding: 0.55rem 0.7rem; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); font-family: var(--font-body); font-size: 0.9rem;
     }
-    body {
-      background: #0f172a;
-      color: #e2e8f0;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      padding: 1.5rem 1rem;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .field .hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.4; }
+    .results { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.25rem; }
+    .result-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1rem; }
+    .result-card .k { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    .result-card .v { font-family: var(--font-display); font-size: 1.25rem; color: var(--accent); margin-top: 0.2rem; }
+    .result-card .s { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; line-height: 1.4; }
+    .verdict { margin-top: 1.25rem; padding: 0.9rem 1.1rem; background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); font-size: 0.9rem; color: var(--text); line-height: 1.6; }
+    .method { margin: 2rem 0 0; }
+    .method h2 { font-size: 1.2rem; margin: 1.5rem 0 0.6rem; }
+    .method p { color: var(--text-muted); margin-bottom: 0.8rem; max-width: 680px; }
+    .method code { font-family: var(--font-display); font-size: 0.85rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 3px; padding: 0.1rem 0.35rem; color: var(--accent); }
+    .faq { margin-top: 2rem; max-width: 680px; }
+    .faq h2 { font-size: 1.2rem; margin-bottom: 0.75rem; }
+    .faq h3 { font-size: 0.95rem; margin: 1rem 0 0.25rem; color: var(--text); }
+    .faq p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .rel { margin-top: 2rem; }
+    .rel a { display: inline-block; margin: 0.3rem 0.5rem 0.3rem 0; padding: 0.5rem 0.9rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--accent); text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+    .rel a:hover { border-color: var(--accent); }
+    @media (max-width: 768px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      .field-grid { grid-template-columns: 1fr 1fr; }
+      .results { grid-template-columns: 1fr 1fr; }
+      h1.page-title { font-size: 1.5rem; }
     }
-    .container {
-      max-width: 1000px;
-      width: 100%;
-    }
-    header {
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    header h1 {
-      font-size: 1.9rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.25rem;
-    }
-    header p {
-      color: #94a3b8;
-      font-size: 1rem;
-    }
-    .card {
-      background: #1e293b;
-      border-radius: 24px;
-      padding: 1.8rem 1.5rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
-      border: 1px solid #334155;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem 2rem;
-    }
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .input-group label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #cbd5e1;
-      letter-spacing: 0.01em;
-    }
-    .input-group input, .input-group select {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 14px;
-      padding: 0.7rem 1rem;
-      color: #f1f5f9;
-      font-size: 1rem;
-      transition: 0.2s;
-      outline: none;
-      width: 100%;
-    }
-    .input-group input:focus, .input-group select:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-    }
-    .input-group input[type="number"] {
-      -moz-appearance: textfield;
-    }
-    .input-group input[type="number"]::-webkit-outer-spin-button,
-    .input-group input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .stat-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 0.8rem 1.2rem;
-      margin-top: 1.8rem;
-      background: #0f172a;
-      padding: 1.2rem 1.5rem;
-      border-radius: 20px;
-      border: 1px solid #2d3a4e;
-    }
-    .stat-item {
-      flex: 1 0 120px;
-    }
-    .stat-item .label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #94a3b8;
-    }
-    .stat-item .value {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #e2e8f0;
-      margin-top: 0.1rem;
-    }
-    .stat-item .value small {
-      font-size: 0.75rem;
-      font-weight: 400;
-      color: #94a3b8;
-      margin-left: 4px;
-    }
-    .chart-wrapper {
-      margin-top: 1.8rem;
-      background: #0f172a;
-      padding: 1rem 0.5rem 0.5rem 0.5rem;
-      border-radius: 20px;
-      border: 1px solid #2d3a4e;
-      position: relative;
-      height: 240px;
-    }
-    #costChart {
-      max-height: 210px;
-      width: 100% !important;
-    }
-    .footer {
-      text-align: center;
-      margin-top: 2rem;
-      color: #64748b;
-      font-size: 0.85rem;
-      border-top: 1px solid #1e293b;
-      padding-top: 1.5rem;
-    }
-    .badge {
-      background: #1e3a5f;
-      color: #7dd3fc;
-      border-radius: 40px;
-      padding: 0.2rem 0.8rem;
-      font-size: 0.7rem;
-      font-weight: 500;
-      margin-left: 0.5rem;
-    }
-    @media (max-width: 640px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      header h1 {
-        font-size: 1.5rem;
-      }
-      .card {
-        padding: 1.2rem 1rem;
-      }
-      .stat-row {
-        flex-direction: column;
-        gap: 0.6rem;
-      }
-      .stat-item .value {
-        font-size: 1.2rem;
-      }
+    @media (max-width: 480px) {
+      .field-grid, .results { grid-template-columns: 1fr; }
     }
   </style>
-
-    <meta property="og:title" content="Agent Loop Cost Calculator — Estimate Multi-Turn Agent">
-    <meta property="og:description" content="Calculate total tokens, cumulative cost, and optimal iteration limit for multi-turn AI agent loops. Supports Claude Opus, Sonnet, Haiku, GPT-4...">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://claudflow.com/tools/agent-loop-cost-calculator">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="container">
-  <header>
-    <h1>🔄 Agent Loop Cost Calculator</h1>
-    <p>Multi-turn expense estimator · accumulating context</p>
-  </header>
-
-  <div class="card">
-    <div class="grid-2">
-      <div class="input-group">
-        <label for="toolsPerLoop">🔧 Tools/actions per iteration</label>
-        <input type="number" id="toolsPerLoop" min="1" max="50" value="3" step="1">
-      </div>
-      <div class="input-group">
-        <label for="tokensPerTool">📝 Avg tokens per tool call (input+output)</label>
-        <input type="number" id="tokensPerTool" min="10" max="50000" value="800" step="10">
-      </div>
-      <div class="input-group">
-        <label for="loopIterations">🔁 Expected loop iterations (1–50)</label>
-        <input type="number" id="loopIterations" min="1" max="50" value="10" step="1">
-      </div>
-      <div class="input-group">
-        <label for="modelSelect">🧠 Model</label>
-        <select id="modelSelect">
-          <option value="opus" data-input="15" data-output="75">Claude Opus ($15/$75)</option>
-          <option value="sonnet" data-input="3" data-output="15" selected>Claude Sonnet ($3/$15)</option>
-          <option value="haiku" data-input="0.25" data-output="1.25">Claude Haiku ($0.25/$1.25)</option>
-          <option value="gpt4" data-input="30" data-output="60">GPT-4 ($30/$60)</option>
-          <option value="gpt4omini" data-input="0.15" data-output="0.6">GPT-4o-mini ($0.15/$0.6)</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label for="systemPrompt">📄 System prompt size (tokens)</label>
-        <input type="number" id="systemPrompt" min="0" max="100000" value="500" step="10">
-      </div>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
     </div>
+  </nav>
 
-    <!-- aggregated stats -->
-    <div class="stat-row" id="statsPanel">
-      <div class="stat-item"><span class="label">Total tokens</span><div class="value" id="totalTokens">—</div></div>
-      <div class="stat-item"><span class="label">Total cost (USD)</span><div class="value" id="totalCost">—</div></div>
-      <div class="stat-item"><span class="label">Cost / iteration</span><div class="value" id="costPerIteration">—</div></div>
-      <div class="stat-item"><span class="label">Optimal iteration limit</span><div class="value" id="optimalLimit">—</div></div>
-    </div>
+  <div class="tool-wrap">
+    <h1 class="page-title">Agent Loop Cost Calculator</h1>
+    <p class="intro">Agent loops bill every turn: the model re-reads a growing transcript, calls tools, and appends results. Move one slider and this page recomputes the whole run turn by turn, then shows where prompt caching stops paying and retries double the bill.</p>
 
-    <!-- chart -->
-    <div class="chart-wrapper">
-      <canvas id="costChart"></canvas>
-    </div>
-    <p style="font-size:0.7rem; color:#64748b; margin-top:0.5rem; text-align:center;">Cumulative cost per iteration (USD, log scale if wide range)</p>
+    <section class="tool-card" id="tool">
+      <div class="field-grid">
+        <div class="field">
+          <label for="turns">Turns (N)</label>
+          <input id="turns" type="number" min="1" max="50" step="1" value="10">
+          <div class="hint">Model turns before the task completes</div>
+        </div>
+        <div class="field">
+          <label for="tools">Tool calls per turn (T)</label>
+          <input id="tools" type="number" min="0" max="50" step="1" value="3">
+          <div class="hint">Tool executions the model runs each turn</div>
+        </div>
+        <div class="field">
+          <label for="tokTool">Tokens per tool record</label>
+          <input id="tokTool" type="number" min="10" max="50000" step="10" value="800">
+          <div class="hint">One tool result written into the transcript</div>
+        </div>
+        <div class="field">
+          <label for="sys">System prompt (tokens)</label>
+          <input id="sys" type="number" min="0" max="100000" step="10" value="3000">
+          <div class="hint">Fixed instructions sent every turn</div>
+        </div>
+        <div class="field">
+          <label for="outFrac">Output share of tool tokens (%)</label>
+          <input id="outFrac" type="number" min="0" max="100" step="1" value="40">
+          <div class="hint">Share of tool record tokens the model generates</div>
+        </div>
+        <div class="field">
+          <label for="model">Model (per 1M tokens, USD)</label>
+          <select id="model">
+            <option value="15,75">Claude Opus, 15 / 75</option>
+            <option value="3,15" selected>Claude Sonnet, 3 / 15</option>
+            <option value="0.8,4">Claude Haiku, 0.80 / 4</option>
+          </select>
+          <div class="hint">Input / output list rates; edit inputs below to use your own</div>
+        </div>
+        <div class="field">
+          <label for="pin">Input rate ($ / 1M)</label>
+          <input id="pin" type="number" min="0" step="0.05" value="3">
+          <div class="hint">Filled from the model list; type over it</div>
+        </div>
+        <div class="field">
+          <label for="pout">Output rate ($ / 1M)</label>
+          <input id="pout" type="number" min="0" step="0.05" value="15">
+          <div class="hint">Filled from the model list; type over it</div>
+        </div>
+        <div class="field">
+          <label for="cache">Prompt caching</label>
+          <select id="cache">
+            <option value="0">Off</option>
+            <option value="1" selected>On</option>
+          </select>
+          <div class="hint">Cached input billed at 10% of the input rate</div>
+        </div>
+        <div class="field">
+          <label for="cacheTTL">Cache TTL (minutes)</label>
+          <select id="cacheTTL">
+            <option value="5" selected>5</option>
+            <option value="60">60</option>
+          </select>
+          <div class="hint">60-minute TTL writes cost 2x instead of 1.25x</div>
+        </div>
+        <div class="field">
+          <label for="gap">Gap between turns (minutes)</label>
+          <input id="gap" type="number" min="0" step="0.5" value="2">
+          <div class="hint">Turn spacing; gaps past the TTL force a cache write</div>
+        </div>
+        <div class="field">
+          <label for="p">Per-call success probability (%)</label>
+          <input id="p" type="number" min="1" max="100" step="1" value="95">
+          <div class="hint">Chance one tool call returns without a retry</div>
+        </div>
+        <div class="field">
+          <label for="maxR">Max retries per failed call (R)</label>
+          <input id="maxR" type="number" min="0" max="10" step="1" value="2">
+          <div class="hint">Retry cap used by the expected-cost model</div>
+        </div>
+      </div>
+
+      <div class="results" id="results">
+        <div class="result-card"><div class="k">Total cost</div><div class="v" id="rCost">, </div><div class="s">whole run, USD</div></div>
+        <div class="result-card"><div class="k">Cost per turn</div><div class="v" id="rPerTurn">, </div><div class="s">average, USD</div></div>
+        <div class="result-card"><div class="k">Last-turn cost</div><div class="v" id="rLastTurn">, </div><div class="s">the most expensive turn</div></div>
+        <div class="result-card"><div class="k">Total tokens</div><div class="v" id="rTokens">, </div><div class="s">input + output</div></div>
+      </div>
+      <div class="verdict" id="verdict">, </div>
+    </section>
+
+    <section class="method">
+      <h2>How the simulation works</h2>
+      <p>Turn <code>i</code> re-sends the full transcript: the system prompt plus every tool record from turns <code>1</code> through <code>i-1</code>, then adds this turn's new tool records. The context therefore grows linearly, and turn <code>N</code> is always the most expensive one. Output tokens are generated once per turn and never re-billed; input tokens are billed every time they are re-read.</p>
+
+      <h2>Prompt caching</h2>
+      <p>With caching on, only the first turn pays a full-price cache write (1.25x input rate at a 5-minute TTL, 2x at 60 minutes). Each later turn re-reads the stored prefix at 10% of the input rate, as long as the gap since the previous turn is inside the TTL. A gap past the TTL expires the cache, so that turn writes it again at full price.</p>
+      <p>Caching is not automatically profitable. A cached read is cheap, but the write costs a premium (25% extra at the 5-minute TTL). Break-even needs the discount to outweigh that premium over the remaining turns: with a write premium of 25% and reads at 10%, caching pays off once the prefix is re-read more than <code>r &gt; (w-1)/s = 0.278</code> times per write, where <code>w</code> is the write multiplier and <code>s</code> the read discount. Runs of ten or more turns usually clear that bar easily; a one-shot call never can.</p>
+
+      <h2>Retries</h2>
+      <p>Each tool call succeeds with probability <code>p</code> or is retried, up to <code>R</code> times. The expected number of attempts for one call is the finite series <code>E = sum_{k=0..R} k * p^(k-1) * (1-p) + (R+1) * p^R * (1-p) + p^(R+1)</code>... simplified: when retries always eventually succeed within the cap, the expected attempts per call are <code>(1-p^(R+1))/(1-p)</code>. Tool records from failed attempts also enter the transcript, so retries raise both the token count and the re-read cost of every later turn.</p>
+
+      <h2>What this tool does not model</h2>
+      <p>Rate-limit premiums, batch discounts, model routing, and per-provider overhead are out of scope. Prices are entered by you against the rates shown in the model list; if your negotiated rates differ, type them in and the run re-prices instantly.</p>
+
+      <div class="faq">
+        <h2>Frequently asked</h2>
+        <h3>Why does the last turn cost more than the first?</h3>
+        <p>Because the transcript is re-sent on every turn. After nine turns of three tool records at 800 tokens each, turn ten carries about 24,000 tokens of history plus the system prompt, and every one of those input tokens is billed again.</p>
+        <h3>When does prompt caching pay off?</h3>
+        <p>Once the prefix is re-read enough times per write. At Claude's list terms (write premium 1.25x, read discount 0.1x) the break-even is a bit over one extra re-read per write; anything longer than a handful of turns is comfortably past it. A single-turn call should leave caching off.</p>
+        <h3>Do retries really move the total?</h3>
+        <p>At a 95% success rate and a cap of two retries, expected attempts per call are about 1.05, small. At 70% success the expectation climbs past 1.4, and every failed attempt still writes its tool record into the transcript, which every later turn then re-reads at full input price.</p>
+        <h3>Are the prices in the list exact?</h3>
+        <p>They are common list rates as of mid-2026 and they are editable. Check your provider's pricing page before relying on a budget figure; this tool models arithmetic, not tariffs.</p>
+      </div>
+
+      <div class="rel">
+        <a href="/tools/agent-retry-cost-calculator.html">Agent Retry Cost Calculator</a>
+        <a href="/tools/prompt-caching-savings-calculator.html">Prompt Caching Savings Calculator</a>
+        <a href="/tools/token-cost-tracker.html">Token Cost Tracker</a>
+        <a href="/tools/agent-concurrency-throughput-calculator.html">Agent Concurrency Throughput Calculator</a>
+        <a href="/tools/">All Tools</a>
+      </div>
+    </section>
   </div>
 
-  <div class="footer">
-    © 2025 claudflow.com
+  <footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever →</a>
+        <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> · 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex, A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP, Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality, Security</a>
+            <a href="https://claudkit.com">ClaudKit, API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket, Support</a>
+            <a href="https://enhio.com">Enhio, Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot, Timestamps</a>
+            <a href="https://gen8x.com">Gen8X, Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X, AI Models</a>
+            <a href="https://heytensor.com">HeyTensor, ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc, Recipes</a>
+            <a href="https://invokebot.com">InvokeBot, Webhooks</a>
+            <a href="https://kappafy.com">Kappafy, JSON</a>
+            <a href="https://kappakit.com">KappaKit, Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM, LLM Costs</a>
+            <a href="https://krzen.com">Krzen, Image Tools</a>
+            <a href="https://lochbot.com">LochBot, Security</a>
+            <a href="https://lockml.com">LockML, ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool">ML0X, ML Basics</a>
+            <a href="https://ml3x.com">ML3X, Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor, Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool, Cooking</a>
+            <a href="https://viryd.com">Viryd, Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools, Telegram Bots</a>
+        </div>
+    </div>
+</nav>
+
+<div class="pow-strip">
+  <div class="pow-strip-inner">
+    <span class="pow-label">By the same builder:</span>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub, theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative, Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder, Dev Blog</a>
+    <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=tool" rel="nofollow">Zovo, AI Dev Tools</a>
   </div>
 </div>
 
 <script>
-  (function() {
-    // ----- DOM refs -----
-    const toolsPerLoop = document.getElementById('toolsPerLoop');
-    const tokensPerTool = document.getElementById('tokensPerTool');
-    const loopIterations = document.getElementById('loopIterations');
-    const modelSelect = document.getElementById('modelSelect');
-    const systemPrompt = document.getElementById('systemPrompt');
+(function () {
+  'use strict';
 
-    const totalTokensEl = document.getElementById('totalTokens');
-    const totalCostEl = document.getElementById('totalCost');
-    const costPerIterationEl = document.getElementById('costPerIteration');
-    const optimalLimitEl = document.getElementById('optimalLimit');
+  var ids = ['turns','tools','tokTool','sys','outFrac','model','pin','pout','cache','cacheTTL','gap','p','maxR'];
+  var el = {};
+  ids.forEach(function (id) { el[id] = document.getElementById(id); });
 
-    // chart
-    const ctx = document.getElementById('costChart').getContext('2d');
-    let chart;
+  var RETRY_CALL_LIMIT = 5000; // guard: p^(R+1) series degrades below this success rate
 
-    // ----- helpers -----
-    function getModelPrices() {
-      const opt = modelSelect.options[modelSelect.selectedIndex];
-      return {
-        inputPrice: parseFloat(opt.dataset.input) || 0,
-        outputPrice: parseFloat(opt.dataset.output) || 0,
-        name: opt.text.split('(')[0].trim()
-      };
+  function num(id, fallback, min, max) {
+    var raw = parseFloat(el[id].value);
+    if (!isFinite(raw)) return fallback;
+    return Math.min(max, Math.max(min, raw));
+  }
+
+  function fmt(v, digits) {
+    return v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  }
+
+  function expectedAttempts(p, R) {
+    // E = sum_{k=1..R} (1-p)^0... closed form for attempts capped at R retries:
+    // attempts = (1 - p^(R+1)) / (1 - p)
+    if (p >= 1) return 1;
+    if (p <= 0) return R + 1;
+    return (1 - Math.pow(p, R + 1)) / (1 - p);
+  }
+
+  function calc() {
+    var N = Math.round(num('turns', 10, 1, 50));
+    var T = Math.round(num('tools', 3, 0, 50));
+    var tokTool = num('tokTool', 800, 10, 50000);
+    var sys = num('sys', 3000, 0, 100000);
+    var outFrac = num('outFrac', 40, 0, 100) / 100;
+    var pin = num('pin', 3, 0, 1e6);
+    var pout = num('pout', 15, 0, 1e6);
+    var caching = el.cache.value === '1';
+    var ttl = parseInt(el.cacheTTL.value, 10);
+    var gapMin = num('gap', 2, 0, 1440);
+    var p = num('p', 95, 1, 100) / 100;
+    var R = Math.round(num('maxR', 2, 0, 10));
+
+    var pair = el.model.value.split(',');
+    var listIn = parseFloat(pair[0]);
+    var listOut = parseFloat(pair[1]);
+    var wroteRates = Math.abs(pin - listIn) > 1e-9 || Math.abs(pout - listOut) > 1e-9;
+
+    var attempts = expectedAttempts(p, R);
+    var warned = p < 0.05 && T * N > RETRY_CALL_LIMIT;
+    var writeMult = (ttl === 60) ? 2.0 : 1.25;
+    var readMult = 0.1;
+
+    var totalCost = 0;
+    var totalTok = 0;
+    var lastTurnCost = 0;
+    var cacheWrites = 0;
+    var cacheReads = 0;
+
+    for (var i = 1; i <= N; i++) {
+      var prefixRecords = (i - 1) * T * attempts;   // re-read every turn
+      var freshRecords = T * attempts;              // written this turn (incl. retry records)
+      var newOutTokens = freshRecords * tokTool * outFrac;
+      var newInTokens = freshRecords * tokTool * (1 - outFrac);
+
+      var turnCost;
+      if (caching && i > 1 && gapMin <= ttl) {
+        // cache hit: re-read prefix at discount; write only the new suffix at full rate
+        var prefixTokens = sys + prefixRecords * tokTool;
+        var suffixTokens = newInTokens;
+        cacheReads++;
+        turnCost = (prefixTokens * readMult * pin + suffixTokens * writeMult * pin + newOutTokens * pout) / 1e6;
+      } else {
+        if (caching) cacheWrites++;
+        var inputTokens = sys + prefixRecords * tokTool + newInTokens;
+        var wm = (caching) ? writeMult : 1.0;
+        turnCost = (inputTokens * wm * pin + newOutTokens * pout) / 1e6;
+      }
+      totalCost += turnCost;
+      totalTok += sys + prefixRecords * tokTool + freshRecords * tokTool;
+      lastTurnCost = turnCost;
     }
 
-    function calc() {
-      const tools = parseInt(toolsPerLoop.value, 10) || 1;
-      const tokPerTool = parseInt(tokensPerTool.value, 10) || 100;
-      const iterations = parseInt(loopIterations.value, 10) || 1;
-      const sysTokens = parseInt(systemPrompt.value, 10) || 0;
-      const { inputPrice, outputPrice } = getModelPrices();
+    // break-even re-reads per write: r > (w - 1) / s
+    var breakeven = (writeMult - 1) / readMult;
+    var reReadsPerWrite = cacheWrites > 0 ? cacheReads / cacheWrites : 0;
 
-      // Clamp iterations 1-50
-      const n = Math.min(50, Math.max(1, iterations));
+    document.getElementById('rCost').textContent = '$' + fmt(totalCost, 4);
+    document.getElementById('rPerTurn').textContent = '$' + fmt(totalCost / N, 4);
+    document.getElementById('rLastTurn').textContent = '$' + fmt(lastTurnCost, 4);
+    document.getElementById('rTokens').textContent = Math.round(totalTok).toLocaleString('en-US');
 
-      // Simulate accumulating context:
-      // iteration i (1-indexed): system prompt + (i * tools * tokPerTool)  (accumulated tool calls)
-      // We assume each iteration adds tools*tokPerTool new tokens (both input & output)
-      // For cost: we treat total tokens as input tokens (since context is sent each turn)
-      // but also output tokens per iteration = tools * tokPerTool * 0.4 (approx output fraction)
-      // Realistic: input = system + accumulated history, output = tools * tokPerTool * outputRatio
-      const outputRatio = 0.4; // 40% of tool tokens are output (generated)
-      const inputRatio = 0.6;  // 60% input (prompt)
+    var msg;
+    if (N === 1) {
+      msg = 'Single-turn run: caching cannot pay off, the prefix is never re-read (break-even is ' + fmt(breakeven, 2) + ' re-reads per write). Leave caching off unless the transcript is reused later.';
+    } else if (caching && reReadsPerWrite > breakeven) {
+      msg = '✅ Caching wins this run: ' + fmt(reReadsPerWrite, 1) + ' re-reads per write against a break-even of ' + fmt(breakeven, 2) + '. Saved vs uncached: about $' + fmt(uncachedCost(totalCost, caching), 4) + '.';
+    } else if (caching) {
+      msg = '⚠️ Below break-even: only ' + fmt(reReadsPerWrite, 1) + ' re-reads per write, and caching breaks even at ' + fmt(breakeven, 2) + '. Gaps past the ' + ttl + '-minute TTL force extra cache writes. Consider caching off.';
+    } else if (attempts > 1.2) {
+      msg = '⚠️ No caching, and retries are material: expected ' + fmt(attempts, 2) + ' attempts per tool call at a ' + Math.round(p * 100) + '% success rate. Expected cost already includes them; a higher success rate is your cheapest lever.';
+    } else {
+      msg = 'Caching is off. At ' + N + ' turns the cached version would save roughly ' + fmt(savingsIfCached(), 4) + ' USD on this run, break-even is ' + fmt(breakeven, 2) + ' re-reads per write, and ' + (N - 1) + ' re-reads per write are available here.';
+    }
 
-      let cumulativeTokens = 0;
-      let cumulativeCost = 0;
-      let perIterCosts = [];
-      let iterTokens = [];
+    if (warned) {
+      msg += ' At this success rate most calls fail all ' + R + ' retries; treat the expected figure as a floor, not a forecast.';
+    }
+    if (wroteRates) {
+      msg += ' Using custom rates: $' + fmt(pin, 2) + ' in / $' + fmt(pout, 2) + ' out per 1M.';
+    }
+    document.getElementById('verdict').innerHTML = msg;
 
-      for (let i = 1; i <= n; i++) {
-        // accumulated context before this iteration: system + (i-1)*tools*tokPerTool (previous turns)
-        const prevContextTokens = sysTokens + (i - 1) * tools * tokPerTool;
-        // new input for this turn: previous context + new tool calls (input portion)
-        const newInputTokens = prevContextTokens + tools * tokPerTool * inputRatio;
-        // output tokens for this turn
-        const newOutputTokens = tools * tokPerTool * outputRatio;
-        const totalThisIter = newInputTokens + newOutputTokens;
-
-        // cost: input tokens * inputPrice/1M + output tokens * outputPrice/1M
-        const iterCost = (newInputTokens * inputPrice / 1_000_000) + (newOutputTokens * outputPrice / 1_000_000);
-        cumulativeTokens += totalThisIter;
-        cumulativeCost += iterCost;
-        perIterCosts.push(iterCost);
-        iterTokens.push(totalThisIter);
-      }
-
-      // total tokens (all iterations)
-      const totalTok = cumulativeTokens;
-      const totalCost = cumulativeCost;
-
-      // cost per iteration (average)
-      const avgCost = totalCost / n;
-
-      // ---- optimal iteration limit: where marginal cost / avg cost > 0.2 (degradation) ----
-      let optimalLimit = n;
-      if (n > 1) {
-        // compute marginal cost per additional iteration (starting from iteration 2)
-        for (let i = 1; i < n; i++) {
-          const marginal = perIterCosts[i] - perIterCosts[i-1];
-          // if marginal > 20% of total cost so far (cumulative up to i)
-          const cumSoFar = perIterCosts.slice(0, i+1).reduce((a,b)=>a+b, 0);
-          if (marginal > 0.2 * cumSoFar && i >= 2) {
-            optimalLimit = i; // degradation point
-            break;
-          }
+    function uncachedCost(cachedCost, wasCaching) {
+      // approximate delta shown when caching is on: recompute once with caching off
+      return Math.max(0, rawCost(false) - rawCost(true));
+    }
+    function savingsIfCached() {
+      return Math.max(0, rawCost(false) - rawCost(true));
+    }
+    function rawCost(withCache) {
+      var c = 0;
+      var wm = withCache ? writeMult : 1.0;
+      for (var j = 1; j <= N; j++) {
+        var prefix = (j - 1) * T * attempts;
+        var fresh = T * attempts;
+        var outTok = fresh * tokTool * outFrac;
+        var inTok = fresh * tokTool * (1 - outFrac);
+        if (withCache && j > 1 && gapMin <= ttl) {
+          c += ((sys + prefix * tokTool) * readMult * pin + inTok * wm * pin + outTok * pout) / 1e6;
+        } else {
+          c += ((sys + prefix * tokTool + inTok) * wm * pin + outTok * pout) / 1e6;
         }
       }
-
-      // ---- update DOM ----
-      totalTokensEl.textContent = totalTok.toLocaleString('en-US', {maximumFractionDigits:0});
-      totalCostEl.textContent = `$${totalCost.toFixed(4)}`;
-      costPerIterationEl.textContent = `$${avgCost.toFixed(4)}`;
-      optimalLimitEl.textContent = optimalLimit;
-
-      // ---- update chart (cumulative cost) ----
-      let cumulativeArr = [];
-      let sum = 0;
-      for (let i = 0; i < n; i++) {
-        sum += perIterCosts[i];
-        cumulativeArr.push(sum);
-      }
-
-      if (chart) {
-        chart.data.labels = Array.from({length: n}, (_, i) => `#${i+1}`);
-        chart.data.datasets[0].data = cumulativeArr;
-        chart.update();
-      } else {
-        chart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: Array.from({length: n}, (_, i) => `#${i+1}`),
-            datasets: [{
-              label: 'Cumulative cost (USD)',
-              data: cumulativeArr,
-              borderColor: '#38bdf8',
-              backgroundColor: 'rgba(56, 189, 248, 0.1)',
-              fill: true,
-              tension: 0.2,
-              pointBackgroundColor: '#38bdf8',
-              pointRadius: 3,
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: (ctx) => `$${ctx.parsed.y.toFixed(4)}`
-                }
-              }
-            },
-            scales: {
-              x: {
-                ticks: { color: '#94a3b8', maxTicksLimit: 15 },
-                grid: { color: '#1e293b' }
-              },
-              y: {
-                ticks: { color: '#94a3b8', callback: (val) => '$' + val.toFixed(2) },
-                grid: { color: '#1e293b' }
-              }
-            }
-          }
-        });
-      }
+      return c;
     }
+  }
 
-    // ----- input event listeners -----
-    const inputs = [toolsPerLoop, tokensPerTool, loopIterations, modelSelect, systemPrompt];
-    inputs.forEach(el => el.addEventListener('input', calc));
-    inputs.forEach(el => el.addEventListener('change', calc));
-
-    // initial calculation
+  // model list fills the editable rate fields
+  el.model.addEventListener('change', function () {
+    var pair = el.model.value.split(',');
+    el.pin.value = pair[0];
+    el.pout.value = pair[1];
     calc();
+  });
 
-    // fix for select change
-    modelSelect.addEventListener('change', calc);
-
-  })();
+  ids.forEach(function (id) {
+    el[id].addEventListener('input', calc);
+    el[id].addEventListener('change', calc);
+  });
+  calc();
+})();
 </script>
-
-<script src="/kit/cta.js" data-mt-cta data-tool="handsofflinks" data-href="https://handsofflinks.com/" data-text="You can automate nearly every part of a build except the links, because links have always meant cold email. Hands Off Links takes the other road. It publishes real technical assets to public platforms under your own accounts and earns the links from those. One-time licence, from 99 dollars." data-action="See how it works" data-placement="inline" data-source="claudflow" data-medium="cta" data-campaign="handsofflinks"></script>
-
-    <footer style="text-align:center;padding:2rem 1rem;margin-top:2rem;border-top:1px solid #334155;color:#94a3b8;font-size:0.85rem;">
-        <p>&copy; 2025 claudflow.com &mdash; Free online tool. No data stored.</p>
-    </footer>
-<div style="margin:20px auto;max-width:728px;text-align:center">
-<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-</div>
-<div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
-<p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
-<a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
-<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
-</div>
 </body>
 </html>
