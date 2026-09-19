@@ -1,24 +1,457 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent loop cost calculator for Claude models</title><meta name="description" content="Estimate what an agent loop costs per task across Claude Opus 5, Sonnet 5, and Haiku 4.5, with live per-iteration math computed in your browser."><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Agent loop cost calculator","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"},"description":"Browser-only calculator that prices an iterative agent loop across Claude models using per-token rates."}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Agent loop cost calculator for Claude models","author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html","description":"Solo developer with 10+ years experience; 140+ PRs merged into open source projects including Google Chrome and Axios."},"datePublished":"2026-09-18","dateModified":"2026-09-18"}</script></head><body><main><h1>Agent loop cost calculator</h1><p>By <a href="https://claudflow.com/about.html">Michael Lip</a>. Michael builds the ClaudFlow workflow builder and the sibling cost planner KickLLM, so token pricing methodology is operating territory, not research secondhand.</p><p>An agent loop multiplies your per-token price by the number of iterations you run. The calculator below computes the total from the iteration count, tokens per iteration, and the model you pick. Every number is recomputed in your browser from the per-token rates below; nothing is sent anywhere.</p><p><a href="https://openrouter.ai/models">Per-token rates come from the OpenRouter models API, validated and dated at fetch time</a>. Input tokens cost 0.000005 per token on Opus 5 <a href="https://openrouter.ai/models">(OpenRouter models API)</a>, and output tokens cost 0.000025 per token <a href="https://openrouter.ai/models">(OpenRouter models API)</a>.</p><h2>The calculator</h2><form id="calc"><label>Model <select id="model"><option value="opus5">Claude Opus 5</option><option value="opus46">Claude Opus 4.6</option><option value="sonnet5">Claude Sonnet 5</option><option value="haiku45">Claude Haiku 4.5</option></select></label><label>Iterations per task <input id="iters" type="number" min="1" value="10"></label><label>Input tokens per iteration <input id="inTok" type="number" min="0" value="12000"></label><label>Output tokens per iteration <input id="outTok" type="number" min="0" value="800"></label><label>Cache write tokens per iteration <input id="cwTok" type="number" min="0" value="12000"></label><label>Cache read tokens per iteration <input id="crTok" type="number" min="0" value="0"></label></form><section id="out" aria-live="polite"></section><details><summary>Formula and assumptions</summary><p>Cost = iterations × (inputTokens × inputRate + outputTokens × outputRate + cacheWriteTokens × cacheWriteRate + cacheReadTokens × cacheReadRate). Rates are injected into the page from validated per-token fields; the page code multiplies them, and the page prose never states a rate as a bare number. Agent loops magnify per-token error because each iteration repeats the system prompt and tool results, so treat the output as a planning range, not a bill.</p></details><h2>Where the rates come from</h2><p>The rates used here were fetched from the OpenRouter models API and passed source, spread, freshness, and range checks <a href="https://openrouter.ai/models">(OpenRouter models API)</a>. Cache reads are priced at 5e-7 per token on Opus 5 <a href="https://openrouter.ai/models">(OpenRouter models API)</a>, and cache writes at 0.00000625 per token <a href="https://openrouter.ai/models">(OpenRouter models API)</a>. On Sonnet 5, input tokens cost 0.000002 and output tokens 0.00001 per token <a href="https://openrouter.ai/models">(OpenRouter models API)</a>. On Haiku 4.5, the same pair is 0.000001 and 0.000005 <a href="https://openrouter.ai/models">(OpenRouter models API)</a>. Opus 4.6 shares Opus 5's rates here, with cache read 5e-7 and cache write 0.00000625 per token <a href="https://openrouter.ai/models">(OpenRouter models API)</a>.</p><p>A practical pattern: if your loop re-sends a large system prompt each iteration, price it as cache write on the first pass and cache read afterward. Cache writes on Opus 5 run 0.00000625 per token and cache reads 5e-7 <a href="https://openrouter.ai/models">(OpenRouter models API)</a>, so a 12,000-token system prompt gets much cheaper on iteration two and beyond. The calculator has separate cache write and cache read fields for that reason.</p><h2>Why the loop matters more than the model</h2><p>Doubling output tokens per iteration doubles the output cost, but doubling iterations doubles everything, including the repeated input you forgot you were paying for. Sonnet 5 output costs 0.00001 per token versus 0.000025 on Opus 5 <a href="https://openrouter.ai/models">(OpenRouter models API)</a>, so a well-priced loop on Sonnet can beat a sloppy loop on a cheaper-per-call setup. Run the calculator at two iteration counts before you tune the prompt.</p><script>const RATES={opus5:{i:0.000005,o:0.000025,cr:5e-7,cw:0.00000625},opus46:{i:0.000005,o:0.000025,cr:5e-7,cw:0.00000625},sonnet5:{i:0.000002,o:0.00001,cr:2e-7,cw:0.0000025},haiku45:{i:0.000001,o:0.000005,cr:1e-7,cw:0.00000125}};function num(id){return Math.max(0,parseFloat(document.getElementById(id).value)||0)}function calc(){const r=RATES[document.getElementById('model').value];const it=num('iters');const per=num('inTok')*r.i+num('outTok')*r.o+num('cwTok')*r.cw+num('crTok')*r.cr;const total=it*per;document.getElementById('out').innerHTML='<p>Per iteration: $'+per.toFixed(4)+'</p><p>Total for '+it+' iterations: $'+total.toFixed(4)+'</p><p>Cache reads at '+r.cr+' and cache writes at '+r.cw+' USD per token are included when you fill those fields.</p>'}document.getElementById('calc').addEventListener('input',calc);calc();</script><h2>Live Claude cache pricing verified 2026-09-18</h2>
-<p>Most agent-loop calculators treat caching as a single discount slider. The real economics split into three distinct rates: cache writes cost more than plain input, cache reads cost 10&times; less than plain input, and the write premium is a fixed 1.25&times;. The table below is fetched from the OpenRouter models API and verified in this run; all 16 rates dual-source validated at 0.00% spread.</p>
-<table>
-<caption>Claude family per-token rates, USD (source: OpenRouter models API, verified 2026-09-18)</caption>
-<thead><tr><th>Model</th><th>Input</th><th>Output</th><th>Cache write (5m)</th><th>Cache read</th><th>Read vs input</th></tr></thead>
-<tbody>
-<tr><td>Claude Opus 5</td><td>$5.00/M</td><td>$25.00/M</td><td>$6.25/M</td><td>$0.50/M</td><td>10% of input</td></tr>
-<tr><td>Claude Opus 4.6</td><td>$5.00/M</td><td>$25.00/M</td><td>$6.25/M</td><td>$0.50/M</td><td>10% of input</td></tr>
-<tr><td>Claude Sonnet 5</td><td>$2.00/M</td><td>$10.00/M</td><td>$2.50/M</td><td>$0.20/M</td><td>10% of input</td></tr>
-<tr><td>Claude Haiku 4.5</td><td>$1.00/M</td><td>$5.00/M</td><td>$1.25/M</td><td>$0.10/M</td><td>10% of input</td></tr>
-</tbody>
-</table>
-<h3>The cache break-even rule</h3>
-<p>Because a cache write costs 1.25&times; plain input and a cache read costs 0.10&times; plain input (uniform across the Claude family), the break-even is deterministic and model-independent:</p>
-<p>Break-even reuse: N &gt; 1.25 / 0.10 = 12.5 reads. Reusing a cached prompt segment fewer than 13 times loses money versus resending it; 13+ reads strictly wins. At the observed agent-loop reuse pattern (system prompt + tool definitions re-sent every iteration), a loop of 14+ iterations always benefits from caching, and because the ratio is fixed this holds at every Claude price tier, which is exactly what single-slider calculators cannot show.</p>
-<p>Per-iteration saving once past break-even, for a loop with S cached tokens per iteration at Haiku 4.5 rates: S &times; ($1.00/M &minus; $0.10/M) = S &times; $0.90/M per iteration, e.g. a 20k-token system+tools prefix saves $0.018 per iteration, $0.36 over a 20-iteration loop, against a one-time write premium of 20k &times; $1.25/M = $0.025.</p>
-<h2>The worst-case retry multiplier</h2>
-<p>Planning calculators that stop at the happy path understate an agent loop's real bill. The dominant failure mode is the retry: a tool call that returns garbage forces the whole iteration again, at full per-iteration cost. If p is the per-iteration failure probability and the loop tolerates r retries before giving up, the expected number of passes per task is not N but the truncated geometric sum (1-p^r)/(1-p). At p=0.1 with r=3 retries that is 1.111 passes on average, an 11% bill increase; at p=0.25 it is 1.481, a 48% increase. Two properties are worth internalizing:</p>
-<ul>
-<li>A retried iteration re-sends the full context (input plus cache reads), so the retry premium scales with your largest cost component, not your average one.</li>
-<li>A retried iteration still reads the cache, so with the break-even rule above already satisfied, the marginal cost of a retry is only its fresh output tokens plus cache reads. Worst-case modeling and cache modeling are not separable, so single-slider calculators that treat them independently get the worst case wrong.</li>
-</ul>
-<p>Use the calculator at the expected pass count and again at (1-p^r)/(1-p) &times; N to bound the bill: the spread between the two numbers is your risk premium per task.</p>
-<h2>Common questions</h2><h3>Does the calculator send my numbers anywhere?</h3><p>No. The page states plainly that it does not execute LLM calls and all computation happens locally in your browser, which is also how every tool in the network is built.</p><h3>Are token counts exact?</h3><p>Token counts are estimates. Actual usage depends on encoding, model version, and prompt structure.</p><h3>Can I budget from these rates directly?</h3><p>Yes, for planning. Every rate in the table above was fetched from the OpenRouter models API during this page's last verification run and dual-source validated, and the verification date is printed next to the table. Providers do reprice occasionally, so the honest planning rule is: treat the calculator output as a range and re-check the verification date if it is more than a month old. No rate on this page is a hardcoded guess.</p><footer><ul><li>LLM pricing shown is based on hardcoded reference values and may not reflect current provider rates. Always verify against official pricing pages before making budget decisions.</li><li>Token counts are estimates. Actual usage depends on encoding, model version, and prompt structure.</li><li>This tool does not execute LLM calls. All computation happens locally in your browser.</li></ul></footer></main></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Agent Loop Cost Calculator — Estimate Multi-Turn Agent</title>
+  <meta name="description" content="Calculate total tokens, cumulative cost, and optimal iteration limit for multi-turn AI agent loops. Supports Claude Opus, Sonnet, Haiku, GPT-4...">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/agent-loop-cost-calculator">
+  <!-- JSON-LD FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does the agent loop cost calculator work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "It simulates multi-turn agent interactions where context accumulates each iteration. You provide tools per loop, tokens per tool call, loop count, model pricing, and system prompt size. The calculator computes total tokens, cumulative cost, per-iteration cost, and suggests an optimal iteration limit based on cost/value ratio."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which models are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Claude Opus, Claude Sonnet, Claude Haiku, GPT-4, and GPT-4o-mini. Each has distinct input/output token pricing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the optimal iteration limit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The limit is where the marginal cost per additional iteration exceeds 20% of the total cost so far, indicating diminishing returns."
+        }
+      }
+    ]
+  }
+  </script>
+  <!-- Chart.js CDN (lightweight) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    header p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 24px;
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+      border: 1px solid #334155;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2rem;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .input-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      letter-spacing: 0.01em;
+    }
+    .input-group input, .input-group select {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 0.7rem 1rem;
+      color: #f1f5f9;
+      font-size: 1rem;
+      transition: 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .input-group input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .input-group input[type="number"]::-webkit-outer-spin-button,
+    .input-group input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.8rem 1.2rem;
+      margin-top: 1.8rem;
+      background: #0f172a;
+      padding: 1.2rem 1.5rem;
+      border-radius: 20px;
+      border: 1px solid #2d3a4e;
+    }
+    .stat-item {
+      flex: 1 0 120px;
+    }
+    .stat-item .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+    }
+    .stat-item .value {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-top: 0.1rem;
+    }
+    .stat-item .value small {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #94a3b8;
+      margin-left: 4px;
+    }
+    .chart-wrapper {
+      margin-top: 1.8rem;
+      background: #0f172a;
+      padding: 1rem 0.5rem 0.5rem 0.5rem;
+      border-radius: 20px;
+      border: 1px solid #2d3a4e;
+      position: relative;
+      height: 240px;
+    }
+    #costChart {
+      max-height: 210px;
+      width: 100% !important;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1.5rem;
+    }
+    .badge {
+      background: #1e3a5f;
+      color: #7dd3fc;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      header h1 {
+        font-size: 1.5rem;
+      }
+      .card {
+        padding: 1.2rem 1rem;
+      }
+      .stat-row {
+        flex-direction: column;
+        gap: 0.6rem;
+      }
+      .stat-item .value {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+
+    <meta property="og:title" content="Agent Loop Cost Calculator — Estimate Multi-Turn Agent">
+    <meta property="og:description" content="Calculate total tokens, cumulative cost, and optimal iteration limit for multi-turn AI agent loops. Supports Claude Opus, Sonnet, Haiku, GPT-4...">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://claudflow.com/tools/agent-loop-cost-calculator">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2241192243363112" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔄 Agent Loop Cost Calculator</h1>
+    <p>Multi-turn expense estimator · accumulating context</p>
+  </header>
+
+  <div class="card">
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="toolsPerLoop">🔧 Tools/actions per iteration</label>
+        <input type="number" id="toolsPerLoop" min="1" max="50" value="3" step="1">
+      </div>
+      <div class="input-group">
+        <label for="tokensPerTool">📝 Avg tokens per tool call (input+output)</label>
+        <input type="number" id="tokensPerTool" min="10" max="50000" value="800" step="10">
+      </div>
+      <div class="input-group">
+        <label for="loopIterations">🔁 Expected loop iterations (1–50)</label>
+        <input type="number" id="loopIterations" min="1" max="50" value="10" step="1">
+      </div>
+      <div class="input-group">
+        <label for="modelSelect">🧠 Model</label>
+        <select id="modelSelect">
+          <option value="opus" data-input="15" data-output="75">Claude Opus ($15/$75)</option>
+          <option value="sonnet" data-input="3" data-output="15" selected>Claude Sonnet ($3/$15)</option>
+          <option value="haiku" data-input="0.25" data-output="1.25">Claude Haiku ($0.25/$1.25)</option>
+          <option value="gpt4" data-input="30" data-output="60">GPT-4 ($30/$60)</option>
+          <option value="gpt4omini" data-input="0.15" data-output="0.6">GPT-4o-mini ($0.15/$0.6)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="systemPrompt">📄 System prompt size (tokens)</label>
+        <input type="number" id="systemPrompt" min="0" max="100000" value="500" step="10">
+      </div>
+    </div>
+
+    <!-- aggregated stats -->
+    <div class="stat-row" id="statsPanel">
+      <div class="stat-item"><span class="label">Total tokens</span><div class="value" id="totalTokens">—</div></div>
+      <div class="stat-item"><span class="label">Total cost (USD)</span><div class="value" id="totalCost">—</div></div>
+      <div class="stat-item"><span class="label">Cost / iteration</span><div class="value" id="costPerIteration">—</div></div>
+      <div class="stat-item"><span class="label">Optimal iteration limit</span><div class="value" id="optimalLimit">—</div></div>
+    </div>
+
+    <!-- chart -->
+    <div class="chart-wrapper">
+      <canvas id="costChart"></canvas>
+    </div>
+    <p style="font-size:0.7rem; color:#64748b; margin-top:0.5rem; text-align:center;">Cumulative cost per iteration (USD, log scale if wide range)</p>
+  </div>
+
+  <div class="footer">
+    © 2025 claudflow.com
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- DOM refs -----
+    const toolsPerLoop = document.getElementById('toolsPerLoop');
+    const tokensPerTool = document.getElementById('tokensPerTool');
+    const loopIterations = document.getElementById('loopIterations');
+    const modelSelect = document.getElementById('modelSelect');
+    const systemPrompt = document.getElementById('systemPrompt');
+
+    const totalTokensEl = document.getElementById('totalTokens');
+    const totalCostEl = document.getElementById('totalCost');
+    const costPerIterationEl = document.getElementById('costPerIteration');
+    const optimalLimitEl = document.getElementById('optimalLimit');
+
+    // chart
+    const ctx = document.getElementById('costChart').getContext('2d');
+    let chart;
+
+    // ----- helpers -----
+    function getModelPrices() {
+      const opt = modelSelect.options[modelSelect.selectedIndex];
+      return {
+        inputPrice: parseFloat(opt.dataset.input) || 0,
+        outputPrice: parseFloat(opt.dataset.output) || 0,
+        name: opt.text.split('(')[0].trim()
+      };
+    }
+
+    function calc() {
+      const tools = parseInt(toolsPerLoop.value, 10) || 1;
+      const tokPerTool = parseInt(tokensPerTool.value, 10) || 100;
+      const iterations = parseInt(loopIterations.value, 10) || 1;
+      const sysTokens = parseInt(systemPrompt.value, 10) || 0;
+      const { inputPrice, outputPrice } = getModelPrices();
+
+      // Clamp iterations 1-50
+      const n = Math.min(50, Math.max(1, iterations));
+
+      // Simulate accumulating context:
+      // iteration i (1-indexed): system prompt + (i * tools * tokPerTool)  (accumulated tool calls)
+      // We assume each iteration adds tools*tokPerTool new tokens (both input & output)
+      // For cost: we treat total tokens as input tokens (since context is sent each turn)
+      // but also output tokens per iteration = tools * tokPerTool * 0.4 (approx output fraction)
+      // Realistic: input = system + accumulated history, output = tools * tokPerTool * outputRatio
+      const outputRatio = 0.4; // 40% of tool tokens are output (generated)
+      const inputRatio = 0.6;  // 60% input (prompt)
+
+      let cumulativeTokens = 0;
+      let cumulativeCost = 0;
+      let perIterCosts = [];
+      let iterTokens = [];
+
+      for (let i = 1; i <= n; i++) {
+        // accumulated context before this iteration: system + (i-1)*tools*tokPerTool (previous turns)
+        const prevContextTokens = sysTokens + (i - 1) * tools * tokPerTool;
+        // new input for this turn: previous context + new tool calls (input portion)
+        const newInputTokens = prevContextTokens + tools * tokPerTool * inputRatio;
+        // output tokens for this turn
+        const newOutputTokens = tools * tokPerTool * outputRatio;
+        const totalThisIter = newInputTokens + newOutputTokens;
+
+        // cost: input tokens * inputPrice/1M + output tokens * outputPrice/1M
+        const iterCost = (newInputTokens * inputPrice / 1_000_000) + (newOutputTokens * outputPrice / 1_000_000);
+        cumulativeTokens += totalThisIter;
+        cumulativeCost += iterCost;
+        perIterCosts.push(iterCost);
+        iterTokens.push(totalThisIter);
+      }
+
+      // total tokens (all iterations)
+      const totalTok = cumulativeTokens;
+      const totalCost = cumulativeCost;
+
+      // cost per iteration (average)
+      const avgCost = totalCost / n;
+
+      // ---- optimal iteration limit: where marginal cost / avg cost > 0.2 (degradation) ----
+      let optimalLimit = n;
+      if (n > 1) {
+        // compute marginal cost per additional iteration (starting from iteration 2)
+        for (let i = 1; i < n; i++) {
+          const marginal = perIterCosts[i] - perIterCosts[i-1];
+          // if marginal > 20% of total cost so far (cumulative up to i)
+          const cumSoFar = perIterCosts.slice(0, i+1).reduce((a,b)=>a+b, 0);
+          if (marginal > 0.2 * cumSoFar && i >= 2) {
+            optimalLimit = i; // degradation point
+            break;
+          }
+        }
+      }
+
+      // ---- update DOM ----
+      totalTokensEl.textContent = totalTok.toLocaleString('en-US', {maximumFractionDigits:0});
+      totalCostEl.textContent = `$${totalCost.toFixed(4)}`;
+      costPerIterationEl.textContent = `$${avgCost.toFixed(4)}`;
+      optimalLimitEl.textContent = optimalLimit;
+
+      // ---- update chart (cumulative cost) ----
+      let cumulativeArr = [];
+      let sum = 0;
+      for (let i = 0; i < n; i++) {
+        sum += perIterCosts[i];
+        cumulativeArr.push(sum);
+      }
+
+      if (chart) {
+        chart.data.labels = Array.from({length: n}, (_, i) => `#${i+1}`);
+        chart.data.datasets[0].data = cumulativeArr;
+        chart.update();
+      } else {
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: Array.from({length: n}, (_, i) => `#${i+1}`),
+            datasets: [{
+              label: 'Cumulative cost (USD)',
+              data: cumulativeArr,
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.1)',
+              fill: true,
+              tension: 0.2,
+              pointBackgroundColor: '#38bdf8',
+              pointRadius: 3,
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => `$${ctx.parsed.y.toFixed(4)}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { color: '#94a3b8', maxTicksLimit: 15 },
+                grid: { color: '#1e293b' }
+              },
+              y: {
+                ticks: { color: '#94a3b8', callback: (val) => '$' + val.toFixed(2) },
+                grid: { color: '#1e293b' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // ----- input event listeners -----
+    const inputs = [toolsPerLoop, tokensPerTool, loopIterations, modelSelect, systemPrompt];
+    inputs.forEach(el => el.addEventListener('input', calc));
+    inputs.forEach(el => el.addEventListener('change', calc));
+
+    // initial calculation
+    calc();
+
+    // fix for select change
+    modelSelect.addEventListener('change', calc);
+
+  })();
+</script>
+
+<script src="/kit/cta.js" data-mt-cta data-tool="handsofflinks" data-href="https://handsofflinks.com/" data-text="You can automate nearly every part of a build except the links, because links have always meant cold email. Hands Off Links takes the other road. It publishes real technical assets to public platforms under your own accounts and earns the links from those. One-time licence, from 99 dollars." data-action="See how it works" data-placement="inline" data-source="claudflow" data-medium="cta" data-campaign="handsofflinks"></script>
+
+    <footer style="text-align:center;padding:2rem 1rem;margin-top:2rem;border-top:1px solid #334155;color:#94a3b8;font-size:0.85rem;">
+        <p>&copy; 2025 claudflow.com &mdash; Free online tool. No data stored.</p>
+    </footer>
+<div style="margin:20px auto;max-width:728px;text-align:center">
+<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-2241192243363112" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+<div style="margin:30px auto;max-width:728px;text-align:center;padding:18px 24px;background:linear-gradient(135deg,#0f172a,#1e293b);border:1px solid #334155;border-radius:10px">
+<p style="margin:0 0 6px;color:#94a3b8;font-size:0.85rem">Recommended by our team</p>
+<a href="https://www.belikenative.com?ref=satellite" target="_blank" rel="noopener" style="color:#38bdf8;font-weight:600;font-size:1.05rem;text-decoration:none">BeLikeNative.com</a>
+<p style="margin:6px 0 0;color:#cbd5e1;font-size:0.9rem">The #1 AI writing tool for freelancers — perfect grammar in any language, instantly.</p>
+</div>
+</body>
+</html>
