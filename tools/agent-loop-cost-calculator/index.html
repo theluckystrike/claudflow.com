@@ -352,6 +352,7 @@
     var breakeven = (writeMult - 1) / readMult;
     var reReadsPerWrite = cacheWrites > 0 ? cacheReads / cacheWrites : 0;
 
+    var ctx = makeCtx(N, T, tokTool, sys, outFrac, gapMin, ttl, attempts, pin, pout, writeMult, readMult);
     document.getElementById('rCost').textContent = '$' + fmt(totalCost, 4);
     document.getElementById('rPerTurn').textContent = '$' + fmt(totalCost / N, 4);
     document.getElementById('rLastTurn').textContent = '$' + fmt(lastTurnCost, 4);
@@ -361,7 +362,7 @@
     if (N === 1) {
       msg = 'Single-turn run: caching cannot pay off, the prefix is never re-read (break-even is ' + fmt(breakeven, 2) + ' re-reads per write). Leave caching off unless the transcript is reused later.';
     } else if (caching && reReadsPerWrite > breakeven) {
-      msg = '✅ Caching wins this run: ' + fmt(reReadsPerWrite, 1) + ' re-reads per write against a break-even of ' + fmt(breakeven, 2) + '. Saved vs uncached: about $' + fmt(uncachedCost(totalCost, caching), 4) + '.';
+      msg = '✅ Caching wins this run: ' + fmt(reReadsPerWrite, 1) + ' re-reads per write against a break-even of ' + fmt(breakeven, 2) + '. Saved vs uncached: about $' + fmt(savingsIfCached(ctx), 4) + '.';
     } else if (caching) {
       msg = '⚠️ Below break-even: only ' + fmt(reReadsPerWrite, 1) + ' re-reads per write, and caching breaks even at ' + fmt(breakeven, 2) + '. Gaps past the ' + ttl + '-minute TTL force extra cache writes. Consider caching off.';
     } else if (attempts > 1.2) {
@@ -377,30 +378,34 @@
       msg += ' Using custom rates: $' + fmt(pin, 2) + ' in / $' + fmt(pout, 2) + ' out per 1M.';
     }
     document.getElementById('verdict').innerHTML = msg;
+  }
 
-    function uncachedCost(cachedCost, wasCaching) {
-      // approximate delta shown when caching is on: recompute once with caching off
-      return Math.max(0, rawCost(false) - rawCost(true));
-    }
-    function savingsIfCached() {
-      return Math.max(0, rawCost(false) - rawCost(true));
-    }
-    function rawCost(withCache) {
-      var c = 0;
-      var wm = withCache ? writeMult : 1.0;
-      for (var j = 1; j <= N; j++) {
-        var prefix = (j - 1) * T * attempts;
-        var fresh = T * attempts;
-        var outTok = fresh * tokTool * outFrac;
-        var inTok = fresh * tokTool * (1 - outFrac);
-        if (withCache && j > 1 && gapMin <= ttl) {
-          c += ((sys + prefix * tokTool) * readMult * pin + inTok * wm * pin + outTok * pout) / 1e6;
-        } else {
-          c += ((sys + prefix * tokTool + inTok) * wm * pin + outTok * pout) / 1e6;
-        }
+  // shared cost context so helpers stay stateless (NASA rule 4: each fn under 60 lines)
+  function makeCtx(N, T, tokTool, sys, outFrac, gapMin, ttl, attempts, pin, pout, writeMult, readMult) {
+    return { N: N, T: T, tokTool: tokTool, sys: sys, outFrac: outFrac,
+             gapMin: gapMin, ttl: ttl, attempts: attempts,
+             pin: pin, pout: pout, writeMult: writeMult, readMult: readMult };
+  }
+
+  function rawCost(ctx, withCache) {
+    var c = 0;
+    var wm = withCache ? ctx.writeMult : 1.0;
+    for (var j = 1; j <= ctx.N; j++) {
+      var prefix = (j - 1) * ctx.T * ctx.attempts;
+      var fresh = ctx.T * ctx.attempts;
+      var outTok = fresh * ctx.tokTool * ctx.outFrac;
+      var inTok = fresh * ctx.tokTool * (1 - ctx.outFrac);
+      if (withCache && j > 1 && ctx.gapMin <= ctx.ttl) {
+        c += ((ctx.sys + prefix * ctx.tokTool) * ctx.readMult * ctx.pin + inTok * wm * ctx.pin + outTok * ctx.pout) / 1e6;
+      } else {
+        c += ((ctx.sys + prefix * ctx.tokTool + inTok) * wm * ctx.pin + outTok * ctx.pout) / 1e6;
       }
-      return c;
     }
+    return c;
+  }
+
+  function savingsIfCached(ctx) {
+    return Math.max(0, rawCost(ctx, false) - rawCost(ctx, true));
   }
 
   // model list fills the editable rate fields
