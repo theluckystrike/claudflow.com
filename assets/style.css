@@ -557,3 +557,10 @@ main,
 .pow-label{font-size:.7rem;color:var(--text-muted,#666);font-weight:600}
 .pow-strip-inner a{font-size:.7rem;color:var(--text-muted,#666);text-decoration:none}
 .pow-strip-inner a:hover{color:var(--accent,#7c6ef8)}
+
+/* Keep all destination labels reachable on narrow screens. */
+@media (max-width: 640px) {
+  nav .nav-links { flex-wrap: wrap; gap: .5rem 1rem; width: 100%; min-width: 0; }
+  nav .nav-right { flex-wrap: wrap; margin-left: 0; max-width: 100%; }
+  nav .nav-pro { white-space: normal; max-width: 100%; }
+}
