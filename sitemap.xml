@@ -38,6 +38,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://claudflow.com/tools/context-window-budget-planner</loc>
     <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>

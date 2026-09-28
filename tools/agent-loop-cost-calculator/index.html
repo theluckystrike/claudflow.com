@@ -362,11 +362,11 @@
     if (N === 1) {
       msg = 'Single-turn run: caching cannot pay off, the prefix is never re-read (break-even is ' + fmt(breakeven, 2) + ' re-reads per write). Leave caching off unless the transcript is reused later.';
     } else if (caching && reReadsPerWrite > breakeven) {
-      msg = '✅ Caching wins this run: ' + fmt(reReadsPerWrite, 1) + ' re-reads per write against a break-even of ' + fmt(breakeven, 2) + '. Saved vs uncached: about $' + fmt(savingsIfCached(ctx), 4) + '.';
+      msg = 'Caching wins this run: ' + fmt(reReadsPerWrite, 1) + ' re-reads per write against a break-even of ' + fmt(breakeven, 2) + '. Saved vs uncached: about $' + fmt(savingsIfCached(ctx), 4) + '.';
     } else if (caching) {
-      msg = '⚠️ Below break-even: only ' + fmt(reReadsPerWrite, 1) + ' re-reads per write, and caching breaks even at ' + fmt(breakeven, 2) + '. Gaps past the ' + ttl + '-minute TTL force extra cache writes. Consider caching off.';
+      msg = 'Below break-even: only ' + fmt(reReadsPerWrite, 1) + ' re-reads per write, and caching breaks even at ' + fmt(breakeven, 2) + '. Gaps past the ' + ttl + '-minute TTL force extra cache writes. Consider caching off.';
     } else if (attempts > 1.2) {
-      msg = '⚠️ No caching, and retries are material: expected ' + fmt(attempts, 2) + ' attempts per tool call at a ' + Math.round(p * 100) + '% success rate. Expected cost already includes them; a higher success rate is your cheapest lever.';
+      msg = 'No caching, and retries are material: expected ' + fmt(attempts, 2) + ' attempts per tool call at a ' + Math.round(p * 100) + '% success rate. Expected cost already includes them; a higher success rate is your cheapest lever.';
     } else {
       msg = 'Caching is off. At ' + N + ' turns the cached version would save roughly ' + fmt(savingsIfCached(), 4) + ' USD on this run, break-even is ' + fmt(breakeven, 2) + ' re-reads per write, and ' + (N - 1) + ' re-reads per write are available here.';
     }
