@@ -187,8 +187,8 @@
       <h2>Reading the break-even turn ratio</h2>
       <p>The verdict line reports the turn ratio at which Sonnet's total catches up to Opus. If Opus reliably finishes in fewer turns than that ratio, Opus is cheaper for the whole run. If not, Sonnet wins on cost and the difference goes to quality judgement, not arithmetic.</p>
       <ul>
-        <li>Same turn count on both models: Opus costs 5x Sonnet at default rates, so Sonnet wins on cost alone.</li>
-        <li>Opus at half the turns still costs about 2.5x Sonnet at default rates.</li>
+        <li>Same turn count on both models: Opus costs about 1.67x Sonnet at default rates (5/3 on input and on output), so Sonnet wins on cost alone.</li>
+        <li>Opus at half the turns usually still costs less than Sonnet at default rates. It approaches parity as the system prompt grows, because the big first-turn re-read lands on whichever model runs the first turn. Run your own numbers above.</li>
         <li>Per-turn cost grows linearly for both models because the transcript re-read grows every turn. The last turn is always the most expensive one.</li>
       </ul>
     </div>
