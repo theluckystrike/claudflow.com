@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Claude Opus vs Sonnet Cost Per Agent Turn, Turn-Level Comparison | ClaudFlow</title>
-  <meta name="description" content="Compare Claude Opus and Sonnet cost per agent turn from list rates: re-read transcript tokens, tool call tokens, output share, and per-turn totals computed in your browser.">
+  <title>Claude Opus vs Sonnet Cost Per Agent Turn | ClaudFlow</title>
+  <meta name="description" content="Compare Claude Opus 5.5 and Sonnet 5 cost per agent turn with transcript re-read growth, break-even turns, and per-run totals.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/">
   <meta property="og:type" content="website">
@@ -46,7 +46,7 @@
     .res-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
     .res-card.opus { border-top: 2px solid #d97757; }
     .res-card.sonnet { border-top: 2px solid var(--accent); }
-    .res-card h3 { font-size: 0.95rem; margin-bottom: 0.6rem; }
+    .res-card h2 { font-size: 0.95rem; margin-bottom: 0.6rem; }
     .res-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; }
     .res-row .k { color: var(--text-muted); }
     .res-row .v { font-weight: 600; color: var(--text); }
@@ -75,6 +75,7 @@
     }
     @media (max-width: 480px) {
       .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
     }
   </style>
 </head>
@@ -126,33 +127,33 @@
       </div>
       <div class="field">
         <label for="opusIn">Opus input $/MTok</label>
-        <input type="number" id="opusIn" min="0" max="1000" value="5" step="0.5">
+        <input type="number" id="opusIn" min="0" max="1000" value="4" step="0.5">
       </div>
       <div class="field">
         <label for="opusOut">Opus output $/MTok</label>
-        <input type="number" id="opusOut" min="0" max="1000" value="25" step="0.5">
+        <input type="number" id="opusOut" min="0" max="1000" value="20" step="0.5">
       </div>
       <div class="field">
         <label for="sonnetIn">Sonnet input $/MTok</label>
-        <input type="number" id="sonnetIn" min="0" max="1000" value="3" step="0.5">
+        <input type="number" id="sonnetIn" min="0" max="1000" value="2" step="0.5">
       </div>
       <div class="field">
         <label for="sonnetOut">Sonnet output $/MTok</label>
-        <input type="number" id="sonnetOut" min="0" max="1000" value="15" step="0.5">
+        <input type="number" id="sonnetOut" min="0" max="1000" value="10" step="0.5">
       </div>
     </div>
 
     <div class="results">
-      <div class="res-card opus">
-        <h3>Claude Opus</h3>
+      <div class="res-card opus" aria-live="polite">
+        <h2>Claude Opus</h2>
         <div class="res-row"><span class="k">First turn</span><span class="v" id="opusFirst">-</span></div>
         <div class="res-row"><span class="k">Last turn</span><span class="v" id="opusLast">-</span></div>
         <div class="res-row"><span class="k">Average turn</span><span class="v" id="opusAvg">-</span></div>
         <div class="res-row"><span class="k">Tokens re-read (total)</span><span class="v" id="opusReread">-</span></div>
         <div class="res-row total"><span class="k">Run total</span><span class="v" id="opusTotal">-</span></div>
       </div>
-      <div class="res-card sonnet">
-        <h3>Claude Sonnet</h3>
+      <div class="res-card sonnet" aria-live="polite">
+        <h2>Claude Sonnet</h2>
         <div class="res-row"><span class="k">First turn</span><span class="v" id="sonnetFirst">-</span></div>
         <div class="res-row"><span class="k">Last turn</span><span class="v" id="sonnetLast">-</span></div>
         <div class="res-row"><span class="k">Average turn</span><span class="v" id="sonnetAvg">-</span></div>
@@ -161,7 +162,7 @@
       </div>
     </div>
 
-    <div class="verdict" id="verdict">-</div>
+    <div class="verdict" id="verdict" role="status" aria-live="polite">-</div>
 
     <div class="section">
       <h2>How the comparison works</h2>
@@ -169,15 +170,15 @@
       <div class="formula">turn_cost(i) = ( sys + (i-1) * T * tok ) * pin / 1e6
              + T * tok * (1 - outFrac) * pin / 1e6
              + T * tok * outFrac * pout / 1e6</div>
-      <p>The run total sums this over the turn count you give each model. Prices are editable so you can check batch rates or future list changes; the defaults are the published Opus 4.5 and Sonnet 4.5 list rates.</p>
+      <p>The run total sums this over the turn count you give each model. Prices are editable so you can check batch rates or future list changes; the defaults are the published Opus 5.5 and Sonnet 5 list rates.</p>
     </div>
 
     <div class="section">
       <h2>Published list rates used by default</h2>
       <table class="cmp">
         <tr><th>Model</th><th>Input $/MTok</th><th>Output $/MTok</th></tr>
-        <tr><td>Claude Opus 4.5</td><td>$5</td><td>$25</td></tr>
-        <tr><td>Claude Sonnet 4.5</td><td>$3</td><td>$15</td></tr>
+        <tr><td>Claude Opus 5.5</td><td>$4</td><td>$20</td></tr>
+        <tr><td>Claude Sonnet 5</td><td>$2</td><td>$10</td></tr>
         <tr><td>Claude Haiku 4.5</td><td>$1</td><td>$5</td></tr>
       </table>
       <p>Source: Anthropic pricing page, docs.claude.com, verified 2026-09-28. Prompt caching and batch multipliers are not applied on this page. See the <a href="/tools/prompt-caching-savings-calculator.html" style="color:var(--accent);">prompt caching savings calculator</a> for cache economics and the <a href="/tools/agent-loop-cost-calculator/" style="color:var(--accent);">agent loop cost calculator</a> for caching and retry effects inside one run.</p>
@@ -279,6 +280,10 @@
   }
 
   function fmt(v, digits) {
+    if (v > 0 && v < Math.pow(10, -digits) / 2) {
+      // never render a nonzero cost as zero
+      return v.toExponential(2);
+    }
     return v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
   }
 
@@ -329,14 +334,23 @@
     } else if (sonnet.total > 0) {
       var ratio = opus.total / sonnet.total;
       var sonnetTurns = Math.round(num('sonnetTurns', 10, 1, 200));
-      var opusTurnsN = Math.round(num('opusTurns', 10, 1, 200));
-      // break-even: the number of turns Opus may take so its total equals Sonnet at sonnetTurns
-      var perTurnOpus = opusTurnsN > 0 ? opus.total / opusTurnsN : 0;
-      var beTurns = perTurnOpus > 0 ? Math.floor(sonnet.total / perTurnOpus) : 0;
+      // Per-turn cost grows with run length (each turn re-reads the transcript), so
+      // break-even is found by direct search, not by dividing totals.
+      // opusBE: max turns Opus can take and still cost no more than the Sonnet run.
+      var opusBE = 0;
+      for (var n = 1; n <= 200; n++) {
+        if (runCost(n, T, tok, sys, outFrac, num('opusIn', 4, 0, 1e6), num('opusOut', 20, 0, 1e6)).total <= sonnet.total) opusBE = n;
+        else break;
+      }
+      // sonnetBE: min turns Sonnet needs to cost no more than the Opus run.
+      var sonnetBE = 0;
+      for (var m = 1; m <= 200; m++) {
+        if (runCost(m, T, tok, sys, outFrac, num('sonnetIn', 2, 0, 1e6), num('sonnetOut', 10, 0, 1e6)).total <= opus.total) { sonnetBE = m; break; }
+      }
       if (ratio < 1) {
-        verdict = 'Opus is cheaper on these inputs: ' + fmt(opus.total, 4) + ' vs ' + fmt(sonnet.total, 4) + ' for Sonnet. That happens when Opus takes far fewer turns. Sonnet would need to finish in ' + beTurns + ' turns or fewer to match Opus here.';
+        verdict = 'Opus is cheaper on these inputs: ' + fmt(opus.total, 4) + ' vs ' + fmt(sonnet.total, 4) + ' for Sonnet. Opus stays ahead as long as it finishes in ' + opusBE + ' turns or fewer; Sonnet would drop to ' + (sonnetBE || 'no reachable') + ' turns to match Opus at its current depth.';
       } else if (ratio > 1) {
-        verdict = 'Opus costs ' + fmt(ratio, 2) + 'x Sonnet on these inputs (' + fmt(opus.total, 4) + ' vs ' + fmt(sonnet.total, 4) + '). Opus only wins if it finishes the task in ' + beTurns + ' turns or fewer while Sonnet needs ' + sonnetTurns + '.';
+        verdict = 'Opus costs ' + fmt(ratio, 2) + 'x Sonnet on these inputs (' + fmt(opus.total, 4) + ' vs ' + fmt(sonnet.total, 4) + '). Opus only wins if it finishes the task in ' + opusBE + ' turns or fewer while Sonnet needs ' + sonnetTurns + '.';
       } else {
         verdict = 'Both runs cost the same (' + fmt(opus.total, 4) + ') on these inputs.';
       }
