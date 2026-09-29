@@ -18,7 +18,13 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
+    "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://claudflow.com/tools/" },
+    { "@type": "ListItem", "position": 3, "name": "Claude Opus vs Sonnet Cost Per Agent Turn", "item": "https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/" }
+  ],
+  "about": { "@type": "WebApplication",
     "name": "Claude Opus vs Sonnet Cost Per Agent Turn",
     "url": "https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/",
     "description": "Browser-based comparison of Claude Opus and Sonnet cost per agent turn: transcript re-read, tool tokens, and output, from Anthropic list rates.",
@@ -27,6 +33,8 @@
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
   }
+}
+}
   </script>
   
   <style>
@@ -98,7 +106,8 @@
 
   <div class="tool-wrap">
     <h1 class="page-title">Claude Opus vs Sonnet Cost Per Agent Turn</h1>
-    <p class="page-sub">Turn-level comparison from Anthropic list rates · transcript re-read included</p>
+    <p class="page-sub">By <a href="https://zovo.one">Michael Lip</a> · turn-level comparison from Anthropic list rates, transcript re-read included</p>
+    <p class="page-sub">Where the numbers come from: the published Anthropic pricing table below, recomputed from the formula in the How section.</p>
 
     <div class="field-grid">
       <div class="field">
