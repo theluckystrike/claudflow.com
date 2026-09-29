@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Opus vs Sonnet Cost Per Agent Turn, Turn-Level Comparison | ClaudFlow</title>
+  <meta name="description" content="Compare Claude Opus and Sonnet cost per agent turn from list rates: re-read transcript tokens, tool call tokens, output share, and per-turn totals computed in your browser.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Claude Opus vs Sonnet Cost Per Agent Turn, Turn-Level Comparison">
+  <meta property="og:description" content="Turn-level cost comparison of Claude Opus and Sonnet for agent loops, computed in your browser from Anthropic list rates.">
+  <meta property="og:url" content="https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/">
+  <meta property="og:site_name" content="Zovo Tools">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Claude Opus vs Sonnet Cost Per Agent Turn",
+    "url": "https://claudflow.com/tools/claude-opus-vs-sonnet-agent-turn-cost/",
+    "description": "Browser-based comparison of Claude Opus and Sonnet cost per agent turn: transcript re-read, tool tokens, and output, from Anthropic list rates.",
+    "applicationCategory": "Productivity",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" }
+  }
+  </script>
+  
+  <style>
+    .tool-wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    p.page-sub { color: var(--text-muted); margin: 0 0 1.5rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.85rem; font-weight: 500; color: #cbd5e1; }
+    .field input, .field select {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 0.6rem 0.85rem; color: var(--text); font-size: 0.95rem; width: 100%;
+      font-family: var(--font-body);
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .results { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+    .res-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-card.opus { border-top: 2px solid #d97757; }
+    .res-card.sonnet { border-top: 2px solid var(--accent); }
+    .res-card h3 { font-size: 0.95rem; margin-bottom: 0.6rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; }
+    .res-row .k { color: var(--text-muted); }
+    .res-row .v { font-weight: 600; color: var(--text); }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; }
+    .verdict {
+      margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55;
+    }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section p, .section li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+    .section ul { padding-left: 1.2rem; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: var(--text-muted); }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.88rem; color: var(--text-muted); margin: 0.75rem 0; overflow-x: auto; white-space: pre; }
+    .rel { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .rel a { color: var(--accent); font-size: 0.85rem; text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; }
+    .rel a:hover { border-color: var(--accent); }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      .field-grid { grid-template-columns: 1fr 1fr; }
+      .results { grid-template-columns: 1fr; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <div class="tool-wrap">
+    <h1 class="page-title">Claude Opus vs Sonnet Cost Per Agent Turn</h1>
+    <p class="page-sub">Turn-level comparison from Anthropic list rates · transcript re-read included</p>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="tools">Tool calls per turn</label>
+        <input type="number" id="tools" min="0" max="50" value="3" step="1">
+      </div>
+      <div class="field">
+        <label for="tokTool">Tokens per tool record (input + output)</label>
+        <input type="number" id="tokTool" min="10" max="50000" value="800" step="10">
+      </div>
+      <div class="field">
+        <label for="sys">System prompt (tokens)</label>
+        <input type="number" id="sys" min="0" max="200000" value="3000" step="100">
+      </div>
+      <div class="field">
+        <label for="outFrac">Output share of a tool record (%)</label>
+        <input type="number" id="outFrac" min="0" max="100" value="40" step="5">
+      </div>
+      <div class="field">
+        <label for="opusTurns">Turns on Opus</label>
+        <input type="number" id="opusTurns" min="1" max="200" value="10" step="1">
+      </div>
+      <div class="field">
+        <label for="sonnetTurns">Turns on Sonnet</label>
+        <input type="number" id="sonnetTurns" min="1" max="200" value="10" step="1">
+      </div>
+      <div class="field">
+        <label for="opusIn">Opus input $/MTok</label>
+        <input type="number" id="opusIn" min="0" max="1000" value="5" step="0.5">
+      </div>
+      <div class="field">
+        <label for="opusOut">Opus output $/MTok</label>
+        <input type="number" id="opusOut" min="0" max="1000" value="25" step="0.5">
+      </div>
+      <div class="field">
+        <label for="sonnetIn">Sonnet input $/MTok</label>
+        <input type="number" id="sonnetIn" min="0" max="1000" value="3" step="0.5">
+      </div>
+      <div class="field">
+        <label for="sonnetOut">Sonnet output $/MTok</label>
+        <input type="number" id="sonnetOut" min="0" max="1000" value="15" step="0.5">
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="res-card opus">
+        <h3>Claude Opus</h3>
+        <div class="res-row"><span class="k">First turn</span><span class="v" id="opusFirst">-</span></div>
+        <div class="res-row"><span class="k">Last turn</span><span class="v" id="opusLast">-</span></div>
+        <div class="res-row"><span class="k">Average turn</span><span class="v" id="opusAvg">-</span></div>
+        <div class="res-row"><span class="k">Tokens re-read (total)</span><span class="v" id="opusReread">-</span></div>
+        <div class="res-row total"><span class="k">Run total</span><span class="v" id="opusTotal">-</span></div>
+      </div>
+      <div class="res-card sonnet">
+        <h3>Claude Sonnet</h3>
+        <div class="res-row"><span class="k">First turn</span><span class="v" id="sonnetFirst">-</span></div>
+        <div class="res-row"><span class="k">Last turn</span><span class="v" id="sonnetLast">-</span></div>
+        <div class="res-row"><span class="k">Average turn</span><span class="v" id="sonnetAvg">-</span></div>
+        <div class="res-row"><span class="k">Tokens re-read (total)</span><span class="v" id="sonnetReread">-</span></div>
+        <div class="res-row total"><span class="k">Run total</span><span class="v" id="sonnetTotal">-</span></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict">-</div>
+
+    <div class="section">
+      <h2>How the comparison works</h2>
+      <p>Both models face the same transcript. On turn i the model re-reads the system prompt plus every tool record from earlier turns, then reads and writes the new records for this turn. The formula per turn is</p>
+      <div class="formula">turn_cost(i) = ( sys + (i-1) * T * tok ) * pin / 1e6
+             + T * tok * (1 - outFrac) * pin / 1e6
+             + T * tok * outFrac * pout / 1e6</div>
+      <p>The run total sums this over the turn count you give each model. Prices are editable so you can check batch rates or future list changes; the defaults are the published Opus 4.5 and Sonnet 4.5 list rates.</p>
+    </div>
+
+    <div class="section">
+      <h2>Published list rates used by default</h2>
+      <table class="cmp">
+        <tr><th>Model</th><th>Input $/MTok</th><th>Output $/MTok</th></tr>
+        <tr><td>Claude Opus 4.5</td><td>$5</td><td>$25</td></tr>
+        <tr><td>Claude Sonnet 4.5</td><td>$3</td><td>$15</td></tr>
+        <tr><td>Claude Haiku 4.5</td><td>$1</td><td>$5</td></tr>
+      </table>
+      <p>Source: Anthropic pricing page, docs.claude.com, verified 2026-09-28. Prompt caching and batch multipliers are not applied on this page. See the <a href="/tools/prompt-caching-savings-calculator.html" style="color:var(--accent);">prompt caching savings calculator</a> for cache economics and the <a href="/tools/agent-loop-cost-calculator/" style="color:var(--accent);">agent loop cost calculator</a> for caching and retry effects inside one run.</p>
+    </div>
+
+    <div class="section">
+      <h2>Reading the break-even turn ratio</h2>
+      <p>The verdict line reports the turn ratio at which Sonnet's total catches up to Opus. If Opus reliably finishes in fewer turns than that ratio, Opus is cheaper for the whole run. If not, Sonnet wins on cost and the difference goes to quality judgement, not arithmetic.</p>
+      <ul>
+        <li>Same turn count on both models: Opus costs about 1.67x Sonnet at default rates (5/3 on input and on output), so Sonnet wins on cost alone.</li>
+        <li>Opus at half the turns usually still costs less than Sonnet at default rates. It approaches parity as the system prompt grows, because the big first-turn re-read lands on whichever model runs the first turn. Run your own numbers above.</li>
+        <li>Per-turn cost grows linearly for both models because the transcript re-read grows every turn. The last turn is always the most expensive one.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Frequently asked</h2>
+      <h3>Why does the last turn cost more than the first?</h3>
+      <p>The transcript is longer. Every earlier tool record is re-read as input on each later turn, so per-turn cost rises linearly with turn number.</p>
+      <h3>Does this include caching?</h3>
+      <p>No. This page compares raw list-rate costs with the full transcript re-read priced at the input rate. Caching discounts the re-read portion and is modeled separately in the agent loop cost calculator.</p>
+      <h3>Are the prices in the list exact?</h3>
+      <p>They are the Anthropic published list rates as of 2026-09-28, and every field is editable, so you can substitute negotiated or batch rates.</p>
+    </div>
+
+    <div class="rel">
+      <a href="/tools/agent-loop-cost-calculator/">Agent Loop Cost Calculator</a>
+      <a href="/tools/prompt-caching-savings-calculator.html">Prompt Caching Savings</a>
+      <a href="/tools/agent-retry-cost-calculator.html">Agent Retry Cost</a>
+      <a href="/tools/tool-use-cost-estimator.html">Tool Use Cost Estimator</a>
+      <a href="/tools/">All Tools</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever →</a>
+        <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> · 47/500 founding spots</div>
+    </div>
+</footer>
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex, A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP, Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality, Security</a>
+            <a href="https://claudkit.com">ClaudKit, API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket, Support</a>
+            <a href="https://enhio.com">Enhio, Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot, Timestamps</a>
+            <a href="https://gen8x.com">Gen8X, Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X, AI Models</a>
+            <a href="https://heytensor.com">HeyTensor, ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc, Recipes</a>
+            <a href="https://invokebot.com">InvokeBot, Webhooks</a>
+            <a href="https://kappafy.com">Kappafy, JSON</a>
+            <a href="https://kappakit.com">KappaKit, Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM, LLM Costs</a>
+            <a href="https://krzen.com">Krzen, Image Tools</a>
+            <a href="https://lochbot.com">LochBot, Security</a>
+            <a href="https://lockml.com">LockML, ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool">ML0X, ML Basics</a>
+            <a href="https://ml3x.com">ML3X, Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor, Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool, Cooking</a>
+            <a href="https://viryd.com">Viryd, Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools, Telegram Bots</a>
+        </div>
+    </div>
+</nav>
+
+<div class="pow-strip">
+  <div class="pow-strip-inner">
+    <span class="pow-label">By the same builder:</span>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub, theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative, Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder, Dev Blog</a>
+    <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=tool" rel="nofollow">Zovo, AI Dev Tools</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var ids = ['tools','tokTool','sys','outFrac','opusTurns','sonnetTurns','opusIn','opusOut','sonnetIn','sonnetOut'];
+  var el = {};
+  ids.forEach(function (id) { el[id] = document.getElementById(id); });
+
+  function num(id, fallback, min, max) {
+    var raw = parseFloat(el[id].value);
+    if (!isFinite(raw)) return fallback;
+    return Math.min(max, Math.max(min, raw));
+  }
+
+  function fmt(v, digits) {
+    return v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  }
+
+  function fmtTok(v) {
+    return Math.round(v).toLocaleString('en-US');
+  }
+
+  // single source of truth for the per-turn math (NASA rule 4)
+  function turnCost(i, T, tok, sys, outFrac, pin, pout) {
+    var reread = sys + (i - 1) * T * tok;
+    var newIn = T * tok * (1 - outFrac);
+    var newOut = T * tok * outFrac;
+    return { cost: (reread * pin + newIn * pin + newOut * pout) / 1e6, reread: reread };
+  }
+
+  function runCost(N, T, tok, sys, outFrac, pin, pout) {
+    var total = 0, reread = 0;
+    for (var i = 1; i <= N; i++) {
+      var t = turnCost(i, T, tok, sys, outFrac, pin, pout);
+      total += t.cost;
+      reread += t.reread;
+    }
+    return { total: total, reread: reread, first: turnCost(1, T, tok, sys, outFrac, pin, pout).cost, last: turnCost(N, T, tok, sys, outFrac, pin, pout).cost };
+  }
+
+  function calc() {
+    var T = Math.round(num('tools', 3, 0, 50));
+    var tok = num('tokTool', 800, 10, 50000);
+    var sys = num('sys', 3000, 0, 200000);
+    var outFrac = num('outFrac', 40, 0, 100) / 100;
+    var opus = runCost(Math.round(num('opusTurns', 10, 1, 200)), T, tok, sys, outFrac, num('opusIn', 5, 0, 1e6), num('opusOut', 25, 0, 1e6));
+    var sonnet = runCost(Math.round(num('sonnetTurns', 10, 1, 200)), T, tok, sys, outFrac, num('sonnetIn', 3, 0, 1e6), num('sonnetOut', 15, 0, 1e6));
+
+    document.getElementById('opusFirst').textContent = '$' + fmt(opus.first, 4);
+    document.getElementById('opusLast').textContent = '$' + fmt(opus.last, 4);
+    document.getElementById('opusAvg').textContent = '$' + fmt(opus.total / Math.round(num('opusTurns', 10, 1, 200)), 4);
+    document.getElementById('opusReread').textContent = fmtTok(opus.reread);
+    document.getElementById('opusTotal').textContent = '$' + fmt(opus.total, 4);
+    document.getElementById('sonnetFirst').textContent = '$' + fmt(sonnet.first, 4);
+    document.getElementById('sonnetLast').textContent = '$' + fmt(sonnet.last, 4);
+    document.getElementById('sonnetAvg').textContent = '$' + fmt(sonnet.total / Math.round(num('sonnetTurns', 10, 1, 200)), 4);
+    document.getElementById('sonnetReread').textContent = fmtTok(sonnet.reread);
+    document.getElementById('sonnetTotal').textContent = '$' + fmt(sonnet.total, 4);
+
+    var verdict;
+    if (opus.total === 0 && sonnet.total === 0) {
+      verdict = 'Enter token and rate figures to compare the two models.';
+    } else if (sonnet.total > 0) {
+      var ratio = opus.total / sonnet.total;
+      var sonnetTurns = Math.round(num('sonnetTurns', 10, 1, 200));
+      var opusTurnsN = Math.round(num('opusTurns', 10, 1, 200));
+      // break-even: the number of turns Opus may take so its total equals Sonnet at sonnetTurns
+      var perTurnOpus = opusTurnsN > 0 ? opus.total / opusTurnsN : 0;
+      var beTurns = perTurnOpus > 0 ? Math.floor(sonnet.total / perTurnOpus) : 0;
+      if (ratio < 1) {
+        verdict = 'Opus is cheaper on these inputs: ' + fmt(opus.total, 4) + ' vs ' + fmt(sonnet.total, 4) + ' for Sonnet. That happens when Opus takes far fewer turns. Sonnet would need to finish in ' + beTurns + ' turns or fewer to match Opus here.';
+      } else if (ratio > 1) {
+        verdict = 'Opus costs ' + fmt(ratio, 2) + 'x Sonnet on these inputs (' + fmt(opus.total, 4) + ' vs ' + fmt(sonnet.total, 4) + '). Opus only wins if it finishes the task in ' + beTurns + ' turns or fewer while Sonnet needs ' + sonnetTurns + '.';
+      } else {
+        verdict = 'Both runs cost the same (' + fmt(opus.total, 4) + ') on these inputs.';
+      }
+    } else {
+      verdict = 'Sonnet total is zero on these inputs; raise the token figures.';
+    }
+    document.getElementById('verdict').textContent = verdict;
+  }
+
+  ids.forEach(function (id) {
+    el[id].addEventListener('input', calc);
+    el[id].addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+</body>
+</html>
