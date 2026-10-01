@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Cache Invalidation Cost Multiplier Calculator | ClaudFlow</title>
+  <meta name="description" content="A timestamp in your system prompt makes every request rewrite the cache. Calculate the cache invalidation cost multiplier - up to 12.36x on Anthropic.">
+  <link rel="canonical" href="https://claudflow.com/tools/cache-invalidations-cost-multiplier/">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Cache Invalidation Cost Multiplier Calculator","url":"https://claudflow.com/tools/cache-invalidations-cost-multiplier/","applicationCategory":"DeveloperApplication","operatingSystem":"All","description":"A timestamp in your system prompt makes every request rewrite the cache. Calculate the cache invalidation cost multiplier - up to 12.36x on Anthropic."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much does a cache miss cost?","acceptedAnswer":{"@type":"Answer","text":"On Anthropic pricing a 5-minute cache write costs 12.5x a cache read for Sonnet-class models ($2.50 vs $0.20 per million tokens). A 50k-token prefix costs $0.01 per request when cached and $0.125 per request when invalidated. Opus is worse: $5.00 per million to write, 25x the read price."}},{"@type":"Question","name":"Why does my cached prompt still miss?","acceptedAnswer":{"@type":"Answer","text":"Anthropic prompt caches expire after 5 minutes of inactivity. Any prefix change also invalidates the cache: one new token at the start forces a rewrite of everything downstream, even if the rest is byte-identical."}},{"@type":"Question","name":"Does this apply to Claude Code and agent frameworks?","acceptedAnswer":{"@type":"Answer","text":"Yes. Agent stacks routinely inject timestamps, session IDs, or freshly serialized tool lists into the system prompt. A framework that prepends a per-request trace ID silently disables caching for everything below it."}},{"@type":"Question","name":"Where should dynamic content go?","acceptedAnswer":{"@type":"Answer","text":"After the static prefix. Put system prompt, tool definitions, and large stable context first; put timestamps, user data, and retrieved documents last. Sessions with a fixed prefix hold cache across turns; sessions that mutate it pay full price every turn."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Cache Invalidation Cost Multiplier Calculator","item":"https://claudflow.com/tools/cache-invalidations-cost-multiplier/"}]}]}</script>
+</head>
+<body>
+<nav>
+  <a href="/" class="brand">claudflow</a>
+  <ul class="nav-links">
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/answers/">Answers</a></li>
+    <li><a href="/research/">Research</a></li>
+  </ul>
+</nav>
+<main style="max-width:1200px;margin:0 auto;padding:2rem;">
+<section style="text-align:center;margin-bottom:2rem;">
+<h1 class="page-title">Cache Invalidation Cost Multiplier Calculator</h1>
+</section>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem;">
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Inputs</h2>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Model
+<select id="model" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;">
+<option value="sonnet55" selected>Claude Sonnet 5.5 (write $2.50 / read $0.20 per M)</option>
+<option value="opus55">Claude Opus 5.5 (write $5.00 / read $0.20 per M)</option>
+<option value="haiku45">Claude Haiku 4.5 (write $1.25 / read $0.10 per M)</option>
+</select></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">System prompt tokens (cached prefix)
+<input id="sys" type="number" min="1" value="50000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Requests per month
+<input id="reqs" type="number" min="1" value="1000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;color:var(--text-muted);">Share of requests invalidated (%)</label>
+<input id="pct" type="number" min="0" max="100" value="100" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;margin-top:0.35rem;">
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Results</h2>
+<p style="color:var(--text-muted);">Stable cached cost (prefix never changes):</p>
+<p id="stableOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Cost at your invalidation rate:</p>
+<p id="brokenOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Cost multiplier vs stable:</p>
+<p id="multOut" style="font-size:1.6rem;color:var(--accent);"></p>
+<p style="color:var(--text-muted);">Dollars lost per month:</p>
+<p id="lostOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);font-size:0.9rem;margin-top:1rem;">Writes pay the 5-minute cache-write rate; reads pay 10-25x less. The first request always writes; invalidated requests rewrite the whole prefix.</p>
+</div>
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+<h2>Verdict</h2>
+<p id="verdict" style="color:var(--text);"></p>
+</div>
+<h2>What breaks the cache</h2>
+<ul style="color:var(--text-muted);line-height:1.7;">
+<li><strong style="color:var(--text);">Timestamp in system prompt</strong> &mdash; injecting a fresh clock value changes the prefix on every request.</li>
+<li><strong style="color:var(--text);">Random nonce or request ID in the prefix</strong> &mdash; any per-request unique value before the cached content invalidates everything after it.</li>
+<li><strong style="color:var(--text);">Unstable tool ordering</strong> &mdash; tool definitions that serialize in non-deterministic order shift the prefix between requests.</li>
+<li><strong style="color:var(--text);">Per-request user data in the prefix</strong> &mdash; user IDs or retrieved documents inserted before the static context force a rewrite.</li>
+<li><strong style="color:var(--text);">Router prepend</strong> &mdash; a routing layer that adds metadata before your prompt changes the prefix per route.</li>
+<li><strong style="color:var(--text);">5-minute TTL expiry</strong> &mdash; gaps longer than five minutes cool the cache; the next request pays a full write.</li>
+</ul>
+
+</main>
+<script>
+(function () {
+  'use strict';
+  function g(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
+  function money(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }); }
+  function fmt(n, d) { return n.toLocaleString('en-US', { maximumFractionDigits: d == null ? 2 : d }); }
+
+  var R = { "sonnet55": { r: 2e-7, w: 2.5e-6 }, "opus55": { r: 2e-7, w: 5e-6 }, "haiku45": { r: 1e-7, w: 1.25e-6 } };
+  function run() {
+    var m = R[document.getElementById('model').value];
+    var sys = Math.max(1, g('sys'));
+    var reqs = Math.max(1, g('reqs'));
+    var p = Math.min(100, Math.max(0, g('pct'))) / 100;
+    var nInv = Math.round(reqs * p);
+    var stable = m.w * sys + (reqs - 1) * m.r * sys;
+    var broken = nInv * m.w * sys + (reqs - nInv) * m.r * sys;
+    var mult = stable > 0 ? broken / stable : 0;
+    document.getElementById('stableOut').textContent = money(stable);
+    document.getElementById('brokenOut').textContent = money(broken);
+    document.getElementById('multOut').textContent = mult.toFixed(2) + 'x';
+    document.getElementById('lostOut').textContent = money(Math.max(0, broken - stable));
+    var v;
+    if (mult > 5) {
+      v = 'Your prefix is destroying the cache - you pay ' + mult.toFixed(1) + 'x the cached rate (' + money(Math.max(0,broken-stable)) + ' lost per month at ' + reqs.toLocaleString('en-US') + ' requests). Fix the prefix before optimizing anything else.';
+    } else if (mult > 1.5) {
+      v = 'Partially degraded: ' + Math.round(p * 100) + '% of requests invalidate the prefix, costing ' + mult.toFixed(2) + 'x the stable rate. Hunt the unstable token - usually a timestamp or a non-deterministic tool order.';
+    } else {
+      v = 'Healthy: at ' + Math.round(p * 100) + '% invalidation the cache is doing its job (' + mult.toFixed(2) + 'x). Keep volatile tokens out of the prefix and watch the 5-minute TTL on bursty traffic.';
+    }
+    document.getElementById('verdict').textContent = v;
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
+  run();
+})();</script>
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+</body>
+</html>

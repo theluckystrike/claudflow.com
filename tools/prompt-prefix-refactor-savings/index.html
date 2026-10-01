@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Prompt Order Refactor: Prompt Caching Savings Calculator | ClaudFlow</title>
+  <meta name="description" content="Static tokens cached at 10x off, dynamic tokens billed last. 60k static + 4k dynamic, 2,000 requests: $256.00 becomes $40.13 - 84% saved.">
+  <link rel="canonical" href="https://claudflow.com/tools/prompt-prefix-refactor-savings/">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Prompt Order Refactor Savings Calculator","url":"https://claudflow.com/tools/prompt-prefix-refactor-savings/","applicationCategory":"DeveloperApplication","operatingSystem":"All","description":"Static tokens cached at 10x off, dynamic tokens billed last. 60k static + 4k dynamic, 2,000 requests: $256.00 becomes $40.13 - 84% saved."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does prompt order really matter for caching?","acceptedAnswer":{"@type":"Answer","text":"Yes. The prefix cache is byte-exact from token 1. A single changed token at position 100 invalidates everything after it, so a timestamp near the top of the system prompt silently uncaches the whole prompt, including tool schemas and reference docs below it."}},{"@type":"Question","name":"What if my dynamic data is large?","acceptedAnswer":{"@type":"Answer","text":"Only the stable prefix caches. If dynamic tokens outweigh static ones, most of every request still bills at full input price. Summarize volatile content or externalize state to a tool call so it never enters the prompt."}},{"@type":"Question","name":"Does the first request cost more after refactoring?","acceptedAnswer":{"@type":"Answer","text":"Slightly. The first request pays the cache-write rate on the static prefix instead of the input rate - a one-time premium amortized to nothing across thousands of requests."}},{"@type":"Question","name":"How is this different from just shortening the prompt?","acceptedAnswer":{"@type":"Answer","text":"Trimming tokens saves once per request; ordering saves on every request without removing anything. You keep the full reference docs, and the static prefix still bills - at the cache-read rate instead of the input rate."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Prompt Order Refactor Savings Calculator","item":"https://claudflow.com/tools/prompt-prefix-refactor-savings/"}]}]}</script>
+</head>
+<body>
+<nav>
+  <a href="/" class="brand">claudflow</a>
+  <ul class="nav-links">
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/answers/">Answers</a></li>
+    <li><a href="/research/">Research</a></li>
+  </ul>
+</nav>
+<main style="max-width:1200px;margin:0 auto;padding:2rem;">
+<section style="text-align:center;margin-bottom:2rem;">
+<h1 class="page-title">Prompt Order Refactor Savings Calculator</h1>
+</section>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem;">
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Inputs</h2>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Model
+<select id="model" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;">
+<option value="sonnet55" selected>Claude Sonnet 5.5 (in $2 / write $2.50 / read $0.20 per M)</option>
+<option value="opus55">Claude Opus 5.5 (in $4 / write $5.00 / read $0.20 per M)</option>
+<option value="haiku45">Claude Haiku 4.5 (in $1 / write $1.25 / read $0.10 per M)</option>
+</select></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Static tokens (cached prefix)
+<input id="st" type="number" min="0" value="60000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Dynamic tokens (per-request tail)
+<input id="dy" type="number" min="0" value="4000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Requests per month
+<input id="reqs" type="number" min="1" value="2000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;color:var(--text-muted);">Current cache hit rate (%)
+<input id="hit" type="number" min="0" max="100" value="0" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;margin-top:0.35rem;">
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Results</h2>
+<p style="color:var(--text-muted);">Current monthly cost (at today's hit rate):</p>
+<p id="curOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Refactored monthly cost (stable prefix first):</p>
+<p id="refOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Savings per month:</p>
+<p id="savOut" style="font-size:1.6rem;color:var(--accent);"></p>
+<p style="color:var(--text-muted);">Savings percent:</p>
+<p id="pctOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);font-size:0.9rem;margin-top:1rem;">Refactored math: request 1 writes the static prefix at cache-write rate; every later request reads it at cache-read rate plus full input price on the dynamic tail only.</p>
+</div>
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+<h2>Verdict</h2>
+<p id="verdict" style="color:var(--text);"></p>
+</div>
+<h2>The reorder rule</h2>
+<ol style="color:var(--text-muted);line-height:1.8;">
+<li><strong style="color:var(--text);">Stable system prompt</strong> - written once, never templated. No dates, no counters, no session IDs.</li>
+<li><strong style="color:var(--text);">Tool schemas in a fixed order</strong> - a reordered tool list is a changed prefix.</li>
+<li><strong style="color:var(--text);">Large reference docs</strong> - specs and retrieved context that survive the whole session.</li>
+<li><strong style="color:var(--text);">Few-shot examples</strong> - frozen examples before live conversation.</li>
+<li><strong style="color:var(--text);">Conversation history</strong> - appended to, never rewritten mid-session.</li>
+<li><strong style="color:var(--text);">Dynamic user data and timestamps LAST</strong> - where they cannot invalidate anything above them.</li>
+</ol>
+
+</main>
+<script>
+(function () {
+  'use strict';
+  function g(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
+  function money(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }); }
+  function fmt(n, d) { return n.toLocaleString('en-US', { maximumFractionDigits: d == null ? 2 : d }); }
+
+  var R = { "sonnet55": { i: 2e-6, r: 2e-7, w: 2.5e-6 }, "opus55": { i: 4e-6, r: 2e-7, w: 5e-6 }, "haiku45": { i: 1e-6, r: 1e-7, w: 1.25e-6 } };
+  function run() {
+    var m = R[document.getElementById('model').value];
+    var st = Math.max(0, g('st'));
+    var dy = Math.max(0, g('dy'));
+    var n = Math.max(1, Math.round(g('reqs')));
+    var hit = Math.min(100, Math.max(0, g('hit'))) / 100;
+    var total = st + dy;
+    var cur = n * (hit * (st * m.r + dy * m.i) + (1 - hit) * total * m.i);
+    var ref = m.w * st + (n - 1) * (st * m.r + dy * m.i);
+    var sav = cur - ref;
+    var pct = cur > 0 ? sav / cur * 100 : 0;
+    document.getElementById('curOut').textContent = money(cur);
+    document.getElementById('refOut').textContent = money(ref);
+    document.getElementById('savOut').textContent = money(Math.max(0, sav));
+    document.getElementById('pctOut').textContent = Math.max(0, pct).toFixed(1) + '%';
+    var v;
+    if (sav <= 0) {
+      v = 'Reordering buys nothing here: your prefix is already effectively cached at a ' + Math.round(hit * 100) + '% hit rate. Check the 5-minute TTL and prefix stability before touching order.';
+    } else if (pct < 20) {
+      v = 'Ordering helps little here: your dynamic share is large relative to the static prefix, so most of each request still bills at full price. Shorten the prompt or externalize state before optimizing order.';
+    } else {
+      v = 'Reordering saves ' + money(sav) + ' per month (' + pct.toFixed(1) + '%): from ' + money(cur) + ' to ' + money(ref) + ' across ' + n.toLocaleString('en-US') + ' requests. Keep the stable ' + st.toLocaleString('en-US') + '-token prefix byte-identical and the ' + dy.toLocaleString('en-US') + '-token tail last.';
+    }
+    document.getElementById('verdict').textContent = v;
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
+  run();
+})();</script>
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+</body>
+</html>

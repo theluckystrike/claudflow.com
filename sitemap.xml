@@ -110,6 +110,10 @@
 <url><loc>https://claudflow.com/research/multi-agent-orchestration-patterns.html</loc><lastmod>2026-08-06</lastmod></url>
 <url><loc>https://claudflow.com/tools/agent-memory-architecture-planner</loc><lastmod>2026-08-06</lastmod></url>
   <url><loc>https://claudflow.com/tools/prompt-caching-savings-estimator/</loc><lastmod>2026-09-30</lastmod></url>
+  <url><loc>https://claudflow.com/tools/prompt-prefix-refactor-savings/</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://claudflow.com/tools/parallel-session-cost-blower/</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://claudflow.com/tools/agent-team-cost-per-deliverable/</loc><changefreq>weekly</changefreq></url>
+  <url><loc>https://claudflow.com/tools/cache-invalidations-cost-multiplier/</loc><changefreq>weekly</changefreq></url>
   <url><loc>https://claudflow.com/tools/batch-api-cost-savings-calculator/</loc><lastmod>2026-10-01</lastmod></url>
   <url><loc>https://claudflow.com/tools/haiku-sonnet-router-savings/</loc><lastmod>2026-10-01</lastmod></url>
   <url><loc>https://claudflow.com/tools/mcp-tool-result-token-budget/</loc><lastmod>2026-10-01</lastmod></url>

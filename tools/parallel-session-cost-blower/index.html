@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Parallel Sessions Cost Blower - Claude Code Spend | ClaudFlow</title>
+  <meta name="description" content="N parallel Claude Code sessions multiply spend linearly. Worked example: 6 sessions = 6x spend; a $200 cap is blown in 5.3 working days.">
+  <link rel="canonical" href="https://claudflow.com/tools/parallel-session-cost-blower/">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Parallel Session Cost Blower","url":"https://claudflow.com/tools/parallel-session-cost-blower/","applicationCategory":"DeveloperApplication","operatingSystem":"All","description":"N parallel Claude Code sessions multiply spend linearly. Worked example: 6 sessions = 6x spend; a $200 cap is blown in 5.3 working days."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How many parallel Claude Code sessions can I afford?","acceptedAnswer":{"@type":"Answer","text":"Invert the formula: sessions = cap / (rate x 60 x hours_per_day x days). At $0.021/min and 6 sessions, a $200 cap buys about 26 hours of fleet time - barely over one working week at 5 hours a day."}},{"@type":"Question","name":"Do parallel agents actually finish faster?","acceptedAnswer":{"@type":"Answer","text":"Wall-clock, yes, for genuinely independent tasks. But serialized gates (merges, review, integration) cap the real speedup, while cost always scales linearly with session count. You pay 6x and finish somewhat less than 6x faster."}},{"@type":"Question","name":"Does prompt caching soften the parallel cost?","acceptedAnswer":{"@type":"Answer","text":"No. Each session has its own context and its own cache. Caching makes each session cheaper per turn, but the N-way multiplication sits on top. Six cached sessions still cost six times one cached session."}},{"@type":"Question","name":"Why is the overage larger than the serial cost?","acceptedAnswer":{"@type":"Answer","text":"Because the baseline is small. One session at $0.021/min for 5 hours a day is about $10.50/day, easy to ignore. Six sessions is $63.00/day of the same habit; with N=6, five-sixths of the bill is pure concurrency premium."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Parallel Session Cost Blower","item":"https://claudflow.com/tools/parallel-session-cost-blower/"}]}]}</script>
+</head>
+<body>
+<nav>
+  <a href="/" class="brand">claudflow</a>
+  <ul class="nav-links">
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/answers/">Answers</a></li>
+    <li><a href="/research/">Research</a></li>
+  </ul>
+</nav>
+<main style="max-width:1200px;margin:0 auto;padding:2rem;">
+<section style="text-align:center;margin-bottom:2rem;">
+<h1 class="page-title">Parallel Session Cost Blower</h1>
+</section>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem;">
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Inputs</h2>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Blended cost per minute per session ($)
+<input id="rate" type="number" min="0.001" step="0.001" value="0.021" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Parallel sessions
+<input id="n" type="number" min="1" max="50" value="6" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Hours per day
+<input id="h" type="number" min="0.5" step="0.5" value="5" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Working days
+<input id="d" type="number" min="1" value="22" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;color:var(--text-muted);">Budget cap ($)
+<input id="cap" type="number" min="1" value="200" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Results</h2>
+<p style="color:var(--text-muted);">Serial cost (1 session, same schedule):</p>
+<p id="serialOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Parallel cost (N sessions):</p>
+<p id="parOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Overage from parallelism:</p>
+<p id="overOut" style="font-size:1.5rem;color:var(--accent);"></p>
+<p style="color:var(--text-muted);">Fleet burn per hour:</p>
+<p id="burnOut" style="font-size:1.3rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Days until cap blown:</p>
+<p id="daysOut" style="font-size:1.5rem;color:var(--text);"></p>
+</div>
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+<h2>Verdict</h2>
+<p id="verdict" style="color:var(--text);"></p>
+</div>
+<h2>Where the multiplier hides</h2>
+<ul style="color:var(--text-muted);line-height:1.7;">
+<li><strong style="color:var(--text);">Git worktrees with N agents</strong> &mdash; one branch per agent looks tidy, but every worktree is a full-rate session re-reading the same large context.</li>
+<li><strong style="color:var(--text);">Background subagents you forgot</strong> &mdash; fire-and-forget calls keep billing after the main session looks idle.</li>
+<li><strong style="color:var(--text);">Retry storms under concurrency</strong> &mdash; parallel sessions hitting rate limits re-send full context on every retry.</li>
+<li><strong style="color:var(--text);">Monitoring loops</strong> &mdash; an agent polling a dashboard on a timer bills while producing zero deliverables.</li>
+<li><strong style="color:var(--text);">Orphaned tmux panes</strong> &mdash; the session you detached yesterday is still running its loop.</li>
+</ul>
+
+</main>
+<script>
+(function () {
+  'use strict';
+  function g(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
+  function money(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }); }
+  function fmt(n, d) { return n.toLocaleString('en-US', { maximumFractionDigits: d == null ? 2 : d }); }
+
+  function run() {
+    var rate = Math.max(0.0001, g('rate'));
+    var n = Math.max(1, Math.round(g('n')));
+    var h = Math.max(0.5, g('h'));
+    var d = Math.max(1, g('d'));
+    var cap = Math.max(1, g('cap'));
+    var serial = rate * 60 * h * d;
+    var par = serial * n;
+    var burn = rate * 60 * n;
+    var hours = cap / burn;
+    var days = hours / h;
+    document.getElementById('serialOut').textContent = money(serial);
+    document.getElementById('parOut').textContent = money(par);
+    document.getElementById('overOut').textContent = money(par - serial);
+    document.getElementById('burnOut').textContent = money(burn) + ' /h';
+    document.getElementById('daysOut').textContent = days.toFixed(1) + ' days';
+    var v;
+    if (days < d && days < 10) {
+      v = 'Your cap survives ' + days.toFixed(1) + ' working days of a ' + Math.round(d) + '-day plan. This fleet needs either a bigger budget or fewer sessions - pick one before the invoice does.';
+    } else if (days < d) {
+      v = 'The cap fails on day ' + days.toFixed(1) + ' of ' + Math.round(d) + '. Trim ' + Math.max(1, Math.ceil(n - cap / (rate * 60 * h * d))) + ' session(s) or shorten the run to stay inside the budget.';
+    } else {
+      v = 'Cap holds: ' + days.toFixed(1) + ' days of runway vs a ' + Math.round(d) + '-day plan, with ' + money(par) + ' total spend and ' + money(par - serial) + ' of it being pure concurrency premium.';
+    }
+    document.getElementById('verdict').textContent = v;
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
+  run();
+})();</script>
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+</body>
+</html>
