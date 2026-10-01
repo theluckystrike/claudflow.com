@@ -1,5 +1,238 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prompt caching savings estimator for Claude models</title><meta name="description" content="Estimate what prompt caching saves per request on claude-opus-5, claude-sonnet-5, claude-haiku-4-5 and claude-opus-4-6, with the math shown and rates verified 2026-09-29.">
-  <meta name="robots" content="index, follow">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Prompt Caching Savings Estimator for Claude Models | ClaudFlow</title>
+  <meta name="description" content="Estimate what prompt caching saves on Claude models. Enter your token mix and request count, get per-request and total savings in your browser from verified rates.">
   <link rel="canonical" href="https://claudflow.com/tools/prompt-caching-savings-estimator/">
+  <meta name="robots" content="index, follow">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Prompt caching savings estimator for Claude models"><script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ClaudFlow prompt caching savings estimator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html","description":"Solo developer with 10+ years experience; 140+ PRs merged into open source projects including Google Chrome and Axios; creator of 20+ Chrome extensions."}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Prompt caching savings estimator for Claude models","author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"},"datePublished":"2026-09-29","dateModified":"2026-09-29"}</script></head><body><main><h1>Prompt caching savings estimator</h1><p>By Michael Lip, <a href="https://claudflow.com/about.html">claudflow.com</a></p><p>Cache reads on Claude models cost a small fraction of fresh input tokens. On claude-opus-5 the cache read rate is 5e-7 USD per token against a fresh input rate of 0.000005 USD per token, per the OpenRouter models API (<a href="https://openrouter.ai/api/v1/models">https://openrouter.ai/api/v1/models</a>). The tool below computes the dollar difference per request from those validated rates, in your browser, with the formula shown.</p><section><h2>Try the estimator</h2><label>Cached input tokens per request <input id="cachedTok" type="number" value="50000" min="0"></label><label>Uncached input tokens per request <input id="freshTok" type="number" value="2000" min="0"></label><label>Output tokens per request <input id="outTok" type="number" value="1000" min="0"></label><label>Requests <input id="reqs" type="number" value="100" min="1"></label><label>Model <select id="model"><option value="claude-opus-5">claude-opus-5</option><option value="claude-opus-4-6">claude-opus-4-6</option><option value="claude-sonnet-5">claude-sonnet-5</option><option value="claude-haiku-4-5">claude-haiku-4-5</option></select></label><div id="out" aria-live="polite"></div><details><summary>Formula and assumptions</summary><p>Cached cost per request = cached tokens x cache read rate + cache write rate x cached tokens on the first request + fresh input tokens x input rate + output tokens x output rate. Uncached cost per request = (cached + fresh input tokens) x input rate + output tokens x output rate. Savings per request is the difference; total multiplies by the request count, amortizing the one-time cache write cost across all requests. Cache writes bill at the cache write rate on the first call only; this tool amortizes that cost over the number of requests you enter, so a low request count will overstate savings if the cache expires and rewrites often. Rates are per token, in USD.</p></details><p>This tool does not execute LLM calls. All computation happens locally in your browser.</p><details><summary>Reference rates</summary><p>Reference rates, verified 2026-09-29 against the OpenRouter models API (https://openrouter.ai/api/v1/models). All rates in USD per token.</p><table id="rateTable"><thead><tr><th>Model</th><th>Input</th><th>Output</th><th>Cache read</th><th>Cache write</th></tr></thead><tbody><tr><td>claude-opus-5</td><td>0.000005</td><td>0.000025</td><td>5e-7</td><td>0.00000625</td></tr><tr><td>claude-opus-4-6</td><td>0.000005</td><td>0.000025</td><td>5e-7</td><td>0.00000625</td></tr><tr><td>claude-sonnet-5</td><td>0.000002</td><td>0.00001</td><td>2e-7</td><td>0.0000025</td></tr><tr><td>claude-haiku-4-5</td><td>0.000001</td><td>0.000005</td><td>1e-7</td><td>0.00000125</td></tr></tbody></table></details></section><section><h2>How we know the numbers are right</h2><p>Methodology: the four rates per model are validated fields pulled from the OpenRouter models API (<a href="https://openrouter.ai/api/v1/models">https://openrouter.ai/api/v1/models</a>) and cross-checked before publish, then injected into this page. The estimator reads them from the table above and recomputes in the reader's browser from the values you type, never from prose figures. Where a value cannot be computed, it appears as a stated assumption with its basis, like the one-time cache write cost in the formula section.</p><p>From running this stack myself: I build and ship the ClaudFlow workflow builder, including the five block types and the JSON export format, so the agent loop patterns this estimator prices are patterns implemented in shipped code, not read about (<a href="https://claudflow.com/about.html">claudflow.com/about</a>). The sibling tool KickLLM sources pricing from provider pricing pages directly, so per-token cost math is operating territory here. The whole network runs client side by design, which is why nothing you type leaves this page.</p></section><section><h2>Why the cache read rate moves the total</h2><p>The cache read rate is the lever. For claude-sonnet-5 the cache read rate is 2e-7 USD per token versus an input rate of 0.000002 USD per token, both from the OpenRouter models API (<a href="https://openrouter.ai/api/v1/models">https://openrouter.ai/api/v1/models</a>). The estimator computes the exact per-request delta from those two rates rather than stating a fixed ratio, because the savings depend on your token mix and request count. The first request also pays the cache write rate, 0.0000025 USD per token on claude-sonnet-5, which the tool amortizes across your request count.</p><p>Keep the cached prefix stable. If your system prompt or retrieved context changes between calls, the cache misses and you pay the write rate again without earning the read discount. The estimator assumes a stable prefix, so treat its output as a ceiling when your prompts vary.</p></section><section><h2>Common questions</h2><h3>Does caching help with short prompts</h3><p>Usually not much. Savings scale with cached token volume times the gap between the input and cache read rates, so a few thousand cached tokens produce cents per thousand requests while a long stable system prompt with retrieved context produces the noticeable sums. Run your own counts through the estimator rather than trusting a rule of thumb.</p><h3>What rate applies on the first call</h3><p>The cache write rate. For claude-haiku-4-5 that is 0.00000125 USD per token, from the OpenRouter models API (<a href="https://openrouter.ai/api/v1/models">https://openrouter.ai/api/v1/models</a>). The estimator includes it once, amortized across the request count you enter.</p><h3>Are these prices live</h3><p>No. They are reference rates, verified 2026-09-29 against the OpenRouter models API (<a href="https://openrouter.ai/api/v1/models">https://openrouter.ai/api/v1/models</a>). LLM pricing shown is based on hardcoded reference values and may not reflect current provider rates. Always verify against official pricing pages before making budget decisions.</p></section><p>Token counts are estimates. Actual usage depends on encoding, model version, and prompt structure.</p><p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts, no tracking, no data leaves your browser. Part of the Zovo Tools network by Michael Lip.</p></main><script>(function(){var R={"claude-opus-5":{i:0.000005,o:0.000025,cr:5e-7,cw:0.00000625},"claude-opus-4-6":{i:0.000005,o:0.000025,cr:5e-7,cw:0.00000625},"claude-sonnet-5":{i:0.000002,o:0.00001,cr:2e-7,cw:0.0000025},"claude-haiku-4-5":{i:0.000001,o:0.000005,cr:1e-7,cw:0.00000125}};function g(id){return parseFloat(document.getElementById(id).value)||0}function fmt(n){return n<0.01&&n>0?n.toExponential(2):n.toFixed(n<1?4:2)}function run(){var m=R[document.getElementById("model").value],c=g("cachedTok"),f=g("freshTok"),o=g("outTok"),n=Math.max(1,g("reqs"));var unc=((c+f)*m.i+o*m.o);var cacheWrite=c*m.cw;var cac=(c*m.cr+f*m.i+o*m.o)+cacheWrite/n;var sav=(unc-cac)*n,pct=unc>0?((unc-cac)/unc*100):0;document.getElementById("out").innerHTML="<p>Uncached, one request costs "+fmt(unc)+" USD. With caching it costs about "+fmt(cac)+" USD per request, including the amortized one-time write cost of "+fmt(cacheWrite)+" USD.</p><p>Savings across "+n+" requests: "+fmt(sav)+" USD, about "+pct.toFixed(1)+"% of the uncached total.</p>"}Array.prototype.forEach.call(document.querySelectorAll("input,select"),function(el){el.addEventListener("input",run)});run()})();</script></body></html>
+  <meta property="og:title" content="Prompt Caching Savings Estimator for Claude Models">
+  <meta property="og:description" content="Compute what prompt caching saves per request and per run on Claude models, in your browser, from rates verified against the OpenRouter models API.">
+  <meta property="og:url" content="https://claudflow.com/tools/prompt-caching-savings-estimator/">
+  <meta property="og:site_name" content="Zovo Tools">
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .tool-wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    p.page-sub { color: var(--text-muted); margin: 0 0 1.5rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.85rem; font-weight: 500; color: #cbd5e1; }
+    .field input, .field select {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 0.6rem 0.85rem; color: var(--text); font-size: 0.95rem; width: 100%;
+      font-family: var(--font-body);
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .results { margin-top: 1.5rem; }
+    .res-card { background: var(--bg-card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; }
+    .res-row .k { color: var(--text-muted); }
+    .res-row .v { font-weight: 600; color: var(--text); }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; }
+    .verdict {
+      margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55;
+    }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section h3 { font-size: 1rem; margin: 1.2rem 0 0.3rem; }
+    .section p, .section li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+    .section ul { padding-left: 1.2rem; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: var(--text-muted); }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.88rem; color: var(--text-muted); margin: 0.75rem 0; overflow-x: auto; white-space: pre; }
+    .rel { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .rel a { color: var(--accent); font-size: 0.85rem; text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; }
+    .rel a:hover { border-color: var(--accent); }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Prompt Caching Savings Estimator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"https://claudflow.com/tools/prompt-caching-savings-estimator/","description":"Compute what prompt caching saves per request and per run on Claude models, in your browser, from rates verified against the OpenRouter models API.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does caching help with short prompts?","acceptedAnswer":{"@type":"Answer","text":"Usually not much. Savings scale with cached token volume times the gap between the input and cache read rates. A few thousand cached tokens produce cents per thousand requests, while a long stable system prompt with retrieved context produces noticeable sums."}},{"@type":"Question","name":"What rate applies on the first call?","acceptedAnswer":{"@type":"Answer","text":"The cache write rate. The estimator includes it once, amortized across the request count you enter."}},{"@type":"Question","name":"Are these prices live?","acceptedAnswer":{"@type":"Answer","text":"No. They are reference rates verified 2026-09-29 against the OpenRouter models API. Verify against official pricing pages before making budget decisions."}}]}
+  </script>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <div class="tool-wrap">
+    <h1 class="page-title">Prompt Caching Savings Estimator</h1>
+    <p class="page-sub">Per-request and per-run cache savings on Claude models, computed in your browser from verified rates</p>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="model">Model</label>
+        <select id="model">
+          <option value="claude-opus-5">claude-opus-5</option>
+          <option value="claude-opus-4-6">claude-opus-4-6</option>
+          <option value="claude-sonnet-5">claude-sonnet-5</option>
+          <option value="claude-haiku-4-5">claude-haiku-4-5</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cachedTok">Cached input tokens per request</label>
+        <input type="number" id="cachedTok" min="0" max="500000" value="50000" step="1000">
+      </div>
+      <div class="field">
+        <label for="freshTok">Uncached input tokens per request</label>
+        <input type="number" id="freshTok" min="0" max="500000" value="2000" step="100">
+      </div>
+      <div class="field">
+        <label for="outTok">Output tokens per request</label>
+        <input type="number" id="outTok" min="0" max="100000" value="1000" step="100">
+      </div>
+      <div class="field">
+        <label for="reqs">Requests</label>
+        <input type="number" id="reqs" min="1" max="1000000" value="100" step="1">
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="res-card" aria-live="polite">
+        <div class="res-row"><span class="k">Uncached cost, one request</span><span class="v" id="uncOut">-</span></div>
+        <div class="res-row"><span class="k">Cached cost, one request</span><span class="v" id="cacOut">-</span></div>
+        <div class="res-row"><span class="k">One-time cache write, amortized</span><span class="v" id="cwOut">-</span></div>
+        <div class="res-row total"><span class="k">Savings across all requests</span><span class="v" id="savOut">-</span></div>
+        <div class="res-row"><span class="k">Savings as share of uncached total</span><span class="v" id="pctOut">-</span></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict" role="status" aria-live="polite">-</div>
+
+    <div class="section">
+      <h2>How the estimate is computed</h2>
+      <p>All rates below are per token, in USD. The cache write rate bills once on the first request. The tool spreads that one-time write across the request count you enter, so treat the result as a ceiling when your cache expires and rewrites often.</p>
+      <div class="formula">uncached(req) = (cached + fresh) * input_rate + out * output_rate
+cached(req)  = cached * cache_read_rate + fresh * input_rate + out * output_rate
+               + cached * cache_write_rate / requests
+savings      = (uncached(req) - cached(req)) * requests</div>
+      <p>Reference rates, verified 2026-09-29 against the OpenRouter models API. You can check them yourself with one command.</p>
+      <div class="formula">curl -s https://openrouter.ai/api/v1/models | jq '.data[] | select(.id=="claude-sonnet-5") | .pricing'</div>
+      <table class="cmp">
+        <tr><th>Model</th><th>Input</th><th>Output</th><th>Cache read</th><th>Cache write</th></tr>
+        <tr><td>claude-opus-5</td><td>0.000005</td><td>0.000025</td><td>5e-7</td><td>0.00000625</td></tr>
+        <tr><td>claude-opus-4-6</td><td>0.000005</td><td>0.000025</td><td>5e-7</td><td>0.00000625</td></tr>
+        <tr><td>claude-sonnet-5</td><td>0.000002</td><td>0.00001</td><td>2e-7</td><td>0.0000025</td></tr>
+        <tr><td>claude-haiku-4-5</td><td>0.000001</td><td>0.000005</td><td>1e-7</td><td>0.00000125</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Why the cache read rate moves the total</h2>
+      <p>The cache read rate is the lever. For claude-sonnet-5 it is 2e-7 USD per token against a fresh input rate of 0.000002 USD per token, a 10x gap. The estimator computes the exact per-request delta from those two rates rather than stating a fixed ratio, because the savings depend on your token mix and request count.</p>
+      <p>Keep the cached prefix stable. If your system prompt or retrieved context changes between calls, the cache misses, you pay the write rate again, and you never earn the read discount. The estimator assumes a stable prefix, so its output is a ceiling when your prompts vary.</p>
+    </div>
+
+    <div class="section">
+      <h2>Frequently asked</h2>
+      <h3>Does caching help with short prompts?</h3>
+      <p>Usually not much. Savings scale with cached token volume times the gap between the input and cache read rates. A few thousand cached tokens produce cents per thousand requests, while a long stable system prompt with retrieved context produces noticeable sums. Run your own counts rather than trusting a rule of thumb.</p>
+      <h3>What rate applies on the first call?</h3>
+      <p>The cache write rate. The estimator includes it once, amortized across the request count you enter. A low request count with an expiring cache will overstate savings.</p>
+      <h3>Are these prices live?</h3>
+      <p>No. They are reference rates, verified 2026-09-29 against the OpenRouter models API. Pricing may not reflect current provider rates, so verify against official pricing pages before making budget decisions. The jq command above lets you check in seconds.</p>
+    </div>
+
+    <div class="section">
+      <h2>About the author</h2>
+      <p>I build and ship the ClaudFlow workflow builder, including its eight block types (input, output, prompt, transform, condition, file, button, submit) and the JSON export format, so the agent loop patterns this estimator prices are patterns implemented in shipped code. The sibling tool KickLLM sources pricing from provider pricing pages directly, so per-token cost math is operating territory here. The whole network runs client side by design, which is why nothing you type leaves this page. More on <a href="/about.html" style="color:var(--accent);">the about page</a>.</p>
+      <p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts, no tracking, no data leaves your browser. Part of the Zovo Tools network by Michael Lip. Token counts are estimates, and actual usage depends on encoding, model version, and prompt structure.</p>
+    </div>
+
+    <div class="rel">
+      <a href="/tools/agent-loop-cost-calculator/">Agent Loop Cost Calculator</a>
+      <a href="/tools/prompt-caching-savings-calculator.html">Prompt Caching Savings</a>
+      <a href="/tools/claude-opus-vs-sonnet-agent-turn-cost/">Opus vs Sonnet Per Turn</a>
+      <a href="/tools/">All Tools</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+  <script>
+  (function () {
+    'use strict';
+    var R = {
+      "claude-opus-5":   { i: 0.000005, o: 0.000025, cr: 5e-7,   cw: 0.00000625 },
+      "claude-opus-4-6": { i: 0.000005, o: 0.000025, cr: 5e-7,   cw: 0.00000625 },
+      "claude-sonnet-5": { i: 0.000002, o: 0.00001,  cr: 2e-7,   cw: 0.0000025  },
+      "claude-haiku-4-5":{ i: 0.000001, o: 0.000005, cr: 1e-7,   cw: 0.00000125 }
+    };
+    function g(id) {
+      var v = parseFloat(document.getElementById(id).value);
+      return isFinite(v) ? v : 0;
+    }
+    function fmt(n) {
+      if (n > 0 && n < 0.01) return n.toExponential(2);
+      return n.toLocaleString('en-US', { minimumFractionDigits: n < 1 ? 4 : 2, maximumFractionDigits: n < 1 ? 4 : 2 });
+    }
+    function run() {
+      var m = R[document.getElementById('model').value];
+      var c = Math.max(0, g('cachedTok'));
+      var f = Math.max(0, g('freshTok'));
+      var o = Math.max(0, g('outTok'));
+      var n = Math.max(1, g('reqs'));
+      var unc = (c + f) * m.i + o * m.o;
+      var cacheWrite = c * m.cw;
+      var cac = c * m.cr + f * m.i + o * m.o + cacheWrite / n;
+      var sav = (unc - cac) * n;
+      var pct = unc > 0 ? (sav / (unc * n) * 100) : 0;
+      document.getElementById('uncOut').textContent = fmt(unc) + ' USD';
+      document.getElementById('cacOut').textContent = fmt(cac) + ' USD';
+      document.getElementById('cwOut').textContent = fmt(cacheWrite / n) + ' USD per request';
+      document.getElementById('savOut').textContent = fmt(sav) + ' USD';
+      document.getElementById('pctOut').textContent = pct.toFixed(1) + '%';
+      var v;
+      if (sav <= 0) {
+        v = 'At these inputs caching does not pay off. The one-time cache write (' + fmt(cacheWrite) + ' USD) exceeds the read-rate savings, so sending uncached requests is cheaper.';
+      } else {
+        v = 'With ' + c.toLocaleString('en-US') + ' cached tokens and ' + n.toLocaleString('en-US') +
+          ' requests on ' + document.getElementById('model').value + ', caching saves ' + fmt(sav) +
+          ' USD in total, about ' + pct.toFixed(1) + '% of the uncached cost.';
+      }
+      document.getElementById('verdict').textContent = v;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) {
+      el.addEventListener('input', run);
+    });
+    run();
+  })();
+  </script>
+</body>
+</html>
