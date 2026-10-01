@@ -2,71 +2,176 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>Agent Team Cost per Deliverable Calculator | ClaudFlow</title>
   <meta name="description" content="Per-token calculators lie. One number: true cost per finished deliverable, incl. retries, escalation, human review. Worked example lands at $8.73/task.">
   <link rel="canonical" href="https://claudflow.com/tools/agent-team-cost-per-deliverable/">
+  <meta name="robots" content="index, follow">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Agent Team Cost per Deliverable Calculator">
+  <meta property="og:description" content="Per-token calculators lie. One number: true cost per finished deliverable, incl. retries, escalation, human review. Worked example lands at $8.73/task.">
+  <meta property="og:url" content="https://claudflow.com/tools/agent-team-cost-per-deliverable/">
+  <meta property="og:site_name" content="Zovo Tools">
   <link rel="stylesheet" href="/assets/style.css">
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Agent Team Cost per Deliverable","url":"https://claudflow.com/tools/agent-team-cost-per-deliverable/","applicationCategory":"DeveloperApplication","operatingSystem":"All","description":"Per-token calculators lie. One number: true cost per finished deliverable, incl. retries, escalation, human review. Worked example lands at $8.73/task."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why is cost per task higher than cost per token?","acceptedAnswer":{"@type":"Answer","text":"Cost per token counts only what you billed for, once. Cost per task counts the failed attempts that retried, the share escalated to a stronger model, the rework loop that repeats the whole cycle, and the human review minutes priced at their real rate. In our worked example those roll a $0.80 attempt into $8.73 per finished task."}},{"@type":"Question","name":"What success rate makes agents worth it?","acceptedAnswer":{"@type":"Answer","text":"Compare model cost per deliverable against human minutes replaced. If the agent's model cost is $1.53 per finished task, it wins whenever a human would spend more than about 1.5 minutes doing the same work at $60/h. If quality slips and a human must fix every output anyway, the agent never wins - count the fix in the rework rate or the human minutes."}},{"@type":"Question","name":"Does escalation to a stronger model pay for itself?","acceptedAnswer":{"@type":"Answer","text":"Only when it lowers the failure or rework rates. A 2.5x escalation premium costs real money per task; it pays when the better model cuts retries and rework more than the premium costs. Track both rates before and after."}},{"@type":"Question","name":"Should human review minutes be in the model?","acceptedAnswer":{"@type":"Answer","text":"Yes. Review time scales with rework (you review reworked tasks too) and it often dominates the number. A calculator that hides human minutes is reporting your token bill, not your cost."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Agent Team Cost per Deliverable","item":"https://claudflow.com/tools/agent-team-cost-per-deliverable/"}]}]}</script>
+  <style>
+    .tool-wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    p.page-sub { color: var(--text-muted); margin: 0 0 1.5rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.85rem; font-weight: 500; color: #cbd5e1; }
+    .field input, .field select {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 0.6rem 0.85rem; color: var(--text); font-size: 0.95rem; width: 100%;
+      font-family: var(--font-body);
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .results { margin-top: 1.5rem; }
+    .res-card { background: var(--bg-card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; }
+    .res-row .k { color: var(--text-muted); }
+    .res-row .v { font-weight: 600; color: var(--text); }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; }
+    .verdict {
+      margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55;
+    }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section h3 { font-size: 1rem; margin: 1.2rem 0 0.3rem; }
+    .section p, .section li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+    .section ul { padding-left: 1.2rem; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: var(--text-muted); }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.88rem; color: var(--text-muted); margin: 0.75rem 0; overflow-x: auto; white-space: pre; }
+    .rel { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .rel a { color: var(--accent); font-size: 0.85rem; text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; }
+    .rel a:hover { border-color: var(--accent); }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Agent Team Cost per Deliverable Calculator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"https://claudflow.com/tools/agent-team-cost-per-deliverable/","description":"Per-token calculators lie. One number: true cost per finished deliverable, incl. retries, escalation, human review. Worked example lands at $8.73/task.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Why is cost per task higher than cost per token?","acceptedAnswer":{"@type":"Answer","text":"Cost per token counts only what you billed for, once. Cost per task counts the failed attempts that retried, the share escalated to a stronger model, the rework loop that repeats the whole cycle, and the human review minutes priced at their real rate. In our worked example those roll a $0.80 attempt into $8.73 per finished task."}},{"@type":"Question","name":"What success rate makes agents worth it?","acceptedAnswer":{"@type":"Answer","text":"Compare model cost per deliverable against human minutes replaced. If the agent's model cost is $1.53 per finished task, it wins whenever a human would spend more than about 1.5 minutes doing the same work at $60/h. If quality slips and a human must fix every output anyway, the agent never wins - count the fix in the rework rate or the human minutes."}},{"@type":"Question","name":"Does escalation to a stronger model pay for itself?","acceptedAnswer":{"@type":"Answer","text":"Only when it lowers the failure or rework rates. A 2.5x escalation premium costs real money per task; it pays when the better model cuts retries and rework more than the premium costs. Track both rates before and after."}},{"@type":"Question","name":"Should human review minutes be in the model?","acceptedAnswer":{"@type":"Answer","text":"Yes. Review time scales with rework (you review reworked tasks too) and it often dominates the number. A calculator that hides human minutes is reporting your token bill, not your cost."}}]}
+  </script>
 </head>
 <body>
-<nav>
-  <a href="/" class="brand">claudflow</a>
-  <ul class="nav-links">
-    <li><a href="/tools/">Tools</a></li>
-    <li><a href="/guides/">Guides</a></li>
-    <li><a href="/answers/">Answers</a></li>
-    <li><a href="/research/">Research</a></li>
-  </ul>
-</nav>
-<main style="max-width:1200px;margin:0 auto;padding:2rem;">
-<section style="text-align:center;margin-bottom:2rem;">
-<h1 class="page-title">Agent Team Cost per Deliverable</h1>
-</section>
+    <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem;">
-<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
-<h2 style="margin-bottom:1rem;">Inputs</h2>
-<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Avg cost per task attempt ($)
-<input id="a" type="number" min="0.01" step="0.05" value="0.80" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
-<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">First-attempt success rate (%)</label>
-<input id="s" type="number" min="1" max="100" value="70" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;margin-top:0.35rem;">
-<label style="display:block;margin-bottom:1rem;margin-top:1rem;color:var(--text-muted);">Escalation rate (%)
-<input id="e" type="number" min="0" max="100" value="15" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
-<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Escalation cost multiplier (x)
-<input id="m" type="number" min="1" step="0.1" value="2.5" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
-<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Rework loop rate (%)
-<input id="r" type="number" min="0" max="100" value="20" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
-<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Human review minutes per task
-<input id="t" type="number" min="0" step="0.5" value="6" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
-<label style="display:block;color:var(--text-muted);">Human hourly rate ($/h)
-<input id="rate" type="number" min="1" value="60" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
-</div>
-<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
-<h2 style="margin-bottom:1rem;">Results</h2>
-<p style="color:var(--text-muted);">Attempts cost (with retry loop):</p>
-<p id="attOut" style="font-size:1.3rem;color:var(--text);"></p>
-<p style="color:var(--text-muted);">Escalation premium:</p>
-<p id="escOut" style="font-size:1.3rem;color:var(--text);"></p>
-<p style="color:var(--text-muted);">Rework multiplier:</p>
-<p id="rwOut" style="font-size:1.3rem;color:var(--text);"></p>
-<p style="color:var(--text-muted);">Human cost per deliverable:</p>
-<p id="humOut" style="font-size:1.3rem;color:var(--text);"></p>
-<p style="color:var(--text-muted);">True cost per deliverable:</p>
-<p id="costOut" style="font-size:1.7rem;color:var(--accent);"></p>
-<p style="color:var(--text-muted);">Deliverables per $100:</p>
-<p id="per100Out" style="font-size:1.3rem;color:var(--text);"></p>
-</div>
-</div>
-<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
-<h2>Verdict</h2>
-<p id="verdict" style="color:var(--text);"></p>
-</div>
-<h2>The rollup model</h2>
-<p style="color:var(--text-muted);line-height:1.7;">cost per deliverable = (1 + f) &times; A &times; (1 &minus; e + m&middot;e) &times; (1 + r) + t &middot; rate/60 &middot; (1 + r), where f is the first-attempt failure rate, e the escalation share, m the escalation cost multiplier, r the rework rate, and t the human review minutes. Tokens are the receipt; cost per deliverable is the invoice.</p>
+  <div class="tool-wrap">
+    <h1 class="page-title">Agent Team Cost per Deliverable</h1>
+    <p class="page-sub">The true cost of one finished deliverable from an agent team, counting retries, escalations, rework, and your review minutes.</p>
 
-</main>
-<script>
+    <div class="field-grid">
+      <div class="field">
+        <label for="a">Avg cost per task attempt ($)</label>
+        <input type="number" id="a" min="0" value="0.80">
+      </div>
+      <div class="field">
+        <label for="s">First-attempt success rate (%)</label>
+        <input type="number" id="s" min="0" value="70">
+      </div>
+      <div class="field">
+        <label for="e">Escalation rate (%)</label>
+        <input type="number" id="e" min="0" value="15">
+      </div>
+      <div class="field">
+        <label for="m">Escalation cost multiplier (x)</label>
+        <input type="number" id="m" min="0" value="2.5">
+      </div>
+      <div class="field">
+        <label for="r">Rework loop rate (%)</label>
+        <input type="number" id="r" min="0" value="20">
+      </div>
+      <div class="field">
+        <label for="t">Human review minutes per task</label>
+        <input type="number" id="t" min="0" value="6">
+      </div>
+      <div class="field">
+        <label for="rate">Human hourly rate ($/h)</label>
+        <input type="number" id="rate" min="0" value="60">
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="res-card" aria-live="polite">
+        <div class="res-row"><span class="k">Attempts cost (with retry loop)</span><span class="v" id="attOut">-</span></div>
+        <div class="res-row"><span class="k">Escalation premium</span><span class="v" id="escOut">-</span></div>
+        <div class="res-row"><span class="k">Rework multiplier</span><span class="v" id="rwOut">-</span></div>
+        <div class="res-row"><span class="k">Human cost per deliverable</span><span class="v" id="humOut">-</span></div>
+        <div class="res-row"><span class="k">True cost per deliverable</span><span class="v" id="costOut">-</span></div>
+        <div class="res-row"><span class="k">Deliverables per $100</span><span class="v" id="per100Out">-</span></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict" role="status" aria-live="polite">-</div>
+
+    <div class="section">
+      <h2>How the math works</h2>
+      <p>Attempts multiply cost by the failure rate. Escalations add a premium on the escalated share. Rework loops the whole pipeline. Human review minutes convert to dollars at your hourly rate, and they scale with rework because you review the reworked tasks too.</p>
+    </div>
+
+    <div class="section">
+      <h2>Frequently asked</h2>
+      <h3>Why is cost per task higher than cost per token?</h3>
+      <p>Cost per token counts only what you billed for, once. Cost per task counts the failed attempts that retried, the share escalated to a stronger model, the rework loop that repeats the whole cycle, and the human review minutes priced at their real rate. In our worked example those roll a $0.80 attempt into $8.73 per finished task.</p>
+      <h3>What success rate makes agents worth it?</h3>
+      <p>Compare model cost per deliverable against human minutes replaced. If the agent's model cost is $1.53 per finished task, it wins whenever a human would spend more than about 1.5 minutes doing the same work at $60/h. If quality slips and a human must fix every output anyway, the agent never wins - count the fix in the rework rate or the human minutes.</p>
+      <h3>Does escalation to a stronger model pay for itself?</h3>
+      <p>Only when it lowers the failure or rework rates. A 2.5x escalation premium costs real money per task; it pays when the better model cuts retries and rework more than the premium costs. Track both rates before and after.</p>
+      <h3>Should human review minutes be in the model?</h3>
+      <p>Yes. Review time scales with rework (you review reworked tasks too) and it often dominates the number. A calculator that hides human minutes is reporting your token bill, not your cost.</p>
+    </div>
+
+    <div class="section">
+      <h2>About the author</h2>
+      <p>I build and ship the ClaudFlow workflow builder, including its eight block types and JSON export format. The agent loop patterns these calculators price are patterns implemented in shipped code, not invented for a blog post. Everything runs client side by design: nothing you type leaves this page. More on <a href="/about.html" style="color:var(--accent);">the about page</a>.</p>
+      <p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts, no tracking, no data leaves your browser. Part of the Zovo Tools network by Michael Lip. Token counts are estimates, and actual usage depends on encoding, model version, and prompt structure.</p>
+    </div>
+
+    <div class="rel">
+      <a href="/tools/agent-loop-cost-calculator/">Agent Loop Cost Calculator</a>
+      <a href="/tools/claude-opus-vs-sonnet-agent-turn-cost/">Opus vs Sonnet Per Turn</a>
+      <a href="/tools/">All Tools</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+  <script>
 (function () {
   'use strict';
   function g(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
@@ -115,4 +220,5 @@
     </div>
 </footer>
 </body>
+</html></body>
 </html>
