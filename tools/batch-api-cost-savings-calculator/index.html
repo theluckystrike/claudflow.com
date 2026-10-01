@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Batch API Cost Savings Calculator for Claude Models | ClaudFlow</title>
+  <meta name="description" content="Calculate what the Anthropic Batch API 50 percent discount saves on your Claude traffic. Enter monthly requests, tokens, and batch share to get sync vs batch monthly cost.">
+  <link rel="canonical" href="https://claudflow.com/tools/batch-api-cost-savings-calculator/">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Batch API Cost Savings Calculator","url":"https://claudflow.com/tools/batch-api-cost-savings-calculator/","applicationCategory":"DeveloperApplication","operatingSystem":"All","description":"Calculate what the Anthropic Batch API 50 percent discount saves on your Claude traffic. Enter monthly requests, tokens, and batch share to get sync vs batch monthly cost."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the Claude Batch API discount?","acceptedAnswer":{"@type":"Answer","text":"Anthropic's Message Batches API bills input and output tokens at 50% of the standard rate. The trade-off is latency: batched requests complete within 24 hours rather than streaming immediately."}},{"@type":"Question","name":"Which traffic is a good fit for batch?","acceptedAnswer":{"@type":"Answer","text":"Backfills, evaluations, classification jobs, report generation, and any workflow where a result in a few hours is fine. Interactive chat and agent tool-use loops are not, because they need low latency."}},{"@type":"Question","name":"Are the rates exact?","acceptedAnswer":{"@type":"Answer","text":"The calculator uses list prices per million tokens for each model shown, matching Anthropic published rates. Enter your own blended rates if you have custom pricing."}}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Batch API Cost Savings Calculator","item":"https://claudflow.com/tools/batch-api-cost-savings-calculator/"}]}]}</script>
+</head>
+<body>
+<nav>
+  <a href="/" class="brand">claudflow</a>
+  <ul class="nav-links">
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/guides/">Guides</a></li>
+    <li><a href="/answers/">Answers</a></li>
+    <li><a href="/research/">Research</a></li>
+  </ul>
+</nav>
+<main style="max-width:1200px;margin:0 auto;padding:2rem;">
+<section style="text-align:center;margin-bottom:2rem;">
+<h1 class="page-title">Batch API Cost Savings Calculator</h1>
+</section>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:2rem;">
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Inputs</h2>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Model
+<select id="model" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;">
+<option value="sonnet55" selected>Claude Sonnet 5.5 ($2 / $10 per M)</option>
+<option value="opus55">Claude Opus 5.5 ($4 / $20 per M)</option>
+<option value="haiku45">Claude Haiku 4.5 ($1 / $5 per M)</option>
+<option value="sonnet46">Claude Sonnet 4.6 ($3 / $15 per M)</option>
+</select></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Requests per month
+<input id="reqs" type="number" min="1" value="100000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Input tokens per request
+<input id="inTok" type="number" min="0" value="2000" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;margin-bottom:1rem;color:var(--text-muted);">Output tokens per request
+<input id="outTok" type="number" min="0" value="500" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+<label style="display:block;color:var(--text-muted);">Share of requests eligible for Batch API (%)
+<input id="batchPct" type="number" min="0" max="100" value="60" style="width:100%;background:var(--bg-hover);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem;"></label>
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
+<h2 style="margin-bottom:1rem;">Results</h2>
+<p style="color:var(--text-muted);">Monthly cost, all synchronous:</p>
+<p id="syncOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Monthly cost, with Batch API on the eligible share:</p>
+<p id="batchOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);">Monthly savings:</p>
+<p id="savOut" style="font-size:1.6rem;color:var(--accent);"></p>
+<p style="color:var(--text-muted);">Effective discount on total spend:</p>
+<p id="pctOut" style="font-size:1.4rem;color:var(--text);"></p>
+<p style="color:var(--text-muted);margin-top:1rem;">Annualized savings:</p>
+<p id="yrOut" style="font-size:1.2rem;color:var(--text);"></p>
+</div>
+</div>
+<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+<h2 id="verdict-h">How this is computed</h2>
+<p id="verdict" style="color:var(--text);"></p>
+<p style="color:var(--text-muted);font-size:0.9rem;">Formula: sync = requests × (input × in_rate + output × out_rate). Batch API bills at 50% of list price on Anthropic and on OpenRouter batch variants. Mixed cost = sync × (1 − 0.5 × batch_share). Latency trade-off: batch responses can take up to 24 hours, so only traffic that tolerates the delay should be shifted.</p>
+</div>
+</main>
+<script>
+(function () {
+  'use strict';
+  var R = {
+    "sonnet55": { i: 2e-6, o: 1e-5 },
+    "opus55":   { i: 4e-6, o: 2e-5 },
+    "haiku45":  { i: 1e-6, o: 5e-6 },
+    "sonnet46": { i: 3e-6, o: 1.5e-5 }
+  };
+  function g(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
+  function money(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }); }
+  function run() {
+    var m = R[document.getElementById('model').value];
+    var n = Math.max(1, g('reqs'));
+    var i = Math.max(0, g('inTok'));
+    var o = Math.max(0, g('outTok'));
+    var p = Math.min(100, Math.max(0, g('batchPct'))) / 100;
+    var perReq = i * m.i + o * m.o;
+    var sync = perReq * n;
+    var batch = sync * (1 - 0.5 * p);
+    var sav = sync - batch;
+    var pct = sync > 0 ? (sav / sync * 100) : 0;
+    document.getElementById('syncOut').textContent = money(sync);
+    document.getElementById('batchOut').textContent = money(batch);
+    document.getElementById('savOut').textContent = money(sav);
+    document.getElementById('pctOut').textContent = pct.toFixed(1) + '%';
+    document.getElementById('yrOut').textContent = money(sav * 12) + ' per year';
+    var v;
+    if (sav <= 0) {
+      v = 'At these inputs there is nothing to save. Raise the batch-eligible share or move work off the synchronous path.';
+    } else if (p >= 0.9) {
+      v = 'With ' + Math.round(p*100) + '% of ' + n.toLocaleString('en-US') + ' monthly requests on Batch API, you save ' + money(sav) + ' per month (' + pct.toFixed(1) + '%). Almost all of this traffic can tolerate a 24 hour turnaround, so also check whether any remaining synchronous calls could be batched too.';
+    } else {
+      v = 'With ' + Math.round(p*100) + '% of ' + n.toLocaleString('en-US') + ' monthly requests shifted to Batch API, you save ' + money(sav) + ' per month (' + pct.toFixed(1) + '% of spend), about ' + money(sav*12) + ' per year. Interactive requests stay synchronous; the batch share covers backfills and scheduled jobs.';
+    }
+    document.getElementById('verdict').textContent = v;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
+  run();
+})();</script>
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+</body>
+</html>
