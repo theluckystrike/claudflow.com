@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Cache Invalidation Cost Multiplier Calculator | ClaudFlow</title>
+  <meta name="description" content="A timestamp in your system prompt makes every request rewrite the cache. Calculate the cache invalidation cost multiplier - up to 12.36x on Anthropic.">
+  <link rel="canonical" href="https://claudflow.com/tools/cache-invalidations-cost-multiplier/">
+  <meta name="robots" content="index, follow">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cache Invalidation Cost Multiplier Calculator">
+  <meta property="og:description" content="A timestamp in your system prompt makes every request rewrite the cache. Calculate the cache invalidation cost multiplier - up to 12.36x on Anthropic.">
+  <meta property="og:url" content="https://claudflow.com/tools/cache-invalidations-cost-multiplier/">
+  <meta property="og:site_name" content="Zovo Tools">
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .tool-wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    p.page-sub { color: var(--text-muted); margin: 0 0 1.5rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.85rem; font-weight: 500; color: #cbd5e1; }
+    .field input, .field select {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 0.6rem 0.85rem; color: var(--text); font-size: 0.95rem; width: 100%;
+      font-family: var(--font-body);
+    }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--accent); }
+    .results { margin-top: 1.5rem; }
+    .res-card { background: var(--bg-card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; }
+    .res-row .k { color: var(--text-muted); }
+    .res-row .v { font-weight: 600; color: var(--text); }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; }
+    .verdict {
+      margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55;
+    }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section h3 { font-size: 1rem; margin: 1.2rem 0 0.3rem; }
+    .section p, .section li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+    .section ul { padding-left: 1.2rem; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: var(--text-muted); }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.88rem; color: var(--text-muted); margin: 0.75rem 0; overflow-x: auto; white-space: pre; }
+    .rel { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .rel a { color: var(--accent); font-size: 0.85rem; text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; }
+    .rel a:hover { border-color: var(--accent); }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Cache Invalidation Cost Multiplier Calculator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"https://claudflow.com/tools/cache-invalidations-cost-multiplier/","description":"A timestamp in your system prompt makes every request rewrite the cache. Calculate the cache invalidation cost multiplier - up to 12.36x on Anthropic.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"}}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much does a cache miss cost?","acceptedAnswer":{"@type":"Answer","text":"On Anthropic pricing a 5-minute cache write costs 12.5x a cache read for Sonnet-class models ($2.50 vs $0.20 per million tokens). A 50k-token prefix costs $0.01 per request when cached and $0.125 per request when invalidated. Opus is worse: $5.00 per million to write, 25x the read price."}},{"@type":"Question","name":"Why does my cached prompt still miss?","acceptedAnswer":{"@type":"Answer","text":"Anthropic prompt caches expire after 5 minutes of inactivity. Any prefix change also invalidates the cache: one new token at the start forces a rewrite of everything downstream, even if the rest is byte-identical."}},{"@type":"Question","name":"Does this apply to Claude Code and agent frameworks?","acceptedAnswer":{"@type":"Answer","text":"Yes. Agent stacks routinely inject timestamps, session IDs, or freshly serialized tool lists into the system prompt. A framework that prepends a per-request trace ID silently disables caching for everything below it."}},{"@type":"Question","name":"Where should dynamic content go?","acceptedAnswer":{"@type":"Answer","text":"After the static prefix. Put system prompt, tool definitions, and large stable context first; put timestamps, user data, and retrieved documents last. Sessions with a fixed prefix hold cache across turns; sessions that mutate it pay full price every turn."}}]}
+  </script>
+</head>
+<body>
+    <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <div class="tool-wrap">
+    <h1 class="page-title">Cache Invalidation Cost Multiplier Calculator</h1>
+    <p class="page-sub">What a timestamp or unstable prefix costs you when every request pays the 12.5x cache-write rate instead of the read rate.</p>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="model">Model</label>
+        <select id="model">
+          <option value="sonnet55" selected>Claude Sonnet 5.5 (write $2.50 / read $0.20 per M)</option>
+          <option value="opus55">Claude Opus 5.5 (write $5.00 / read $0.20 per M)</option>
+          <option value="haiku45">Claude Haiku 4.5 (write $1.25 / read $0.10 per M)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sys">System prompt tokens (cached prefix)</label>
+        <input type="number" id="sys" min="0" value="50000">
+      </div>
+      <div class="field">
+        <label for="reqs">Requests per month</label>
+        <input type="number" id="reqs" min="0" value="1000">
+      </div>
+      <div class="field">
+        <label for="pct">Share of requests invalidated (%)</label>
+        <input type="number" id="pct" min="0" value="100">
+      </div>
+    </div>
+
+    <div class="results">
+      <div class="res-card" aria-live="polite">
+        <div class="res-row"><span class="k">Stable cached cost (prefix never changes)</span><span class="v" id="stableOut">-</span></div>
+        <div class="res-row"><span class="k">Cost at your invalidation rate</span><span class="v" id="brokenOut">-</span></div>
+        <div class="res-row"><span class="k">Cost multiplier vs stable</span><span class="v" id="multOut">-</span></div>
+        <div class="res-row"><span class="k">Dollars lost per month</span><span class="v" id="lostOut">-</span></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict" role="status" aria-live="polite">-</div>
+
+    <div class="section">
+      <h2>How the math works</h2>
+      <p>Writes pay the 5-minute cache-write rate; reads pay roughly a tenth of that. The first request always writes. Invalidated requests rewrite the entire prefix, so the multiplier is the blend of read and write prices across your traffic.</p>
+    </div>
+    <div class="section">
+      <h2>What breaks the cache</h2>
+      <ul>
+      <li>Timestamp in system prompt &mdash; injecting a fresh clock value changes the prefix on every request.</li>
+      <li>Random nonce or request ID in the prefix &mdash; any per-request unique value before the cached content invalidates everything after it.</li>
+      <li>Unstable tool ordering &mdash; tool definitions that serialize in non-deterministic order shift the prefix between requests.</li>
+      <li>Per-request user data in the prefix &mdash; user IDs or retrieved documents inserted before the static context force a rewrite.</li>
+      <li>Router prepend &mdash; a routing layer that adds metadata before your prompt changes the prefix per route.</li>
+      <li>5-minute TTL expiry &mdash; gaps longer than five minutes cool the cache; the next request pays a full write.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Frequently asked</h2>
+      <h3>How much does a cache miss cost?</h3>
+      <p>On Anthropic pricing a 5-minute cache write costs 12.5x a cache read for Sonnet-class models ($2.50 vs $0.20 per million tokens). A 50k-token prefix costs $0.01 per request when cached and $0.125 per request when invalidated. Opus is worse: $5.00 per million to write, 25x the read price.</p>
+      <h3>Why does my cached prompt still miss?</h3>
+      <p>Anthropic prompt caches expire after 5 minutes of inactivity. Any prefix change also invalidates the cache: one new token at the start forces a rewrite of everything downstream, even if the rest is byte-identical.</p>
+      <h3>Does this apply to Claude Code and agent frameworks?</h3>
+      <p>Yes. Agent stacks routinely inject timestamps, session IDs, or freshly serialized tool lists into the system prompt. A framework that prepends a per-request trace ID silently disables caching for everything below it.</p>
+      <h3>Where should dynamic content go?</h3>
+      <p>After the static prefix. Put system prompt, tool definitions, and large stable context first; put timestamps, user data, and retrieved documents last. Sessions with a fixed prefix hold cache across turns; sessions that mutate it pay full price every turn.</p>
+    </div>
+
+    <div class="section">
+      <h2>About the author</h2>
+      <p>I build and ship the ClaudFlow workflow builder, including its eight block types and JSON export format. The agent loop patterns these calculators price are patterns implemented in shipped code, not invented for a blog post. Everything runs client side by design: nothing you type leaves this page. More on <a href="/about.html" style="color:var(--accent);">the about page</a>.</p>
+      <p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts, no tracking, no data leaves your browser. Part of the Zovo Tools network by Michael Lip. Token counts are estimates, and actual usage depends on encoding, model version, and prompt structure.</p>
+    </div>
+
+    <div class="rel">
+      <a href="/tools/prompt-caching-savings-estimator/">Prompt Caching Savings Estimator</a>
+      <a href="/tools/prompt-prefix-refactor-savings/">Prompt Order Refactor Savings</a>
+      <a href="/tools/">All Tools</a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
+    </div>
+</footer>
+
+  <script>
+(function () {
+  'use strict';
+  function g(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
+  function money(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }); }
+  function fmt(n, d) { return n.toLocaleString('en-US', { maximumFractionDigits: d == null ? 2 : d }); }
+
+  var R = { "sonnet55": { r: 2e-7, w: 2.5e-6 }, "opus55": { r: 2e-7, w: 5e-6 }, "haiku45": { r: 1e-7, w: 1.25e-6 } };
+  function run() {
+    var m = R[document.getElementById('model').value];
+    var sys = Math.max(1, g('sys'));
+    var reqs = Math.max(1, g('reqs'));
+    var p = Math.min(100, Math.max(0, g('pct'))) / 100;
+    var nInv = Math.round(reqs * p);
+    var stable = m.w * sys + (reqs - 1) * m.r * sys;
+    var broken = nInv * m.w * sys + (reqs - nInv) * m.r * sys;
+    var mult = stable > 0 ? broken / stable : 0;
+    document.getElementById('stableOut').textContent = money(stable);
+    document.getElementById('brokenOut').textContent = money(broken);
+    document.getElementById('multOut').textContent = mult.toFixed(2) + 'x';
+    document.getElementById('lostOut').textContent = money(Math.max(0, broken - stable));
+    var v;
+    if (mult > 5) {
+      v = 'Your prefix is destroying the cache - you pay ' + mult.toFixed(1) + 'x the cached rate (' + money(Math.max(0,broken-stable)) + ' lost per month at ' + reqs.toLocaleString('en-US') + ' requests). Fix the prefix before optimizing anything else.';
+    } else if (mult > 1.5) {
+      v = 'Partially degraded: ' + Math.round(p * 100) + '% of requests invalidate the prefix, costing ' + mult.toFixed(2) + 'x the stable rate. Hunt the unstable token - usually a timestamp or a non-deterministic tool order.';
+    } else {
+      v = 'Healthy: at ' + Math.round(p * 100) + '% invalidation the cache is doing its job (' + mult.toFixed(2) + 'x). Keep volatile tokens out of the prefix and watch the 5-minute TTL on bursty traffic.';
+    }
+    document.getElementById('verdict').textContent = v;
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
+  run();
+})();</script>
+</body>
+</html>
