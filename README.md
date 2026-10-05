@@ -16,9 +16,9 @@ ClaudFlow is a free visual workflow builder for designing AI prompt chains as fl
 - Double-click to edit block labels and prompt content
 - Multi-step prompt chaining with data piping between nodes
 - Branching logic via Condition blocks
-- 100% client-side — no data leaves your browser
+- Client-side tool processing; workflow data stays in your browser
 - MIT licensed
-- No signup, no tracking
+- No signup; optional analytics by consent
 
 ## Tech Stack
 
@@ -29,7 +29,7 @@ ClaudFlow is a free visual workflow builder for designing AI prompt chains as fl
 
 ## Part of Zovo Tools
 
-ClaudFlow is part of [Zovo Tools](https://zovo.one/tools) — free developer tools by a solo developer. No tracking, no signup, no nonsense.
+ClaudFlow is part of [Zovo Tools](https://zovo.one/tools) — free developer tools by a solo developer. No signup. Optional analytics is consent-based.
 
 **Other tools in the network:**
 

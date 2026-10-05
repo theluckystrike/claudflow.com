@@ -66,6 +66,7 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does prompt order really matter for caching?","acceptedAnswer":{"@type":"Answer","text":"Yes. The prefix cache is byte-exact from token 1. A single changed token at position 100 invalidates everything after it, so a timestamp near the top of the system prompt silently uncaches the whole prompt, including tool schemas and reference docs below it."}},{"@type":"Question","name":"What if my dynamic data is large?","acceptedAnswer":{"@type":"Answer","text":"Only the stable prefix caches. If dynamic tokens outweigh static ones, most of every request still bills at full input price. Summarize volatile content or externalize state to a tool call so it never enters the prompt."}},{"@type":"Question","name":"Does the first request cost more after refactoring?","acceptedAnswer":{"@type":"Answer","text":"Slightly. The first request pays the cache-write rate on the static prefix instead of the input rate - a one-time premium amortized to nothing across thousands of requests."}},{"@type":"Question","name":"How is this different from just shortening the prompt?","acceptedAnswer":{"@type":"Answer","text":"Trimming tokens saves once per request; ordering saves on every request without removing anything. You keep the full reference docs, and the static prefix still bills - at the cache-read rate instead of the input rate."}}]}
   </script>
+<script defer src="/assets/js/roi-measurement.js"></script>
 </head>
 <body>
     <nav>
@@ -157,7 +158,7 @@
     <div class="section">
       <h2>About the author</h2>
       <p>I build and ship the ClaudFlow workflow builder, including its eight block types and JSON export format. The agent loop patterns these calculators price are patterns implemented in shipped code, not invented for a blog post. Everything runs client side by design: nothing you type leaves this page. More on <a href="/about.html" style="color:var(--accent);">the about page</a>.</p>
-      <p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts, no tracking, no data leaves your browser. Part of the Zovo Tools network by Michael Lip. Token counts are estimates, and actual usage depends on encoding, model version, and prompt structure.</p>
+      <p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts. Tool inputs stay in your browser. Page and product-interest analytics is optional and requires consent. Part of the Zovo Tools network by Michael Lip. Token counts are estimates, and actual usage depends on encoding, model version, and prompt structure.</p>
     </div>
 
     <div class="rel">
@@ -170,7 +171,8 @@
   <footer class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand">Zovo Tools</div>
-        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+        <a href="/about.html#analytics">Analytics and privacy</a>
         <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
         <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a> &middot; 47/500 founding spots</div>
     </div>

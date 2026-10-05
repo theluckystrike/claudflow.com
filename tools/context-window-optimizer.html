@@ -170,6 +170,7 @@
       .cwo-stats { grid-template-columns:1fr 1fr; }
     }
   </style>
+<script defer src="/assets/js/roi-measurement.js"></script>
 </head>
 <body>
   <nav>
@@ -373,7 +374,7 @@
 
     <h2>Privacy and Local Execution</h2>
 
-    <p>The Context Window Optimizer runs entirely in your browser. No prompts, examples, or configuration data are sent to any server. Token estimates are calculated client-side using a character-based heuristic. Budget plans exported as JSON are generated and downloaded locally. There are no accounts, no cookies, no analytics, and no server-side processing. Your prompt text, system instructions, and all other content remain private on your device at all times. The complete application is static HTML, CSS, and JavaScript. For teams working with sensitive prompts or proprietary system instructions, this local-only architecture ensures nothing leaves your machine.</p>
+    <p>The Context Window Optimizer runs entirely in your browser. No prompts, examples, or configuration data are sent to any server. Token estimates are calculated client-side using a character-based heuristic. Budget plans exported as JSON are generated and downloaded locally. There are no accounts or server-side tool processing. Optional page and product-interest analytics runs only with your consent. Your prompt text, system instructions, and all other content remain private on your device at all times. The complete application is static HTML, CSS, and JavaScript. For teams working with sensitive prompts or proprietary system instructions, this local-only architecture ensures nothing leaves your machine.</p>
   </section>
 
   <section class="faq-section" style="max-width:800px;margin:2rem auto;padding:0 1.5rem;">
@@ -401,7 +402,7 @@
 
     <details>
       <summary>Does this tool actually call AI models or count real tokens?</summary>
-      <p>No. The Context Window Optimizer is a planning and estimation tool that runs entirely in your browser. Token counts are estimated using a character-based heuristic that closely approximates actual tokenizer output. No data is sent to any server. For exact counts, use the official tokenizer for your target model.</p>
+      <p>No. The Context Window Optimizer is a planning and estimation tool that runs entirely in your browser. Token counts are estimated using a character-based heuristic that closely approximates actual tokenizer output. Tool inputs and results are not sent to any server. For exact counts, use the official tokenizer for your target model.</p>
     </details>
   </section>
 
@@ -457,7 +458,8 @@
 <footer class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand">Zovo Tools</div>
-        <div class="footer-tagline">Free developer tools by a solo dev. No tracking.</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+        <a href="/about.html#analytics">Analytics and privacy</a>
         <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime  | $99 once, free forever &rarr;</a>
         <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tools-context-window-optimizer">Zovo</a> &middot; 47/500 founding spots</div>
     </div>
