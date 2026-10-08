@@ -65,8 +65,10 @@ nav .nav-links a:hover { color: var(--text); }
 }
 .toolbar-group {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
+  min-width: 0;
 }
 .toolbar-group label {
   color: var(--text-muted);
