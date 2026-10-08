@@ -46,7 +46,7 @@ window.ROI_MEASUREMENT_CONFIG = {"site": "claudflow", "id": "G-SXQPGSJPYB", "pro
     }
     if (config.site === 'claudflow') {
       if (url.hostname === 'zovo.one' && /\/(pricing|lifetime)/.test(url.pathname)) return {product_id: 'zovo_lifetime', placement: a.closest('footer') ? 'footer' : 'inline', kind: 'offer_click'};
-      if (url.hostname === 'handsofflinks.com') return {product_id: 'hands_off_links', placement: 'inline', kind: 'offer_click'};
+      if (url.hostname === 'ml0x.com' && url.pathname.indexOf('/pipeline') === 0) return {product_id: 'ml0x_pipeline', placement: 'inline', kind: 'offer_click'};
     }
     return null;
   }
