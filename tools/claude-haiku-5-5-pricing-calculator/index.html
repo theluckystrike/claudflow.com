@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Haiku 5.5 Pricing Calculator for Both Price Levels | ClaudFlow</title>
+  <meta name="description" content="Claude Haiku 5.5 has two sets of prices, split at a prompt of 100,000 tokens. See which set applies, the cost per request and per month. Rates verified 2026-10-10.">
+  <link rel="canonical" href="https://claudflow.com/tools/claude-haiku-5-5-pricing-calculator/">
+  <meta name="robots" content="index, follow">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Claude Haiku 5.5 Pricing Calculator">
+  <meta property="og:description" content="See which Claude Haiku 5.5 prices apply to your prompt, the cost per request and per month, and where the price changes. Computed in your browser from rates verified 2026-10-10.">
+  <meta property="og:url" content="https://claudflow.com/tools/claude-haiku-5-5-pricing-calculator/">
+  <meta property="og:site_name" content="Zovo Tools">
+  <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    .tool-wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem 2rem 2rem; }
+    .tool-wrap a { color: var(--accent); }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    p.page-sub { color: var(--text-muted); margin: 0 0 0.5rem; }
+    p.byline { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.5rem; }
+    p.lead { color: #cbd5e1; font-size: 0.95rem; line-height: 1.65; margin: 0 0 1.5rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.85rem; font-weight: 500; color: #cbd5e1; }
+    .field input[type="text"], .field select {
+      background: var(--bg); border: 1px solid #555; border-radius: var(--radius);
+      padding: 0.6rem 0.85rem; color: var(--text); font-size: 1rem; width: 100%;
+      font-family: var(--font-body);
+    }
+    .field input:focus-visible, .field select:focus-visible, .check input:focus-visible, .tool-wrap summary:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 2px;
+    }
+    .field input[aria-invalid="true"] { border-color: #f87171; }
+    .field .hint { color: #a3a3a3; font-size: 0.8rem; line-height: 1.4; }
+    .field .err { color: #fca5a5; font-size: 0.8rem; line-height: 1.4; min-height: 0; }
+    .check { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 1rem; font-size: 0.9rem; color: #cbd5e1; }
+    .check input { width: 1.15rem; height: 1.15rem; margin-top: 0.15rem; flex: none; accent-color: var(--accent); }
+    .results { margin-top: 1.5rem; }
+    .res-card { background: var(--bg-card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; padding: 0.2rem 0; }
+    .res-row .k { color: #a3a3a3; }
+    .res-row .v { font-weight: 600; color: var(--text); text-align: right; overflow-wrap: anywhere; }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.5rem; }
+    .verdict {
+      margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55;
+    }
+    .tool-wrap details { margin-top: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.7rem 1rem; }
+    .tool-wrap summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+    .tool-wrap details p, .tool-wrap details li { color: #a3a3a3; font-size: 0.92rem; line-height: 1.6; }
+    .tool-wrap details ul { padding-left: 1.2rem; }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section h3 { font-size: 1rem; margin: 1.2rem 0 0.3rem; }
+    .section p, .section li { color: #a3a3a3; font-size: 0.95rem; line-height: 1.65; }
+    .section p { margin: 0 0 0.75rem; }
+    .site-footer a:not(.footer-cta), .site-footer .footer-tagline, .site-footer .footer-copy { color: #a3a3a3; }
+    .section ul { padding-left: 1.2rem; }
+    .section blockquote { border-left: 2px solid var(--accent); margin: 0.75rem 0; padding: 0.2rem 0 0.2rem 0.9rem; color: #cbd5e1; font-size: 0.92rem; line-height: 1.6; }
+    .section blockquote cite { display: block; color: #a3a3a3; font-size: 0.8rem; font-style: normal; margin-top: 0.3rem; overflow-wrap: anywhere; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp caption { text-align: left; color: #cbd5e1; font-size: 0.9rem; padding-bottom: 0.4rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: #a3a3a3; }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.85rem; color: #a3a3a3; margin: 0.75rem 0; overflow-x: auto; white-space: pre; font-family: var(--font-display); }
+    .rel { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .rel a { color: var(--accent); font-size: 0.85rem; text-decoration: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.4rem 0.8rem; }
+    .rel a:hover { border-color: var(--accent); }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+      .res-row { flex-direction: column; gap: 0.1rem; }
+      .res-row .v { text-align: left; }
+      .formula { font-size: 0.78rem; padding: 0.7rem 0.75rem; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Claude Haiku 5.5 Pricing Calculator","url":"https://claudflow.com/tools/claude-haiku-5-5-pricing-calculator/","description":"Shows which Claude Haiku 5.5 prices apply to a prompt, the cost per request and per month, and the prompt length where the price changes.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"},"datePublished":"2026-10-10","dateModified":"2026-10-10"}
+  </script>
+<script defer src="/assets/js/roi-measurement.js"></script>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main class="tool-wrap">
+    <h1 class="page-title">Claude Haiku 5.5 pricing calculator</h1>
+    <p class="page-sub">Which prices apply to your prompt, what one request and one month cost, and where the price changes</p>
+    <p class="byline">By Michael Lip, <a href="https://claudflow.com/about.html">claudflow.com</a>. Updated October 10, 2026.</p>
+
+    <p class="lead">Anthropic prices Claude Haiku 5.5 (model ID claude-haiku-5-5) by prompt length. Its pricing page says that "a request whose prompt is over 100,000 tokens pays higher prices" and that the prompt length "counts all of its input tokens, including cache reads and cache writes". Enter the token counts of one request. The calculator adds up the prompt, shows which set of prices applies, and prices the request and the month.</p>
+
+    <form id="calc" novalidate onsubmit="return false">
+      <div class="field-grid">
+        <div class="field">
+          <label for="inTok">Uncached input tokens per request</label>
+          <input type="text" inputmode="numeric" id="inTok" value="20000" aria-describedby="inTok-hint inTok-err">
+          <span class="hint" id="inTok-hint">Input tokens that are not read from or written to the cache.</span>
+          <span class="err" id="inTok-err"></span>
+        </div>
+        <div class="field">
+          <label for="crTok">Cache read tokens per request</label>
+          <input type="text" inputmode="numeric" id="crTok" value="60000" aria-describedby="crTok-hint crTok-err">
+          <span class="hint" id="crTok-hint">Cache hits. They count toward the prompt length.</span>
+          <span class="err" id="crTok-err"></span>
+        </div>
+        <div class="field">
+          <label for="cwTok">Cache write tokens per request</label>
+          <input type="text" inputmode="numeric" id="cwTok" value="0" aria-describedby="cwTok-hint cwTok-err">
+          <span class="hint" id="cwTok-hint">Tokens written to the cache. They count toward the prompt length.</span>
+          <span class="err" id="cwTok-err"></span>
+        </div>
+        <div class="field">
+          <label for="ttl">Cache write duration</label>
+          <select id="ttl" aria-describedby="ttl-hint">
+            <option value="5m" selected>5 minutes</option>
+            <option value="1h">1 hour</option>
+          </select>
+          <span class="hint" id="ttl-hint">Sets the price of the cache write tokens.</span>
+        </div>
+        <div class="field">
+          <label for="outTok">Output tokens per request</label>
+          <input type="text" inputmode="numeric" id="outTok" value="1000" aria-describedby="outTok-hint outTok-err">
+          <span class="hint" id="outTok-hint">Output does not count toward the prompt length, but its price follows it.</span>
+          <span class="err" id="outTok-err"></span>
+        </div>
+        <div class="field">
+          <label for="reqs">Requests per month</label>
+          <input type="text" inputmode="numeric" id="reqs" value="10000" aria-describedby="reqs-hint reqs-err">
+          <span class="hint" id="reqs-hint">Each request is assumed to have the token counts above.</span>
+          <span class="err" id="reqs-err"></span>
+        </div>
+      </div>
+      <label class="check" for="batch"><input type="checkbox" id="batch"> <span>Price the requests through the Batch API (50% of the standard prices)</span></label>
+    </form>
+
+    <div class="results">
+      <div class="res-card" id="results" aria-live="polite">
+        <div class="res-row"><span class="k">Prompt length (uncached input + cache read + cache write)</span><span class="v" id="oPrompt">-</span></div>
+        <div class="res-row"><span class="k">Prices that apply</span><span class="v" id="oLevel">-</span></div>
+        <div class="res-row"><span class="k">Distance to the 100,000 token limit</span><span class="v" id="oRoom">-</span></div>
+        <div class="res-row"><span class="k">Batch API</span><span class="v" id="oBatch">-</span></div>
+        <div class="res-row total"><span class="k">Uncached input, one request</span><span class="v" id="oIn">-</span></div>
+        <div class="res-row"><span class="k">Cache read, one request</span><span class="v" id="oCr">-</span></div>
+        <div class="res-row"><span class="k">Cache write, one request</span><span class="v" id="oCw">-</span></div>
+        <div class="res-row"><span class="k">Output, one request</span><span class="v" id="oOut">-</span></div>
+        <div class="res-row total"><span class="k">Cost of one request</span><span class="v" id="oReq">-</span></div>
+        <div class="res-row"><span class="k">Cost per month</span><span class="v" id="oMonth">-</span></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict" role="status" aria-live="polite">-</div>
+
+    <details>
+      <summary>Formula and assumptions</summary>
+      <div class="formula">prompt = uncached input
+       + cache read + cache write
+prices = base   if prompt &lt;= 100,000
+         higher if prompt &gt;  100,000
+request cost
+  = uncached input * input rate
+  + cache read  * cache read rate
+  + cache write * cache write rate
+  + output      * output rate
+batch: each rate * 0.5
+month cost = request cost * requests</div>
+      <ul>
+        <li>The cache write rate is the 5 minute rate or the 1 hour rate that you select.</li>
+        <li>One set of prices applies to the whole request. A request over the limit pays the higher rate on every token, output tokens included.</li>
+        <li>A prompt of exactly 100,000 tokens gets the base prices. Anthropic's table says "for prompts up to 100,000 tokens" and "for prompts over 100,000 tokens".</li>
+        <li>Each request in the month has the same token counts. If your requests differ, run the calculator once for each group.</li>
+        <li>The cache write tokens that you enter are billed at the write rate on each request. If only the first request writes the cache, enter 0 here and price that first request alone.</li>
+        <li>The Batch API option halves all four line items. Anthropic's batch documentation says "All usage is charged at 50% of the standard API prices."</li>
+        <li>The rates are the Claude API rates with global routing. US-only inference (a 1.1x multiplier in Anthropic's pricing page) and partner platforms are not included.</li>
+        <li>The calculator checks the prompt against the 1M token context window that Anthropic lists. It does not check the output limit.</li>
+        <li>All sums use whole-number arithmetic on the per-token rates. Amounts below 1 USD are shown exactly. Amounts of 1 USD or more are rounded to the cent.</li>
+        <li>Token counts are estimates. Actual usage depends on encoding, model version, and prompt structure.</li>
+      </ul>
+    </details>
+
+    <p class="lead" style="margin-top:1.5rem">This tool does not execute LLM calls. All computation happens locally in your browser.</p>
+
+    <div class="section">
+      <h2>Reference rates</h2>
+      <p>Reference rates, verified 2026-10-10 against the OpenRouter models API (<a href="https://openrouter.ai/api/v1/models">https://openrouter.ai/api/v1/models</a>) and the Anthropic pricing page (<a href="https://platform.claude.com/docs/en/about-claude/pricing">https://platform.claude.com/docs/en/about-claude/pricing</a>). Units are USD per token. The two sources give the same value for each rate.</p>
+      <table class="cmp" id="rates-standard">
+        <caption>claude-haiku-5-5, standard prices, USD per token</caption>
+        <thead>
+          <tr><th scope="col">Token type</th><th scope="col">Prompt up to 100,000 tokens</th><th scope="col">Prompt over 100,000 tokens</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Input</th><td>0.0000001</td><td>0.0000005</td></tr>
+          <tr><th scope="row">Output</th><td>0.0000005</td><td>0.0000025</td></tr>
+          <tr><th scope="row">Cache read</th><td>0.00000001</td><td>0.00000005</td></tr>
+          <tr><th scope="row">Cache write, 5 minutes</th><td>0.000000125</td><td>0.000000625</td></tr>
+          <tr><th scope="row">Cache write, 1 hour</th><td>0.0000002</td><td>0.000001</td></tr>
+        </tbody>
+      </table>
+      <table class="cmp" id="rates-batch">
+        <caption>claude-haiku-5-5, Batch API prices, USD per token</caption>
+        <thead>
+          <tr><th scope="col">Token type</th><th scope="col">Prompt up to 100,000 tokens</th><th scope="col">Prompt over 100,000 tokens</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Input</th><td>0.00000005</td><td>0.00000025</td></tr>
+          <tr><th scope="row">Output</th><td>0.00000025</td><td>0.00000125</td></tr>
+          <tr><th scope="row">Cache read</th><td>0.000000005</td><td>0.000000025</td></tr>
+          <tr><th scope="row">Cache write, 5 minutes</th><td>0.0000000625</td><td>0.0000003125</td></tr>
+          <tr><th scope="row">Cache write, 1 hour</th><td>0.0000001</td><td>0.0000005</td></tr>
+        </tbody>
+      </table>
+      <p>LLM pricing shown is based on hardcoded reference values and may not reflect current provider rates. Always verify against official pricing pages before making budget decisions.</p>
+    </div>
+
+    <div class="section">
+      <h2>What the sources say</h2>
+      <p>Each rule in the calculator comes from one of these passages. All were read on 2026-10-10.</p>
+      <blockquote>Claude Haiku 5.5 is priced by prompt length: a request whose prompt is over 100,000 tokens pays higher prices. A request's prompt length counts all of its input tokens, including cache reads and cache writes. Each request is priced on its own: a request over the threshold pays the higher prices even when part of its prompt is a cache hit, and earlier requests keep the prices they were billed at.<cite>Anthropic pricing page, Long context pricing, <a href="https://platform.claude.com/docs/en/about-claude/pricing#long-context-pricing">platform.claude.com/docs/en/about-claude/pricing</a></cite></blockquote>
+      <blockquote>Claude Haiku 5.5 (for prompts up to 100,000 tokens): base input $0.10 / MTok, 5m cache writes $0.125 / MTok, 1h cache writes $0.20 / MTok, cache hits and refreshes $0.01 / MTok, output $0.50 / MTok. Claude Haiku 5.5 (for prompts over 100,000 tokens): base input $0.50 / MTok, 5m cache writes $0.625 / MTok, 1h cache writes $1 / MTok, cache hits and refreshes $0.05 / MTok, output $2.50 / MTok.<cite>Anthropic pricing page, Model pricing table, two rows written out with their column names. MTok is Anthropic's unit for one million tokens.</cite></blockquote>
+      <blockquote>Claude Haiku 5.5 (for prompts up to 100,000 tokens): batch input $0.05 / MTok, batch output $0.25 / MTok. Claude Haiku 5.5 (for prompts over 100,000 tokens): batch input $0.25 / MTok, batch output $1.25 / MTok.<cite>Anthropic pricing page, Batch processing table, two rows written out with their column names</cite></blockquote>
+      <blockquote>The Batches API offers significant cost savings. All usage is charged at 50% of the standard API prices.<cite>Anthropic batch processing guide, <a href="https://platform.claude.com/docs/en/build-with-claude/batch-processing">platform.claude.com/docs/en/build-with-claude/batch-processing</a></cite></blockquote>
+      <p>The OpenRouter models API has two entries, anthropic/claude-haiku-5.5 and anthropic/claude-haiku-5.5:batch. Each entry gives the five base rates in USD per token and an override with "min_prompt_tokens": 100000 that carries the five higher rates. The values in the two tables above are those strings. Note one difference in wording. The OpenRouter field name reads as a minimum of 100,000 tokens, and Anthropic says "over 100,000 tokens". This calculator follows Anthropic, the provider that bills the request.</p>
+    </div>
+
+    <div class="section">
+      <h2>How the price changes at 100,000 tokens</h2>
+      <p>The change is a step, not a slope. Below the limit, each added uncached input token costs one input rate. The token that takes the prompt past 100,000 changes the rate of every token in the request. The result panel shows the size of that step for your own request: it prices the same request at a prompt of 100,001 tokens, or at exactly 100,000 tokens if you are already over.</p>
+      <p>Cached tokens do not help you stay under the limit. A cache hit is cheaper than uncached input, but it has the same weight in the prompt length. A request with a small uncached part and a large cached prefix can be over the limit, and then its cache reads, its cache writes and its output all use the higher rates.</p>
+      <p>Count tokens with the model itself. Anthropic's Claude Haiku 5.5 overview says it "uses the same newer tokenizer as Claude 4.7 and later models, so the same text counts as approximately 30% more tokens than on Claude Haiku 4.5". A prompt that you measured on an older model can be longer on this one.</p>
+    </div>
+
+    <div class="section">
+      <h2>Questions</h2>
+      <h3>Does the higher price apply only to the tokens above 100,000?</h3>
+      <p>No. The pricing page says "a request over the threshold pays the higher prices". The calculator applies the higher rates to the whole request.</p>
+      <h3>Do cache reads and cache writes count toward the 100,000 tokens?</h3>
+      <p>Yes. The pricing page says the prompt length "counts all of its input tokens, including cache reads and cache writes".</p>
+      <h3>Does one long request change the price of other requests?</h3>
+      <p>No. The pricing page says "Each request is priced on its own". Only the requests that are over the limit pay the higher prices.</p>
+      <h3>Does the Batch API discount apply at both price levels?</h3>
+      <p>Yes. Anthropic's batch table has a row for prompts up to 100,000 tokens and a row for prompts over 100,000 tokens.</p>
+      <h3>Are these prices live?</h3>
+      <p>No. They are reference rates, verified 2026-10-10. Check the two sources above before you set a budget.</p>
+    </div>
+
+    <div class="section">
+      <h2>Related tools</h2>
+      <p>This page does not model retries or failed calls. Use the retry calculators for that. The other tools cover cache savings and batch savings on other Claude models.</p>
+      <div class="rel">
+        <a href="/tools/agent-retry-cost-calculator">Agent Retry Cost Calculator</a>
+        <a href="/tools/workflow-retry-cost-calculator/">Workflow Retry Cost Calculator</a>
+        <a href="/tools/prompt-caching-savings-estimator/">Prompt Caching Savings Estimator</a>
+        <a href="/tools/batch-api-cost-savings-calculator/">Batch API Cost Savings Calculator</a>
+        <a href="/tools/claude-api-cost-calculator/">Claude API Cost Calculator</a>
+        <a href="/tools/">All Tools</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <p>ClaudFlow is a free, privacy-first suite of AI workflow tools. No accounts. Tool inputs stay in your browser. Page and product-interest analytics is optional and requires consent. Part of the Zovo Tools network by Michael Lip.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+        <a href="/about.html#analytics">Analytics and privacy</a>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a></div>
+    </div>
+</footer>
+
+  <script>
+  (function () {
+    'use strict';
+    // Rates in USD per token, as decimal strings. Source: Anthropic pricing page and
+    // OpenRouter models API (anthropic/claude-haiku-5.5), both read on 2026-10-10.
+    var RATES = {
+      base: { input: '0.0000001', output: '0.0000005', cacheRead: '0.00000001', cacheWrite5m: '0.000000125', cacheWrite1h: '0.0000002' },
+      over: { input: '0.0000005', output: '0.0000025', cacheRead: '0.00000005', cacheWrite5m: '0.000000625', cacheWrite1h: '0.000001' }
+    };
+    var LIMIT = 100000n;          // prompt tokens; the higher prices apply above this
+    var CONTEXT = 1000000n;       // context window in tokens
+    var MAX_TOKENS = 1000000;     // largest value accepted in a token field
+    var MAX_REQS = 1000000000;    // largest value accepted for requests per month
+    var PICO = 1000000000000n;    // pico-dollars in one dollar
+
+    function $(id) { return document.getElementById(id); }
+
+    // "0.000000125" -> 125000n pico-dollars per token (exact)
+    function pico(s) {
+      var frac = s.split('.')[1] || '';
+      return BigInt(s.split('.')[0]) * PICO + BigInt((frac + '000000000000').slice(0, 12));
+    }
+
+    function group(s) { return s.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    function tok(n) { return group(n.toString()); }
+    function tk(n) { return tok(n) + (n === 1n ? ' token' : ' tokens'); }
+
+    // pico-dollars -> "$0.0031" (exact, under 1 USD) or "$1,234.57" (rounded half up)
+    function money(p) {
+      if (p >= PICO) {
+        var cents = (p + 5000000000n) / 10000000000n;
+        var c = (cents % 100n).toString();
+        return '$' + group((cents / 100n).toString()) + '.' + (c.length < 2 ? '0' + c : c);
+      }
+      var f = (p + PICO).toString().slice(1).replace(/0+$/, '');
+      while (f.length < 2) f += '0';
+      return '$0.' + f;
+    }
+
+    // whole number from a text field, or null when the text is not valid
+    function read(id, max) {
+      var el = $(id), err = $(id + '-err');
+      var s = el.value.replace(/[\s,_]/g, '');
+      var n = null;
+      if (/^[+-]?0+$/.test(s)) n = 0;
+      else if (/^\+?\d{1,10}$/.test(s)) { n = Number(s); if (n > max) n = null; }
+      if (n === null) {
+        el.setAttribute('aria-invalid', 'true');
+        err.textContent = 'Enter a whole number from 0 to ' + group(String(max)) + '.';
+        return null;
+      }
+      el.removeAttribute('aria-invalid');
+      err.textContent = '';
+      return BigInt(n);
+    }
+
+    function price(set, ttl, batch, inTok, crTok, cwTok, outTok) {
+      var div = batch ? 2n : 1n;
+      var cw = ttl === '1h' ? set.cacheWrite1h : set.cacheWrite5m;
+      var r = {
+        input: inTok * pico(set.input) / div,
+        cacheRead: crTok * pico(set.cacheRead) / div,
+        cacheWrite: cwTok * pico(cw) / div,
+        output: outTok * pico(set.output) / div
+      };
+      r.total = r.input + r.cacheRead + r.cacheWrite + r.output;
+      return r;
+    }
+
+    var OUT = ['oPrompt', 'oLevel', 'oRoom', 'oBatch', 'oIn', 'oCr', 'oCw', 'oOut', 'oReq', 'oMonth'];
+
+    function blank(msg) {
+      OUT.forEach(function (id) { $(id).textContent = '-'; });
+      $('verdict').textContent = msg;
+    }
+
+    function calc() {
+      var inTok = read('inTok', MAX_TOKENS), crTok = read('crTok', MAX_TOKENS);
+      var cwTok = read('cwTok', MAX_TOKENS), outTok = read('outTok', MAX_TOKENS);
+      var reqs = read('reqs', MAX_REQS);
+      if (inTok === null || crTok === null || cwTok === null || outTok === null || reqs === null) {
+        blank('Correct the marked fields to see a result.');
+        return;
+      }
+      var ttl = $('ttl').value === '1h' ? '1h' : '5m';
+      var batch = $('batch').checked;
+      var prompt = inTok + crTok + cwTok;
+      if (prompt > CONTEXT) {
+        blank('The prompt is ' + tk(prompt) + '. Anthropic lists a 1M token context window for Claude Haiku 5.5. Lower the token counts.');
+        $('oPrompt').textContent = tk(prompt);
+        return;
+      }
+      var over = prompt > LIMIT;
+      var now = price(over ? RATES.over : RATES.base, ttl, batch, inTok, crTok, cwTok, outTok);
+      var month = now.total * reqs;
+
+      $('oPrompt').textContent = tk(prompt);
+      $('oLevel').textContent = over ? 'Higher prices (prompt over 100,000 tokens)' : 'Base prices (prompt up to 100,000 tokens)';
+      $('oRoom').textContent = over ? tk(prompt - LIMIT) + ' over the limit' : tk(LIMIT - prompt) + ' under the limit';
+      $('oBatch').textContent = batch ? 'On, all rates at 50%' : 'Off, standard rates';
+      $('oIn').textContent = money(now.input);
+      $('oCr').textContent = money(now.cacheRead);
+      $('oCw').textContent = money(now.cacheWrite);
+      $('oOut').textContent = money(now.output);
+      $('oReq').textContent = money(now.total);
+      $('oMonth').textContent = money(month) + ' for ' + tok(reqs) + (reqs === 1n ? ' request' : ' requests');
+
+      var v;
+      if (!over) {
+        var add = LIMIT - prompt + 1n;
+        var up = price(RATES.over, ttl, batch, inTok + add, crTok, cwTok, outTok);
+        v = 'This prompt is ' + tk(LIMIT - prompt) + ' under the 100,000 token limit, so the base prices apply. With ' + tok(add) +
+          ' more uncached input ' + (add === 1n ? 'token' : 'tokens') + ' the prompt is 100,001 tokens and the whole request moves to the higher prices: ' + money(up.total) +
+          ' per request in place of ' + money(now.total);
+        if (now.total > 0n) {
+          var h = (up.total * 100n + now.total / 2n) / now.total;
+          var hs = (h % 100n).toString();
+          v += ', which is ' + group((h / 100n).toString()) + '.' + (hs.length < 2 ? '0' + hs : hs) + ' times as much';
+        }
+        v += '. Per month that is ' + money(up.total * reqs) + ' in place of ' + money(month) + '.';
+      } else {
+        var x = prompt - LIMIT;
+        v = 'This prompt is ' + tk(x) + ' over the 100,000 token limit, so every token in the request is billed at the higher prices, output tokens included. ';
+        if (inTok >= x) {
+          var down = price(RATES.base, ttl, batch, inTok - x, crTok, cwTok, outTok);
+          v += 'With ' + tok(x) + ' fewer uncached input ' + (x === 1n ? 'token' : 'tokens') + ' the prompt is exactly 100,000 tokens and the base prices apply: ' + money(down.total) +
+            ' per request in place of ' + money(now.total) + '. Per month that is ' + money(down.total * reqs) + ' in place of ' + money(month) + '.';
+        } else {
+          v += 'The cache read and cache write tokens alone are ' + tk(crTok + cwTok) + ', which is over the limit. Removing uncached input does not bring this request back to the base prices.';
+        }
+      }
+      $('verdict').textContent = v;
+    }
+
+    ['inTok', 'crTok', 'cwTok', 'outTok', 'reqs', 'ttl', 'batch'].forEach(function (id) {
+      $(id).addEventListener('input', calc);
+      $(id).addEventListener('change', calc);
+    });
+    // The browser can restore field values after this script runs (Back button). Compute again then.
+    window.addEventListener('pageshow', calc);
+    calc();
+  })();
+  </script>
+</body>
+</html>
