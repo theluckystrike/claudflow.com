@@ -67,6 +67,7 @@
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does prompt order really matter for caching?","acceptedAnswer":{"@type":"Answer","text":"Yes. The prefix cache is byte-exact from token 1. A single changed token at position 100 invalidates everything after it, so a timestamp near the top of the system prompt silently uncaches the whole prompt, including tool schemas and reference docs below it."}},{"@type":"Question","name":"What if my dynamic data is large?","acceptedAnswer":{"@type":"Answer","text":"Only the stable prefix caches. If dynamic tokens outweigh static ones, most of every request still bills at full input price. Summarize volatile content or externalize state to a tool call so it never enters the prompt."}},{"@type":"Question","name":"Does the first request cost more after refactoring?","acceptedAnswer":{"@type":"Answer","text":"Slightly. The first request pays the cache-write rate on the static prefix instead of the input rate - a one-time premium amortized to nothing across thousands of requests."}},{"@type":"Question","name":"How is this different from just shortening the prompt?","acceptedAnswer":{"@type":"Answer","text":"Trimming tokens saves once per request; ordering saves on every request without removing anything. You keep the full reference docs, and the static prefix still bills - at the cache-read rate instead of the input rate."}}]}
   </script>
 <script defer src="/assets/js/roi-measurement.js"></script>
+  <link rel="stylesheet" href="/assets/support-cta.css">
 </head>
 <body>
     <nav>
@@ -165,6 +166,7 @@
       <a href="/tools/prompt-caching-savings-estimator/">Prompt Caching Savings Estimator</a>
       <a href="/tools/cache-invalidations-cost-multiplier/">Cache Invalidation Multiplier</a>
       <a href="/tools/">All Tools</a>
+    <a href="/support/">Support</a>
     </div>
   </div>
 
@@ -177,6 +179,9 @@
         <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a></div>
     </div>
 </footer>
+<!-- support-cta:footer -->
+<section class="support-cta support-cta--footer" data-support-cta="footer" aria-label="Support ClaudFlow"><h2 class="support-cta__title">Made by one person, free to use.</h2><p>I started ClaudFlow in April 2026 and have built 35 tools since. I pay for the domain and the hours myself. If it saves you time, a small tip helps me keep the tools accurate. The tools stay free either way. Michael</p><div class="support-cta__actions"><a class="support-cta__btn support-cta__btn--primary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'footer',rail:'bmc'})"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>Buy me a coffee</a><a class="support-cta__btn support-cta__btn--secondary" href="https://paypal.me/najzzz" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'footer',rail:'paypal'})">Tip with PayPal</a><a class="support-cta__link" href="/support/">Why I ask</a></div></section>
+
 
   <script>
 (function () {

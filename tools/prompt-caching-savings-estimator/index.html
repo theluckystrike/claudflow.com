@@ -67,6 +67,7 @@
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does caching help with short prompts?","acceptedAnswer":{"@type":"Answer","text":"Usually not much. Savings scale with cached token volume times the gap between the input and cache read rates. A few thousand cached tokens produce cents per thousand requests, while a long stable system prompt with retrieved context produces noticeable sums."}},{"@type":"Question","name":"What rate applies on the first call?","acceptedAnswer":{"@type":"Answer","text":"The cache write rate. The estimator includes it once, amortized across the request count you enter."}},{"@type":"Question","name":"Are these prices live?","acceptedAnswer":{"@type":"Answer","text":"No. They are reference rates verified 2026-09-29 against the OpenRouter models API. Verify against official pricing pages before making budget decisions."}}]}
   </script>
 <script defer src="/assets/js/roi-measurement.js"></script>
+  <link rel="stylesheet" href="/assets/support-cta.css">
 </head>
 <body>
   <nav>
@@ -174,6 +175,7 @@ savings      = (uncached(req) - cached(req)) * requests</div>
       <a href="/tools/prompt-caching-savings-calculator.html">Prompt Caching Savings</a>
       <a href="/tools/claude-opus-vs-sonnet-agent-turn-cost/">Opus vs Sonnet Per Turn</a>
       <a href="/tools/">All Tools</a>
+    <a href="/support/">Support</a>
     </div>
   </div>
 
@@ -186,6 +188,9 @@ savings      = (uncached(req) - cached(req)) * requests</div>
         <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a></div>
     </div>
 </footer>
+<!-- support-cta:footer -->
+<section class="support-cta support-cta--footer" data-support-cta="footer" aria-label="Support ClaudFlow"><h2 class="support-cta__title">Made by one person, free to use.</h2><p>I started ClaudFlow in April 2026 and have built 35 tools since. I pay for the domain and the hours myself. If it saves you time, a small tip helps me keep the tools accurate. The tools stay free either way. Michael</p><div class="support-cta__actions"><a class="support-cta__btn support-cta__btn--primary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'footer',rail:'bmc'})"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>Buy me a coffee</a><a class="support-cta__btn support-cta__btn--secondary" href="https://paypal.me/najzzz" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'footer',rail:'paypal'})">Tip with PayPal</a><a class="support-cta__link" href="/support/">Why I ask</a></div></section>
+
 
   <script>
   (function () {

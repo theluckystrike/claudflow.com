@@ -115,6 +115,7 @@
   {"@context":"https://schema.org","@type":"WebSite","name":"ClaudFlow","url":"https://claudflow.com/","sameAs":["https://github.com/theluckystrike/claudflow.com"],"author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
   </script>
 <script defer src="/assets/js/roi-measurement.js"></script>
+  <link rel="stylesheet" href="/assets/support-cta.css">
 </head>
 <body>
   <nav>
@@ -165,6 +166,9 @@
       <svg id="canvas-svg"></svg>
     </div>
     <p style="color:var(--text-muted);font-size:0.8rem;margin-top:0.5rem;">Click to add blocks. Drag to move. Drag from bottom port to top port to connect. Double-click to edit.</p>
+  <!-- support-cta:result -->
+  <section class="support-cta support-cta--card" id="support-cta-result" data-support-cta="result" aria-label="Support ClaudFlow" style="margin:1rem 0 0" hidden><h2 class="support-cta__title">Workflow exported.</h2><p>I have built ClaudFlow on my own since April 2026. If it saved you drawing the prompt chain by hand, a $3 coffee helps me keep it going. Michael</p><div class="support-cta__actions"><a class="support-cta__btn support-cta__btn--primary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'result',rail:'bmc'})"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>Buy me a coffee</a><a class="support-cta__btn support-cta__btn--secondary" href="https://paypal.me/najzzz/3USD" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'result',rail:'paypal'})">Tip with PayPal</a></div></section>
+  <script>(function(){var b=document.getElementById("btn-export"),c=document.getElementById("support-cta-result");if(b&&c)b.addEventListener("click",function(){c.hidden=false;});})();</script>
   </div>
 
   <!-- Edit Modal -->
@@ -316,6 +320,9 @@
         <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=home">Zovo</a></div>
     </div>
 </footer>
+<!-- support-cta:footer -->
+<section class="support-cta support-cta--footer" data-support-cta="footer" aria-label="Support ClaudFlow"><h2 class="support-cta__title">Made by one person, free to use.</h2><p>I started ClaudFlow in April 2026 and have built 35 tools since. I pay for the domain and the hours myself. If it saves you time, a small tip helps me keep the tools accurate. The tools stay free either way. Michael</p><div class="support-cta__actions"><a class="support-cta__btn support-cta__btn--primary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'footer',rail:'bmc'})"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v2M10 2v2M14 2v2"/></svg>Buy me a coffee</a><a class="support-cta__btn support-cta__btn--secondary" href="https://paypal.me/najzzz" target="_blank" rel="noopener" onclick="typeof gtag==='function'&&gtag('event','support_click',{cta_position:'footer',rail:'paypal'})">Tip with PayPal</a><a class="support-cta__link" href="/support/">Why I ask</a></div></section>
+
 
 <nav class="zovo-network" aria-label="Zovo Tools Network">
     <div class="zovo-network-inner">
