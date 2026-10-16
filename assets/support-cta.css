@@ -93,3 +93,25 @@
 }
 .support-cta--page p { color: var(--sc-text); font-size: 1rem; }
 .support-cta--page .support-cta__note { color: var(--sc-muted); font-size: 0.85rem; }
+
+/* v3: self-hosted portrait, stable copy space and wrapping payment options. */
+[data-support-cta] { box-sizing: border-box; overflow-wrap: anywhere; }
+[data-support-cta] *, [data-support-cta] *::before, [data-support-cta] *::after { box-sizing: border-box; }
+[data-support-cta][hidden], [data-sct-variant][hidden] { display: none !important; }
+[data-sct-variant] { min-height: 132px; }
+.sct-portrait { display: inline-block; flex-shrink: 0; border-radius: 50%; object-fit: cover; }
+[data-support-cta] .sct-maker { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.sct-card-option { display: inline-flex; flex-direction: column; align-items: center; max-width: 100%; }
+.sct-card-option small { font-size: 0.75rem; line-height: 1.5; color: #a3a3a3; }
+.sct-dismiss { min-height: 44px; padding: 8px 12px; background: transparent; border: 0; color: #a3a3a3; font: inherit; text-decoration: underline; cursor: pointer; }
+.sct-dismiss:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sct-costs { display: table; width: 100%; border-collapse: collapse; margin: 16px 0; }
+.sct-costs th, .sct-costs td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border, #333); white-space: normal; }
+.sct-costs caption { text-align: left; color: #a3a3a3; }
+@media(max-width:480px) {
+ [data-sct-variant] { min-height: 180px; }
+ [data-support-cta] .sct-card-option { width: 100%; }
+ [data-support-cta] .sct-card-option a { width: 100%; flex: none; }
+}
+[data-support-cta] a.support-cta__btn { white-space: normal; text-align: center; max-width: 100%; }
+.support-cta--footer .sct-maker { justify-content: center; }
