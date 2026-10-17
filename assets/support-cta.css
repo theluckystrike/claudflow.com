@@ -115,3 +115,10 @@
 }
 [data-support-cta] a.support-cta__btn { white-space: normal; text-align: center; max-width: 100%; }
 .support-cta--footer .sct-maker { justify-content: center; }
+
+/* GitHub Sponsors is the quiet third payment option. */
+[data-support-cta] a.sct-github { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; max-width: 100%; padding: 8px 12px; background: transparent; border: 0; color: var(--sc-muted); font: inherit; font-size: 0.85rem; line-height: 1.4; text-align: center; text-decoration: underline; text-underline-offset: 3px; }
+[data-support-cta] a.sct-github small { display: block; font-size: 0.75rem; }
+[data-support-cta] a.sct-github:hover { color: var(--sc-text); }
+[data-support-cta] a.sct-github:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 2px; }
+[data-support-cta] .sct-github-prompt { margin: 16px 0 0; }
