@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Sonnet 4.5 retirement migration cost calculator</title>
+  <meta name="description" content="Claude Sonnet 4.5 retires from the Claude API on November 30, 2026. Estimate your monthly cost on Sonnet 5.5 rates, with tokenizer, cache, batch and thinking effects.">
+  <meta property="og:title" content="Claude Sonnet 4.5 retirement migration cost calculator">
+  <meta property="og:description" content="Estimate your monthly cost of moving Claude Sonnet 4.5 traffic to Sonnet 5.5 rates before the November 30, 2026 retirement, with tokenizer, cache, batch and thinking-token effects.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://claudflow.com/tools/claude-sonnet-4-5-retirement-migration-cost/">
+  <link rel="canonical" href="https://claudflow.com/tools/claude-sonnet-4-5-retirement-migration-cost/">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Claude Sonnet 4.5 Retirement Migration Cost Calculator","url":"https://claudflow.com/tools/claude-sonnet-4-5-retirement-migration-cost/","description":"Estimates the monthly cost of moving Claude Sonnet 4.5 traffic to Claude Sonnet 5.5 rates before the November 30, 2026 retirement, with tokenizer, cache, batch and thinking-token effects.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"},"datePublished":"2026-10-20","dateModified":"2026-10-20"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Claude Sonnet 4.5 retirement migration cost calculator","item":"https://claudflow.com/tools/claude-sonnet-4-5-retirement-migration-cost/"}]}]}
+  </script>
+  <script defer src="/assets/js/roi-measurement.js"></script>
+  <link rel="stylesheet" href="/assets/support-cta.css?v=4-github">
+  <script defer src="/assets/support-v3.js?v=3"></script>
+  <style>
+    .tool-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .tool-wrap a { color: var(--accent); }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    .page-sub { color: var(--text-muted); margin: 0.2rem 0 0.4rem; }
+    .byline { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.2rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 1.2rem; margin: 1rem 0; }
+    .field label { display: block; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .field input, .field select { width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); min-height: 41px; }
+    .err { color: #f87171; font-size: 0.8rem; min-height: 1rem; margin: 0.15rem 0 0; }
+    .results { margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.3rem 0; }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.6rem; }
+    .res-row .k { color: var(--text-muted); }
+    .res-row .v { font-variant-numeric: tabular-nums; }
+    .verdict { margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55; }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--text-muted); margin: 0.75rem 0; overflow-x: auto; white-space: pre; font-family: var(--font-display); }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section h3 { font-size: 1rem; margin: 1.2rem 0 0.3rem; }
+    .section p, .section li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+    .section p { margin: 0 0 0.75rem; }
+    .section ul { padding-left: 1.2rem; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp caption { text-align: left; color: var(--text); font-size: 0.9rem; padding-bottom: 0.4rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: var(--text-muted); }
+    .tool-wrap details { margin-top: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.7rem 1rem; }
+    .tool-wrap summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+    .tool-wrap details p, .tool-wrap details li { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
+    .tool-wrap details ul { padding-left: 1.2rem; }
+    .deadline { margin-top: 1.25rem; }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+      .res-row { flex-direction: column; gap: 0.1rem; }
+      .res-row .v { text-align: left; }
+      .formula { font-size: 0.78rem; padding: 0.7rem 0.75rem; }
+    }
+    @media print {
+      :root { --bg: #fff; --bg-card: #fff; --text: #111; --text-muted: #444; --accent: #0e7490; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main class="tool-wrap">
+    <h1 class="page-title">Claude Sonnet 4.5 retirement migration cost calculator</h1>
+    <p class="page-sub">What your Sonnet 4.5 traffic costs on Sonnet 5.5 rates, with tokenizer, cache, batch and thinking-token effects</p>
+    <p class="byline">By Michael Lip, <a href="https://claudflow.com/about.html">claudflow.com</a>. Updated October 20, 2026.</p>
+
+    <p class="lead">Anthropic announced on September 30, 2026 that Claude Sonnet 4.5 (<code>claude-sonnet-4-5-20250929</code>) retires from the Claude API on November 30, 2026. The recommended replacement is Claude Sonnet 5.5 (<code>claude-sonnet-5-5</code>). Enter your monthly token volumes. The calculator applies both rate cards, the Sonnet 5 tokenizer factor, your cache mix, the Batch API discount, the US-only inference premium on Sonnet 5.5, and Sonnet 5.5 thinking tokens, then shows the monthly and annual difference.</p>
+
+    <p class="deadline">Days remaining until retirement: <span id="daysLeft">-</span></p>
+
+    <form id="calc" novalidate onsubmit="return false">
+      <div class="field-grid">
+        <div class="field">
+          <label for="inMTok">Uncached input, million tokens per month</label>
+          <input type="number" id="inMTok" min="0" step="0.1" value="100" inputmode="decimal" aria-describedby="inMTok-err">
+          <p class="err" id="inMTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="outMTok">Output, million tokens per month</label>
+          <input type="number" id="outMTok" min="0" step="0.1" value="20" inputmode="decimal" aria-describedby="outMTok-err">
+          <p class="err" id="outMTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="cacheReadMTok">Cache read, million tokens per month</label>
+          <input type="number" id="cacheReadMTok" min="0" step="0.1" value="300" inputmode="decimal" aria-describedby="cacheReadMTok-err">
+          <p class="err" id="cacheReadMTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="cacheW5MTok">Cache write 5m, million tokens per month</label>
+          <input type="number" id="cacheW5MTok" min="0" step="0.1" value="0" inputmode="decimal" aria-describedby="cacheW5MTok-err">
+          <p class="err" id="cacheW5MTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="cacheW1hMTok">Cache write 1h, million tokens per month</label>
+          <input type="number" id="cacheW1hMTok" min="0" step="0.1" value="0" inputmode="decimal" aria-describedby="cacheW1hMTok-err">
+          <p class="err" id="cacheW1hMTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="thinkMTok">Sonnet 5.5 thinking tokens, million per month (billed as output)</label>
+          <input type="number" id="thinkMTok" min="0" step="0.1" value="0" inputmode="decimal" aria-describedby="thinkMTok-err">
+          <p class="err" id="thinkMTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="tokFactor">Tokenizer factor on Sonnet 5.5 (about 1.30 for text, depends on content)</label>
+          <input type="number" id="tokFactor" min="1" max="2" step="0.01" value="1.30" inputmode="decimal" aria-describedby="tokFactor-err">
+          <p class="err" id="tokFactor-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="batchPct">Batch API share, percent of token volume</label>
+          <input type="number" id="batchPct" min="0" max="100" step="1" value="0" inputmode="numeric" aria-describedby="batchPct-err">
+          <p class="err" id="batchPct-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="geo">Endpoint</label>
+          <select id="geo">
+            <option value="1" selected>Global routing (standard pricing)</option>
+            <option value="1.1">US-only inference on Sonnet 5.5 (1.1x premium)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+
+    <div class="results" role="status" aria-live="polite">
+      <div class="res-row"><span class="k">Monthly cost at Sonnet 4.5 rates</span><span class="v" id="oldOut">-</span></div>
+      <div class="res-row"><span class="k">Monthly cost at Sonnet 5.5 rates</span><span class="v" id="newOut">-</span></div>
+      <div class="res-row total"><span class="k">Monthly difference after migration</span><span class="v" id="diffOut">-</span></div>
+      <div class="res-row"><span class="k">Change</span><span class="v" id="pctOut">-</span></div>
+      <div class="res-row"><span class="k">Annualized difference</span><span class="v" id="yrOut">-</span></div>
+    </div>
+    <div class="verdict" id="verdict">Enter your monthly token volumes to see the cost difference between Sonnet 4.5 and Sonnet 5.5 rates.</div>
+    <p class="byline" style="margin-top:0.6rem">If the thinking input is 0, the result does not include thinking tokens. Sonnet 5.5 runs adaptive thinking by default, so enter your estimate of its thinking tokens. If you used extended thinking on Sonnet 4.5, those thinking tokens are already in your billed output. The output field carries them to Sonnet 5.5 with the tokenizer factor, so enter in the thinking field only the thinking you expect above that amount.</p>
+
+    <details>
+      <summary>How the calculation works</summary>
+      <div class="formula" id="formulaBlock">token counts (MTok) * 1,000,000 = tokens
+Sonnet 4.5 rates (USD per MTok): input 3, output 15, cache read 0.30, cache write 5m 3.75, cache write 1h 6
+Sonnet 5.5 rates (USD per MTok): input 2, output 10, cache read 0.10, cache write 5m 2.50, cache write 1h 4
+Sonnet 4.5 cost = sum of (token count * Sonnet 4.5 rate)
+Sonnet 5.5 cost = (sum of (token count * tokenizer factor * Sonnet 5.5 rate) + thinking * 10) * geo
+geo = 1.1 for US-only inference on Sonnet 5.5, else 1 (Sonnet 4.5 has no inference_geo)
+Batch API bills 50% of standard prices on the batched share of both costs
+month difference = Sonnet 4.5 cost - Sonnet 5.5 cost</div>
+      <ul>
+        <li>The tokenizer factor applies on Sonnet 5.5 only. Anthropic's pricing page says the newer tokenizer produces approximately 30% more tokens for the same text. Token counts you measured on Sonnet 4.5 grow on Sonnet 5.5.</li>
+        <li>Sonnet 5.5 runs adaptive thinking by default on requests with no <code>thinking</code> field. Sonnet 4.5 ran without thinking by default. Thinking tokens are billed as output tokens, and Anthropic's migration guide says <code>max_tokens</code> covers thinking plus text. The calculator bills the thinking input at the Sonnet 5.5 output rate only and does not apply the tokenizer factor to it.</li>
+        <li>The Batch API option halves the batched share of every line item. Anthropic's <a href="https://platform.claude.com/docs/en/build-with-claude/batch-processing">batch documentation</a> says "All usage is charged at 50% of the standard API prices."</li>
+        <li>US-only inference (the <code>inference_geo</code> parameter) costs 1.1x on all Sonnet 5.5 token pricing categories. Sonnet 4.5 does not accept <code>inference_geo</code> (requests that include it return a 400 error), so the Sonnet 4.5 cost always uses standard pricing. Global routing uses standard pricing.</li>
+        <li>Cache write prices are the same multiples of base input on both models (1.25x for 5-minute writes, 2x for 1-hour writes), so a cache write token changes cost by the same ratio as an uncached input token. Cache reads change most: 0.1x base input on Sonnet 4.5 ($0.30) versus 0.05x on Sonnet 5.5 ($0.10), so cache-heavy traffic benefits most.</li>
+        <li>Token counts are estimates. Count tokens with the token counting API on each model ID before you re-budget.</li>
+        <li>The calculator is for text tokens. Sonnet 5.5 uses a high-resolution image tier, and Anthropic's migration guide says a 2000×1500 image costs about 2.5 times as many tokens, so do not apply the text tokenizer factor to image tokens.</li>
+      </ul>
+    </details>
+
+    <p class="lead" style="margin-top:1.5rem">This tool does not execute LLM calls. All computation happens locally in your browser.</p>
+
+    <div class="section">
+      <h2>Reference rates</h2>
+      <p>Verified 2026-10-20 against the Anthropic pricing page (<a href="https://platform.claude.com/docs/en/about-claude/pricing">https://platform.claude.com/docs/en/about-claude/pricing</a>). Units are USD per million tokens.</p>
+      <table class="cmp" id="rates">
+        <caption>Standard prices, USD per million tokens</caption>
+        <thead>
+          <tr><th scope="col">Token type</th><th scope="col">Sonnet 4.5</th><th scope="col">Sonnet 5.5</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Input</th><td>$3.00</td><td>$2.00</td></tr>
+          <tr><th scope="row">Output</th><td>$15.00</td><td>$10.00</td></tr>
+          <tr><th scope="row">Cache read</th><td>$0.30</td><td>$0.10</td></tr>
+          <tr><th scope="row">Cache write, 5 minutes (1.25x input)</th><td>$3.75</td><td>$2.50</td></tr>
+          <tr><th scope="row">Cache write, 1 hour (2x input)</th><td>$6.00</td><td>$4.00</td></tr>
+          <tr><th scope="row">Batch API (50% of standard)</th><td>$1.50 / $7.50</td><td>$1.00 / $5.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Retirement facts</h2>
+      <ul>
+        <li>Anthropic notified developers on September 30, 2026 that <code>claude-sonnet-4-5-20250929</code> retires from the Claude API on November 30, 2026.</li>
+        <li>After the retirement date, requests to the old model ID fail. The migration is mandatory for Claude API traffic.</li>
+        <li>The November 30, 2026 date applies to the Claude API, Claude Platform on AWS and Microsoft Foundry. Amazon Bedrock and Google Cloud set their own retirement schedules, and this page uses Claude API prices.</li>
+        <li>The September 30, 2026 notice covers only Claude Sonnet 4.5. Other models have their own dates on the <a href="https://platform.claude.com/docs/en/about-claude/model-deprecations">model deprecations page</a>.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Migration checklist from Anthropic</h2>
+      <p>Condensed from the Sonnet 5.5 migration guide (<a href="https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide">https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide</a>). Follow the links there for the full text.</p>
+      <h3>Every starting model</h3>
+      <ul>
+        <li>Change the model ID to <code>claude-sonnet-5-5</code>, which has no date suffix.</li>
+        <li>Pass <code>thinking</code> blocks back unchanged, and read content blocks by <code>type</code>.</li>
+        <li>To run without up-front thinking, send the lowest thinking setting at <code>high</code> effort or below.</li>
+        <li>Replace forced tool use with <code>auto</code> and strict tools.</li>
+        <li>Keep conversations append-only.</li>
+        <li>On the Claude API and Google Cloud, move computer use to the toolset, without the <code>fine-grained-tool-streaming-2025-05-14</code> beta header.</li>
+        <li>Pair the advisor tool with a supported advisor, and expect encrypted advice.</li>
+        <li>Read text between tool calls from <code>thinking</code> blocks.</li>
+        <li>Handle refusals, and configure fallback.</li>
+        <li>Re-run your effort sweep and re-baseline cost.</li>
+      </ul>
+      <h3>Claude Sonnet 4.6 or earlier</h3>
+      <ul>
+        <li>Expect thinking on requests with no <code>thinking</code> field, and revisit <code>max_tokens</code>.</li>
+        <li>Replace thinking budgets with an effort level.</li>
+        <li>Remove non-default <code>temperature</code>, <code>top_p</code>, and <code>top_k</code> values.</li>
+        <li>If you show thinking text, set <code>display: "summarized"</code>.</li>
+        <li>Recount tokens, and re-budget image tokens.</li>
+      </ul>
+      <h3>Claude Sonnet 4.5 or earlier</h3>
+      <ul>
+        <li>Replace assistant prefills. Sonnet 5.5 rejects a prefilled last assistant turn with a 400 error.</li>
+        <li>Parse tool call input with a standard JSON parser.</li>
+        <li>On Amazon Bedrock, move computer use from <code>computer_20250124</code> to <code>computer_20251124</code>.</li>
+        <li>Set <code>output_config.effort</code> explicitly. Sonnet 4.5 has no effort parameter.</li>
+        <li>Remove any context-window beta header.</li>
+        <li>Remove <code>interleaved-thinking-2025-05-14</code>, and replace <code>fine-grained-tool-streaming-2025-05-14</code> with <code>eager_input_streaming</code>.</li>
+        <li>Move <code>output_format</code> to <code>output_config.format</code>.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Frequently asked questions</h2>
+      <h3>When does Claude Sonnet 4.5 retire from the Claude API?</h3>
+      <p>November 30, 2026. Anthropic notified developers on September 30, 2026.</p>
+      <h3>Which model replaces Claude Sonnet 4.5?</h3>
+      <p>Anthropic recommends <code>claude-sonnet-5-5</code> as the replacement.</p>
+      <h3>Does Claude Sonnet 5.5 cost less than Sonnet 4.5?</h3>
+      <p>At list prices it costs less per token. Input is $2 per million tokens versus $3, output is $10 versus $15, and cache reads drop from $0.30 to $0.10. The same text produces about 30% more tokens on the Sonnet 5 tokenizer, so enter the tokenizer factor above before you compare totals. Sonnet 5.5 also runs adaptive thinking by default, and thinking tokens are billed as output, so enter your expected thinking tokens too. Cache-heavy workloads still see the largest relative drop.</p>
+      <h3>Do I have to migrate before the retirement date?</h3>
+      <p>On the Claude API, yes. Requests to <code>claude-sonnet-4-5-20250929</code> fail once the model retires on November 30, 2026. Anthropic's notice gives no cutoff hour, so finish the move before that day. Migrating earlier moves traffic to the lower Sonnet 5.5 per-token prices sooner and leaves time to re-run evaluations and recount tokens before the cutoff.</p>
+      <h3>How do assistant prefills behave after migration?</h3>
+      <p>Sonnet 5.5 rejects a prefilled last assistant turn with a 400 error that reads "This model does not support assistant message prefill." Replace each prefill by its purpose: structured outputs for output format, system prompt instructions for preambles, clearer user turns for unwanted refusals, user-message continuations for interrupted responses, and the user turn for context reminders.</p>
+    </div>
+
+    <div class="section">
+      <h2>Related tools</h2>
+      <ul>
+        <li><a href="/tools/claude-haiku-5-5-pricing-calculator/">Claude Haiku 5.5 pricing calculator</a></li>
+        <li><a href="/tools/cache-invalidations-cost-multiplier/">Cache invalidation cost multiplier</a></li>
+        <li><a href="/tools/batch-api-cost-savings-calculator/">Batch API cost savings calculator</a></li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">Zovo Tools</div>
+      <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+      <a href="/about.html#analytics">Analytics and privacy</a>
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+      <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a></div>
+    </div>
+  </footer>
+<!-- support-cta:footer -->
+<section class="support-cta support-cta--footer" data-support-cta="footer" aria-label="Support ClaudFlow"><div class="sct-maker"><img class="sct-portrait" src="/assets/michael-128.webp" width="40" height="40" loading="lazy" alt="Michael Lip"><h2 class="support-cta__title">Made by Michael, one person and a lot of coffee.</h2></div><p>If ClaudFlow has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</p><div class="support-cta__actions"><span class="sct-card-option"><a class="support-cta__btn sct-primary support-cta__btn--primary" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="support-cta__btn support-cta__btn--secondary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="sct-github" href="https://github.com/sponsors/theluckystrike" target="_blank" rel="noopener" data-rail="github"><span>Sponsor on GitHub<small>monthly or one-time</small></span></a><a class="support-cta__link" href="/support/">Why I ask</a></div></section>
+
+  <script>
+  (function () {
+    'use strict';
+    // Rates in USD per MTok. Verified 2026-10-20 against the Anthropic pricing page.
+    var R = {
+      old: { i: 3, o: 15, c: 0.30, w5: 3.75, w1: 6 },
+      neu: { i: 2, o: 10, c: 0.10, w5: 2.50, w1: 4 }
+    };
+    var MAX_MTOK = 1000000;
+
+    function $(id) { return document.getElementById(id); }
+    function money(n) { return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }); }
+
+    function read(id) {
+      var el = $(id), err = $(id + '-err');
+      var s = el.value.replace(/[\s,_]/g, '');
+      var n = null;
+      if (el.validity && el.validity.badInput) n = null;
+      else if (/^[+-]?0*\.?0*$/.test(s)) n = 0;
+      else if (/^\+?(\d{1,7}(\.\d{1,4})?|\.\d{1,4})$/.test(s)) { n = parseFloat(s); if (n > MAX_MTOK) n = null; }
+      if (n === null) {
+        el.setAttribute('aria-invalid', 'true');
+        err.textContent = 'Enter a number from 0 to ' + MAX_MTOK.toLocaleString('en-US') + '.';
+        return null;
+      }
+      el.removeAttribute('aria-invalid');
+      err.textContent = '';
+      return n;
+    }
+
+    function readFactor() {
+      var el = $('tokFactor'), err = $('tokFactor-err');
+      var s = el.value.trim();
+      var n = parseFloat(s);
+      if (!/^\d+(\.\d{1,2})?$/.test(s) || !isFinite(n) || n < 1 || n > 2) {
+        el.setAttribute('aria-invalid', 'true');
+        err.textContent = 'Enter a factor from 1.00 to 2.00.';
+        return null;
+      }
+      el.removeAttribute('aria-invalid');
+      err.textContent = '';
+      return n;
+    }
+
+    // cost in USD from MTok volumes. tokF inflates text token counts on Sonnet 5.5 only.
+    // Thinking tokens are Sonnet 5.5 counts: billed at the Sonnet 5.5 output rate only, no tokenizer factor.
+    // geo applies to Sonnet 5.5 only: Sonnet 4.5 does not accept inference_geo.
+    function monthly(r, m, batch, geo, tokF, isNew) {
+      var c = m.in * tokF * r.i
+            + m.out * tokF * r.o
+            + m.cr * tokF * r.c
+            + m.w5 * tokF * r.w5
+            + m.w1 * tokF * r.w1;
+      if (isNew) c += m.think * r.o;
+      c *= geo;
+      c *= (1 - 0.5 * batch);
+      return c;
+    }
+
+    function blank(msg) {
+      ['oldOut','newOut','diffOut','pctOut','yrOut'].forEach(function (id) { $(id).textContent = '-'; });
+      $('verdict').textContent = msg;
+    }
+
+    function run() {
+      var m = {
+        in: read('inMTok'), out: read('outMTok'), cr: read('cacheReadMTok'),
+        w5: read('cacheW5MTok'), w1: read('cacheW1hMTok'), think: read('thinkMTok')
+      };
+      var batchP = read('batchPct');
+      if (batchP !== null && batchP > 100) {
+        $('batchPct').setAttribute('aria-invalid', 'true');
+        $('batchPct-err').textContent = 'Enter a percent from 0 to 100.';
+        batchP = null;
+      }
+      var tokF = readFactor();
+      if (m.in === null || m.out === null || m.cr === null || m.w5 === null || m.w1 === null || m.think === null || batchP === null || tokF === null) {
+        blank('Correct the marked fields to see a result.');
+        return;
+      }
+      var batch = Math.min(100, Math.max(0, batchP)) / 100;
+      var geo = parseFloat($('geo').value) || 1;
+      var oldC = monthly(R.old, m, batch, 1, 1, false);
+      var newC = monthly(R.neu, m, batch, geo, tokF, true);
+      var diff = oldC - newC;
+      var pct = oldC > 0 ? (diff / oldC * 100) : 0;
+      var none = oldC <= 0 && newC <= 0;
+      $('oldOut').textContent = money(oldC);
+      $('newOut').textContent = money(newC);
+      $('diffOut').textContent = none ? '-' : (diff >= 0 ? money(diff) + ' saved' : money(-diff) + ' more');
+      $('pctOut').textContent = oldC > 0 ? (diff >= 0 ? '-' : '+') + Math.abs(pct).toFixed(1) + '%' : '-';
+      $('yrOut').textContent = none ? '-' : (diff >= 0 ? money(diff * 12) + ' saved per year' : money(-diff * 12) + ' more per year');
+      var v;
+      if (none) {
+        v = 'Enter your monthly token volumes to see the cost difference between Sonnet 4.5 and Sonnet 5.5 rates.';
+      } else {
+        v = 'At ' + fmtM(m.in) + 'M uncached input, ' + fmtM(m.out) + 'M output, ' + fmtM(m.cr) + 'M cache-read, ' + fmtM(m.w5) + 'M 5-minute cache-write, ' + fmtM(m.w1) + 'M 1-hour cache-write and ' + fmtM(m.think) + 'M Sonnet 5.5 thinking tokens per month, Sonnet 5.5 rates cost ' + money(newC) + ' versus ' + money(oldC) + ' on Sonnet 4.5 rates, ' + (diff >= 0 ? 'saving ' + money(diff) : 'costing ' + money(-diff) + ' more') + ' per month' + (oldC > 0 ? ' (' + Math.abs(pct).toFixed(1) + '%)' : '') + '. The tokenizer factor is ' + tokF.toFixed(2) + 'x on Sonnet 5.5. Count tokens on each model ID before you re-budget.';
+      }
+      $('verdict').textContent = v;
+    }
+
+    function fmtM(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 2 }); }
+
+    // days remaining until 2026-11-30, by calendar date in the user's time zone
+    (function () {
+      var el = $('daysLeft');
+      if (!el) return;
+      var t = new Date();
+      var today = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
+      var d = Math.round((Date.UTC(2026, 10, 30) - today) / 86400000);
+      el.textContent = d > 1 ? d + ' days (November 30, 2026)'
+        : d === 1 ? '1 day (November 30, 2026)'
+        : d === 0 ? 'Retirement day is today (November 30, 2026)'
+        : 'The retirement date has passed';
+    })();
+
+    Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
+    run();
+    // The browser restores form values after this script runs (Back button), so recompute from the restored values.
+    globalThis.onload = run;
+    globalThis.onpageshow = run;
+  })();
+  </script>
+</body>
+</html>
