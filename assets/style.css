@@ -559,3 +559,9 @@ main,
 .pow-label{font-size:.7rem;color:var(--text-muted,#666);font-weight:600}
 .pow-strip-inner a{font-size:.7rem;color:var(--text-muted,#666);text-decoration:none}
 .pow-strip-inner a:hover{color:var(--accent,#7c6ef8)}
+
+/* AEO dated short answer */
+.aeo-answer{max-width:900px;margin:1.25rem auto 0;padding:.9rem 1.1rem;background:var(--bg-card,rgba(255,255,255,0.03));border:1px solid var(--border,rgba(255,255,255,0.08));border-left:3px solid var(--accent,#7c6ef8);border-radius:var(--radius,6px);line-height:1.6}
+.aeo-answer p{margin:0 0 .35rem}
+.aeo-answer p:last-child{margin:0}
+.aeo-answer .aeo-updated{font-size:.78rem;color:var(--text-muted,#8b93a7)}

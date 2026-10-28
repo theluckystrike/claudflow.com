@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>When Does the 5-Minute Claude Prompt Cache Timer Start? | ClaudFlow</title>
+  <meta name="description" content="The Claude prompt cache lifetime counts from the cache write or last read, not the end of the response. Learn how streaming time eats the 5-minute window and when the 1-hour cache pays off.">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="When Does the 5-Minute Claude Prompt Cache Timer Start?">
+  <meta property="og:description" content="The Claude prompt cache lifetime counts from the cache write or last read, not the end of the response. Learn how streaming time eats the 5-minute window and when the 1-hour cache pays off.">
+  <meta property="og:url" content="https://claudflow.com/answers/claude-prompt-cache-ttl-timer.html">
+  <meta property="og:image" content="https://claudflow.com/assets/og-image.png">
+  <meta property="og:site_name" content="Zovo Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="When Does the 5-Minute Claude Prompt Cache Timer Start?">
+  <meta name="twitter:description" content="The Claude prompt cache lifetime counts from the cache write or last read, not the end of the response. Learn how streaming time eats the 5-minute window and when the 1-hour cache pays off.">
+  <meta name="twitter:image" content="https://claudflow.com/assets/og-image.png">
+  <link rel="canonical" href="https://claudflow.com/answers/claude-prompt-cache-ttl-timer.html">
+  <link rel="alternate" hreflang="en" href="https://claudflow.com/answers/claude-prompt-cache-ttl-timer.html">
+  <link rel="alternate" hreflang="x-default" href="https://claudflow.com/answers/claude-prompt-cache-ttl-timer.html">
+  <link rel="alternate" type="application/atom+xml" title="ClaudFlow | AI Workflow Builder Blog Feed" href="/blog/feed.xml">
+  <link rel="stylesheet" href="/assets/style.css"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "When does the 5-minute Claude prompt cache timer start?", "description": "The Claude prompt cache lifetime counts from the cache write or last read, not the end of the response. Learn how streaming time eats the 5-minute window and when the 1-hour cache pays off.", "author": {"@type": "Person", "name": "Michael Lip", "url": "https://claudflow.com/about.html"}, "publisher": {"@type": "Organization", "name": "ClaudFlow", "url": "https://claudflow.com"}, "datePublished": "2026-10-28", "dateModified": "2026-10-28", "mainEntityOfPage": "https://claudflow.com/answers/claude-prompt-cache-ttl-timer.html", "image": "https://claudflow.com/assets/og-image.png"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://claudflow.com/"}, {"@type": "ListItem", "position": 2, "name": "Answers", "item": "https://claudflow.com/answers/"}, {"@type": "ListItem", "position": 3, "name": "Prompt Cache TTL: When the Timer Starts"}]}</script>
+<link rel="stylesheet" href="/assets/support-cta.css?v=4-github">
+<script defer src="/assets/support-v3.js?v=3"></script>
+</head>
+
+<body>
+<nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=answers-claude-prompt-cache-ttl-timer" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0;">
+    <nav class="breadcrumb" aria-label="Breadcrumb" style="margin-bottom:1.5rem;font-size:0.9rem;">
+      <a href="/" style="color:var(--accent);text-decoration:none;">Home</a> &rsaquo;
+      <a href="/answers/" style="color:var(--accent);text-decoration:none;">Answers</a> &rsaquo;
+      <span style="color:var(--text-muted);">Prompt Cache TTL: When the Timer Starts</span>
+    </nav>
+
+    <section class="hero" style="padding:0 0 1rem;text-align:left;max-width:100%;">
+      <h1 style="font-size:2rem;margin-bottom:0.5rem;">When does the 5-minute Claude prompt cache timer start?</h1>
+      <p style="color:var(--text-muted);font-size:1.05rem;max-width:760px;">The clock starts earlier than most cost models assume. This page shows the exact start point and the settings that reset or kill the cache.</p>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-top:0.75rem;">Updated October 28, 2026. Facts checked against the Anthropic documentation on this date.</p>
+    </section>
+  </main>
+
+  <div style="max-width:1100px;margin:0 auto;padding:0 1.5rem 2rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:2rem;">
+      <p style="margin:0;font-size:1rem;line-height:1.6;color:var(--text);"><strong>Short answer.</strong> The 5-minute cache timer starts when the cache is written or last read, not when the response finishes. A response that streams for 4 minutes leaves about 1 minute for the next request to reuse the cache. The 1-hour cache option avoids that squeeze at a higher write price.</p>
+    </div>
+
+    <article style="max-width:820px;font-size:0.95rem;line-height:1.7;color:var(--text);">
+
+    <h2 id="start">The timer starts at the cache write, not the end of the response</h2>
+    <p>Anthropic measures the cache lifetime from the last time the cache was written or read, not from the end of its response. That single sentence changes how you schedule follow-up calls.</p>
+    <p>The vendor gives a worked example. If a response takes 4 minutes to stream, a follow-up request that reuses the same cached prefix must start within about 1 minute of that response completing. Time spent generating output counts against the 5-minute window. A long answer eats most of the window before the next call even begins.</p>
+    <p>Short answers leave the full window. Long answers leave almost none. If your workload streams long output and then asks a follow-up question, the cache often misses for a reason that has nothing to do with your prompt.</p>
+
+    <h2 id="ttl">The two TTL choices and their write prices</h2>
+    <p>Anthropic offers a 5-minute default and a 1-hour option at extra cost. The documented multipliers are:</p>
+    <ul>
+      <li>5-minute cache write: 1.25 times the base input token price.</li>
+      <li>1-hour cache write: 2 times the base input token price.</li>
+      <li>Cache read: 0.1 times the base input token price.</li>
+    </ul>
+    <p>A 1-hour entry costs 60% more to write than a 5-minute entry. It pays off when your follow-up gap is longer than 5 minutes but shorter than an hour, for example a scheduled job that runs every 20 minutes over the same document. For a gap under 5 minutes, the 5-minute entry is cheaper.</p>
+    <p>If you mix both TTLs in one request, put the 1-hour entry before any 5-minute entry. Anthropic states that longer TTL entries must appear before shorter ones.</p>
+
+    <h2 id="kills">What kills the cache before the timer runs out</h2>
+    <p>The timer only matters if the prefix stays identical. These changes invalidate the cache immediately:</p>
+    <ul>
+      <li><strong>Any change to the cached prefix.</strong> Cache keys are a cryptographic hash of the prompt up to the cache control point. One changed token at the start misses the whole entry.</li>
+      <li><strong>Tool definition changes.</strong> Names, descriptions or parameters invalidate the entire cache.</li>
+      <li><strong>Thinking and effort settings.</strong> Changing the thinking configuration always invalidates message blocks; tool and system caches are also invalidated on models that render the configuration ahead of them.</li>
+      <li><strong>Images and tool_choice.</strong> Adding or removing an image invalidates message blocks. A change to <code>tool_choice</code> affects message blocks only.</li>
+    </ul>
+    <p>There is no manual clear. Anthropic states that caches expire on their own and cannot be cleared by hand, so a cache you no longer want still costs nothing to keep idle: it simply expires.</p>
+
+    <h2 id="measure">How to measure a cache hit or miss</h2>
+    <p>Read the usage fields on the response. <code>cache_creation_input_tokens</code> and <code>cache_read_input_tokens</code> tell you which path ran. If both are 0, the prompt was not cached, usually because it did not reach the minimum length for the model and platform. A prompt just under the minimum is worth extending to reach it, because a read costs 0.1 times the base input price.</p>
+
+    <h2 id="cost">What this means for a cost model</h2>
+    <p>Model the timer, not only the price. A cache that misses because a 6-minute gap exceeded the window costs a full write at 1.25 times base, not a read at 0.1 times base. That is a 12.5 times jump on the cached prefix. Use the <a href="/tools/cache-invalidations-cost-multiplier/">Cache Invalidations Cost Multiplier</a> to price a miss pattern, and the <a href="/tools/prompt-caching-savings-estimator/">Prompt Caching Savings Estimator</a> to compare a cache-hit plan with no caching.</p>
+    <p>For a batch job that writes a cache inside the batch, remember that Anthropic does not support <code>max_tokens: 0</code> pre-warming in a batch. The vendor expects the ephemeral entry to expire before the follow-up request runs.</p>
+
+    <h2 id="sources">Sources</h2>
+    <ul>
+      <li>Anthropic, Prompt caching, "Cache lifetime" and "What invalidates the cache": <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching" rel="noopener">platform.claude.com/docs/en/build-with-claude/prompt-caching</a>, read 2026-10-28.</li>
+      <li>Anthropic, Batch processing, "What can be batched": <a href="https://platform.claude.com/docs/en/build-with-claude/batch-processing" rel="noopener">platform.claude.com/docs/en/build-with-claude/batch-processing</a>, read 2026-10-28.</li>
+    </ul>
+ 
+    </article>
+  </div>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">Zovo Tools</div>
+        <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+        <a href="/about.html#analytics">Analytics and privacy</a>
+        <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime  | $99 once, free forever &rarr;</a>
+        <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=answers-claude-prompt-cache-ttl-timer">Zovo</a></div>
+    </div>
+</footer>
+<!-- support-cta:footer -->
+<section class="support-cta support-cta--footer" data-support-cta="footer" aria-label="Support ClaudFlow"><div class="sct-maker"><img class="sct-portrait" src="/assets/michael-128.webp" width="40" height="40" loading="lazy" alt="Michael Lip"><h2 class="support-cta__title">Made by Michael, one person and a lot of coffee.</h2></div><p>If ClaudFlow has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</p><div class="support-cta__actions"><span class="sct-card-option"><a class="support-cta__btn sct-primary support-cta__btn--primary" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="support-cta__btn support-cta__btn--secondary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="sct-github" href="https://github.com/sponsors/theluckystrike" target="_blank" rel="noopener" data-rail="github"><span>Sponsor on GitHub<small>monthly or one-time</small></span></a><a class="support-cta__link" href="/support/">Why I ask</a></div></section>
+
+
+<nav class="zovo-network" aria-label="Zovo Tools Network">
+    <div class="zovo-network-inner">
+        <h3 class="zovo-network-title">Explore More Tools</h3>
+        <div class="zovo-network-links">
+            <a href="https://abwex.com">ABWex: A/B Testing</a>
+            <a href="https://b2berp.com">B2BERP: Business Tools</a>
+            <a href="https://bugbountyreality.com">BugBountyReality: Security</a>
+            <a href="https://claudkit.com">ClaudKit: API Tools</a>
+            <a href="https://dismissticket.com">DismissTicket: Support</a>
+            <a href="https://enhio.com">Enhio: Text Tools</a>
+            <a href="https://epochpilot.com">EpochPilot: Timestamps</a>
+            <a href="https://gen8x.com">Gen8X: Color Tools</a>
+            <a href="https://gpt0x.com">GPT0X: AI Models</a>
+            <a href="https://heytensor.com">HeyTensor: ML Tools</a>
+            <a href="https://ingredientcalculator.com">IngredientCalc: Recipes</a>
+            <a href="https://invokebot.com">InvokeBot: Webhooks</a>
+            <a href="https://kappafy.com">Kappafy: JSON</a>
+            <a href="https://kappakit.com">KappaKit: Dev Toolkit</a>
+            <a href="https://kickllm.com">KickLLM: LLM Costs</a>
+            <a href="https://krzen.com">Krzen: Image Tools</a>
+            <a href="https://lochbot.com">LochBot: Security</a>
+            <a href="https://lockml.com">LockML: ML Security</a>
+            <a href="https://ml0x.com?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=answers-claude-prompt-cache-ttl-timer">ML0X: ML Basics</a>
+            <a href="https://ml3x.com">ML3X: Matrix Math</a>
+            <a href="https://pictureeditor.net">PictureEditor: Image Editing</a>
+            <a href="https://recipetool.net">RecipeTool: Cooking</a>
+            <a href="https://viryd.com">Viryd: Dev Tools</a>
+            <a href="https://tg.zovo.one/">Tiny Telegram Tools: Telegram Bots</a>
+        </div>
+    </div>
+</nav>
+
+<div class="pow-strip">
+  <div class="pow-strip-inner">
+    <span class="pow-label">By the same builder:</span>
+    <a href="https://github.com/theluckystrike" rel="nofollow">GitHub: theluckystrike</a>
+    <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative: Grammar AI</a>
+    <a href="https://earlythunder.com" rel="nofollow">EarlyThunder: Dev Blog</a>
+    <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
+    <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=inline&amp;utm_campaign=answers-claude-prompt-cache-ttl-timer" rel="nofollow">Zovo: AI Dev Tools</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var strategy = 'sliding';
+  function fmt(n){ return n.toLocaleString(); }
+
+  window.cmsSelect = function(s){
+    strategy = s;
+    var cards = document.querySelectorAll('.cms-strat-card');
+    for(var i=0;i<cards.length;i++) cards[i].classList.toggle('active', cards[i].getAttribute('data-strat')===s);
+    cmsUpdate();
+  };
+
+  window.cmsUpdate = function(){
+    var turns = parseInt(document.getElementById('cms-turns').value)||1;
+    var tpt = parseInt(document.getElementById('cms-tpt').value)||100;
+    var system = parseInt(document.getElementById('cms-system').value)||0;
+    var windowSize = parseInt(document.getElementById('cms-window').value)||200000;
+    var convos = parseInt(document.getElementById('cms-convos').value)||1;
+    var costPer1M = parseFloat(document.getElementById('cms-cost').value)||3;
+
+    var rawTotal = turns * tpt;
+    var strategies = {
+      sliding: { windowTurns:20, summaryTokens:0, ragTokens:0, label:'Sliding Window' },
+      summary: { windowTurns:10, summaryTokens:Math.min(600,Math.ceil(turns*tpt*0.02)), ragTokens:0, label:'Summary Compression' },
+      rag:     { windowTurns:5,  summaryTokens:0, ragTokens:2000, label:'RAG Retrieval' },
+      hybrid:  { windowTurns:8,  summaryTokens:Math.min(400,Math.ceil(turns*tpt*0.015)), ragTokens:1500, label:'Hybrid' }
+    };
+
+    var s = strategies[strategy];
+    var recentTokens = Math.min(turns, s.windowTurns) * tpt;
+    var totalUsed = system + s.summaryTokens + s.ragTokens + recentTokens;
+    var free = Math.max(0, windowSize - totalUsed);
+    var pctUsed = Math.min(100, (totalUsed/windowSize)*100);
+
+    var noStrategyTokens = rawTotal + system;
+    var withStrategyTokens = totalUsed;
+    var savingsPerTurn = Math.max(0, noStrategyTokens - withStrategyTokens);
+    var totalInputTokensNoStrat = 0;
+    for(var t=1;t<=turns;t++) totalInputTokensNoStrat += system + t*tpt;
+    var totalInputTokensWithStrat = 0;
+    for(var t=1;t<=turns;t++){
+      var rt = Math.min(t, s.windowTurns)*tpt;
+      var st = t>s.windowTurns ? s.summaryTokens : 0;
+      totalInputTokensWithStrat += system + st + s.ragTokens + rt;
+    }
+    var monthlySaveTokens = (totalInputTokensNoStrat - totalInputTokensWithStrat) * convos * 30;
+    var monthlySaveDollars = (monthlySaveTokens/1000000) * costPer1M;
+
+    var viz = document.getElementById('cms-viz');
+    var pSys = Math.max(1, (system/windowSize)*100);
+    var pSum = (s.summaryTokens/windowSize)*100;
+    var pRag = (s.ragTokens/windowSize)*100;
+    var pRecent = (recentTokens/windowSize)*100;
+    var pFree = Math.max(0, 100-pSys-pSum-pRag-pRecent);
+    viz.innerHTML = '<div class="cms-seg" style="width:'+pSys+'%;background:#a855f7;">'+(pSys>4?'System':'')+'</div>'
+      +'<div class="cms-seg" style="width:'+(pSum+pRag)+'%;background:#06B6D4;">'+(pSum+pRag>4?(s.summaryTokens>0?'Summary':'RAG'):'')+'</div>'
+      +'<div class="cms-seg" style="width:'+pRecent+'%;background:#22c55e;">'+(pRecent>4?'Recent':'')+'</div>'
+      +'<div class="cms-seg" style="width:'+pFree+'%;background:var(--bg-card);color:var(--text-muted);">'+(pFree>5?fmt(free)+' free':'')+'</div>';
+
+    var stats = document.getElementById('cms-stats');
+    var savingsPct = totalInputTokensNoStrat>0 ? Math.round((1-totalInputTokensWithStrat/totalInputTokensNoStrat)*100) : 0;
+    stats.innerHTML = '<div class="cms-stat"><div class="val">'+fmt(totalUsed)+'</div><div class="lbl">Tokens / Final Turn</div></div>'
+      +'<div class="cms-stat"><div class="val">'+fmt(totalInputTokensWithStrat)+'</div><div class="lbl">Total / Conversation</div></div>'
+      +'<div class="cms-stat"><div class="val" style="color:#22c55e;">'+savingsPct+'%</div><div class="lbl">Token Savings</div></div>'
+      +'<div class="cms-stat"><div class="val" style="color:#22c55e;">$'+monthlySaveDollars.toFixed(0)+'</div><div class="lbl">Monthly Savings</div></div>';
+
+    var rec = document.getElementById('cms-recommendation');
+    var recs = {
+      sliding:'Best for: Short task-focused conversations (support tickets, coding sessions, quick Q&A). Not recommended when users reference information from early in the conversation.',
+      summary:'Best for: Advisory conversations, project discussions, multi-session interactions. The sweet spot for most production chatbots that need long-term awareness without RAG infrastructure.',
+      rag:'Best for: Knowledge-intensive applications with large document bases. Customer support over help articles, research assistants, internal documentation bots. Requires vector database infrastructure.',
+      hybrid:'Best for: Enterprise assistants that handle long conversations with external knowledge requirements. Maximum capability but highest implementation complexity. Worth it for high-value, high-volume applications.'
+    };
+    rec.innerHTML = '<strong style="color:var(--accent);">'+s.label+' Recommendation</strong><br><span style="color:var(--text-muted);">'+recs[strategy]+'</span>';
+
+    updateComparison(turns, tpt, system, windowSize, convos, costPer1M, strategies);
+    updateCode();
+  };
+
+  function updateComparison(turns,tpt,system,windowSize,convos,costPer1M,strategies){
+    var body = document.getElementById('cms-compare-body');
+    var html = '';
+    var keys = ['sliding','summary','rag','hybrid'];
+    var complexities = ['Low','Medium','Medium-High','High'];
+    var retentions = ['Recent only','Good','Query-specific','Excellent'];
+    for(var k=0;k<keys.length;k++){
+      var s = strategies[keys[k]];
+      var recentT = Math.min(turns, s.windowTurns)*tpt;
+      var used = system + s.summaryTokens + s.ragTokens + recentT;
+      var totalInput = 0;
+      for(var t=1;t<=turns;t++){
+        var rt = Math.min(t,s.windowTurns)*tpt;
+        var st = t>s.windowTurns?s.summaryTokens:0;
+        totalInput += system + st + s.ragTokens + rt;
+      }
+      var monthly = (totalInput*convos*30/1000000)*costPer1M;
+      var isActive = keys[k]===strategy;
+      html += '<tr'+(isActive?' style="background:rgba(6,182,212,0.08);"':'')+'><td'+(isActive?' style="font-weight:600;"':'')+'>'+s.label+'</td><td>'+fmt(used)+'</td><td>$'+monthly.toFixed(0)+'</td><td>'+retentions[k]+'</td><td>'+complexities[k]+'</td></tr>';
+    }
+    body.innerHTML = html;
+  }
+
+  function updateCode(){
+    var codes = {
+      sliding:'# Sliding Window Memory Strategy\ndef build_messages(history, max_turns=20, system_prompt=""):\n    messages = []\n    if system_prompt:\n        messages.append({"role": "system", "content": system_prompt})\n    \n    # Keep only the most recent N turns\n    recent = history[-max_turns:] if len(history) > max_turns else history\n    messages.extend(recent)\n    return messages\n\n# Usage\nhistory.append({"role": "user", "content": user_input})\nresponse = client.messages.create(\n    model="claude-sonnet-4-20250514",\n    messages=build_messages(history, max_turns=20,\n        system_prompt="You are a helpful assistant.")\n)\nhistory.append({"role": "assistant", "content": response.content})',
+      summary:'# Summary Compression Memory Strategy\ndef compress_if_needed(history, max_tokens=120000, system_prompt=""):\n    total = sum(len(m["content"])//4 for m in history)\n    if total < max_tokens:\n        return history  # No compression needed\n    \n    # Summarize older messages\n    old = history[:-10]  # Keep last 10 raw\n    recent = history[-10:]\n    \n    summary = client.messages.create(\n        model="claude-sonnet-4-20250514",\n        messages=[{"role":"user","content":\n            "Summarize this conversation as bullet points:\\n"\n            + "\\n".join(m["content"] for m in old)}]\n    )\n    \n    compressed = [{"role":"user","content":\n        f"[CONVERSATION SUMMARY]\\n{summary.content}"}]\n    return compressed + recent',
+      rag:'# RAG Retrieval Memory Strategy\nimport chromadb\n\nclient_db = chromadb.Client()\ncollection = client_db.get_or_create_collection("knowledge")\n\ndef build_rag_messages(query, history, system_prompt="", top_k=5):\n    # Retrieve relevant context\n    results = collection.query(query_texts=[query], n_results=top_k)\n    context_chunks = "\\n---\\n".join(results["documents"][0])\n    \n    messages = [{"role": "system", "content":\n        f"{system_prompt}\\n\\nRelevant context:\\n{context_chunks}"}]\n    \n    # Add only recent conversation turns\n    messages.extend(history[-5:])\n    messages.append({"role": "user", "content": query})\n    return messages',
+      hybrid:'# Hybrid Memory Strategy (Summary + RAG + Sliding Window)\ndef build_hybrid_context(query, history, knowledge_db,\n                         system_prompt="", summary=None):\n    messages = []\n    \n    # 1. System prompt\n    context_parts = [system_prompt]\n    \n    # 2. Conversation summary (long-term memory)\n    if summary:\n        context_parts.append(f"[CONVERSATION HISTORY]\\n{summary}")\n    \n    # 3. RAG retrieval (domain knowledge)\n    results = knowledge_db.query(query_texts=[query], n_results=3)\n    if results["documents"][0]:\n        chunks = "\\n---\\n".join(results["documents"][0])\n        context_parts.append(f"[RELEVANT DOCS]\\n{chunks}")\n    \n    messages.append({"role":"system",\n        "content":"\\n\\n".join(context_parts)})\n    \n    # 4. Sliding window (recent context)\n    messages.extend(history[-8:])\n    messages.append({"role":"user","content":query})\n    return messages'
+    };
+    document.getElementById('cms-code').textContent = codes[strategy];
+  }
+
+  cmsUpdate();
+})();
+</script>
+  <script src="/assets/js/cdf-ui.js" defer></script>
+</body>
+</html>
