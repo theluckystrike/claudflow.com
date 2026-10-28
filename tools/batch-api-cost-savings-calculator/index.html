@@ -60,12 +60,8 @@
       nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
     }
   </style>
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Batch API Cost Savings Calculator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"https://claudflow.com/tools/batch-api-cost-savings-calculator/","description":"Calculate what the Anthropic Batch API 50 percent discount saves on your Claude traffic. Enter monthly requests, tokens, and batch share to get sync vs batch monthly cost.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"}}
-  </script>
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the Claude Batch API discount?","acceptedAnswer":{"@type":"Answer","text":"Anthropic's Message Batches API bills input and output tokens at 50% of the standard rate. The trade-off is latency: batched requests complete within 24 hours rather than streaming immediately."}},{"@type":"Question","name":"Which traffic is a good fit for batch?","acceptedAnswer":{"@type":"Answer","text":"Backfills, evaluations, classification jobs, report generation, and any workflow where a result in a few hours is fine. Interactive chat and agent tool-use loops are not, because they need low latency."}},{"@type":"Question","name":"Are the rates exact?","acceptedAnswer":{"@type":"Answer","text":"The calculator uses list prices per million tokens for each model shown, matching Anthropic published rates. Enter your own blended rates if you have custom pricing."}}]}
-  </script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Batch API Cost Savings Calculator","applicationCategory":"DeveloperApplication","operatingSystem":"Web","url":"https://claudflow.com/tools/batch-api-cost-savings-calculator/","description":"Calculate what the Anthropic Batch API 50 percent discount saves on your Claude traffic. Enter monthly requests, tokens, and batch share to get sync vs batch monthly cost.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"},"dateModified":"2026-10-28"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the Claude Batch API discount?","acceptedAnswer":{"@type":"Answer","text":"Anthropic's Message Batches API bills input and output tokens at 50% of the standard rate. The trade-off is latency: batched requests complete within 24 hours rather than streaming immediately."}},{"@type":"Question","name":"Which traffic is a good fit for batch?","acceptedAnswer":{"@type":"Answer","text":"Backfills, evaluations, classification jobs, report generation, and any workflow where a result in a few hours is fine. Interactive chat and agent tool-use loops are not, because they need low latency."}},{"@type":"Question","name":"Are the rates exact?","acceptedAnswer":{"@type":"Answer","text":"The calculator uses list prices per million tokens for each model shown, matching Anthropic published rates. Enter your own blended rates if you have custom pricing."}}]}</script>
 <script defer src="/assets/js/roi-measurement.js"></script>
   <link rel="stylesheet" href="/assets/support-cta.css?v=4-github">
 <script defer src="/assets/support-v3.js?v=3"></script>
@@ -90,6 +86,11 @@
   <div class="tool-wrap">
     <h1 class="page-title">Batch API Cost Savings Calculator</h1>
     <p class="page-sub">What shifting delay-tolerant traffic to Anthropic's Batch API saves per month, computed in your browser from list prices.</p>
+
+  <section class="aeo-answer" aria-label="Short answer">
+    <p><strong>Short answer:</strong> The Anthropic Message Batches API bills input and output tokens at 50% of the standard rate. Results arrive within 24 hours instead of streaming. Enter monthly requests, tokens per request and the share of traffic you can delay; the calculator shows sync cost, batch cost and the monthly and annual saving.</p>
+    <p class="aeo-updated">Updated October 28, 2026</p>
+  </section>
 
     <div class="field-grid">
       <div class="field">
@@ -213,6 +214,14 @@
   Array.prototype.forEach.call(document.querySelectorAll('input,select'), function (el) { el.addEventListener('input', run); });
   run();
 })();</script>
+  <section style="max-width:980px;margin:2rem auto 0;padding:0 2rem;">
+    <h2 style="font-size:1.1rem;">Related answers</h2>
+    <ul style="line-height:1.8;">
+      <li><a href="/answers/claude-batch-results-29-day-window.html">How long do Claude Batch API results stay available?</a> &mdash; the 29-day download window and what the clock counts from.</li>
+      <li><a href="/answers/claude-batch-request-failure-isolation.html">If one request in a Claude batch fails, do the others still finish?</a> &mdash; partial failure and how to retry only what broke.</li>
+      <li><a href="/answers/claude-prompt-cache-ttl-timer.html">When does the 5-minute Claude prompt cache timer start?</a> &mdash; why streaming time eats the cache window.</li>
+    </ul>
+  </section>
   <script src="/assets/js/cdf-ui.js" defer></script>
 </body>
 </html>
