@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Claude Managed Agents pricing calculator</title>
+  <meta name="description" content="Estimate one Claude Managed Agents session and a month of sessions from tokens, cache writes and reads, $0.08 per session-hour runtime and web searches.">
+  <meta property="og:title" content="Claude Managed Agents pricing calculator">
+  <meta property="og:description" content="Calculate the cost of a Claude Managed Agents session from token volumes, session runtime hours, and web searches, with caching and the US inference geography multiplier.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://claudflow.com/tools/claude-managed-agents-cost-calculator/">
+  <link rel="canonical" href="https://claudflow.com/tools/claude-managed-agents-cost-calculator/">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Claude Managed Agents Pricing Calculator","url":"https://claudflow.com/tools/claude-managed-agents-cost-calculator/","description":"Estimates the cost of a Claude Managed Agents session from token volumes, session runtime hours, and web searches, using the official Anthropic Managed Agents rates including the $0.08 per session-hour runtime charge and the $10 per 1,000 searches web search fee.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Michael Lip","url":"https://claudflow.com/about.html"},"datePublished":"2026-10-31","dateModified":"2026-10-31"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"claudflow","item":"https://claudflow.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://claudflow.com/tools/"},{"@type":"ListItem","position":3,"name":"Claude Managed Agents pricing calculator","item":"https://claudflow.com/tools/claude-managed-agents-cost-calculator/"}]}]}</script>
+  <script defer src="/assets/js/roi-measurement.js"></script>
+  <link rel="stylesheet" href="/assets/support-cta.css?v=4-github">
+  <script defer src="/assets/support-v3.js?v=3"></script>
+  <style>
+    .tool-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .tool-wrap a { color: var(--accent); }
+    h1.page-title { font-family: var(--font-display); font-size: 1.6rem; margin: 0.5rem 0 0.25rem; }
+    .page-sub { color: var(--text-muted); margin: 0.2rem 0 0.4rem; }
+    .byline { color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1.2rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 1.2rem; margin: 1rem 0; }
+    .field label { display: block; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .field input, .field select { width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); min-height: 41px; }
+    .err { color: #f87171; font-size: 0.8rem; min-height: 1rem; margin: 0.15rem 0 0; }
+    .results { margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+    .res-row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.3rem 0; }
+    .res-row.total { border-top: 1px solid var(--border); margin-top: 0.5rem; padding-top: 0.6rem; }
+    .res-row .k { color: var(--text-muted); }
+    .res-row .v { font-variant-numeric: tabular-nums; }
+    .verdict { margin-top: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1.1rem; font-size: 0.95rem; line-height: 1.55; }
+    .formula { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--text-muted); margin: 0.75rem 0; overflow-x: auto; white-space: pre; font-family: var(--font-display); }
+    .section { margin-top: 2.5rem; }
+    .section h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.6rem; }
+    .section h3 { font-size: 1rem; margin: 1.2rem 0 0.3rem; }
+    .section p, .section li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+    .section p { margin: 0 0 0.75rem; }
+    .section ul { padding-left: 1.2rem; }
+    table.cmp { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 0.75rem; }
+    table.cmp caption { text-align: left; color: var(--text); font-size: 0.9rem; padding-bottom: 0.4rem; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; }
+    table.cmp th { color: var(--text); font-weight: 600; }
+    table.cmp td { color: var(--text-muted); }
+    .tool-wrap details { margin-top: 1.25rem; border: 1px solid var(--border); border-radius: var(--radius); padding: 0.7rem 1rem; }
+    .tool-wrap summary { cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+    .tool-wrap details p, .tool-wrap details li { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
+    .tool-wrap details ul { padding-left: 1.2rem; }
+    @media (max-width: 720px) {
+      .tool-wrap { padding: 1.25rem 1rem; }
+      h1.page-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .field-grid { grid-template-columns: 1fr; }
+      nav .nav-links { gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+      .res-row { flex-direction: column; gap: 0.1rem; }
+      .res-row .v { text-align: left; }
+      .formula { font-size: 0.78rem; padding: 0.7rem 0.75rem; }
+    }
+    @media print {
+      :root { --bg: #fff; --bg-card: #fff; --text: #111; --text-muted: #444; --accent: #0e7490; }
+      .formula { white-space: pre-wrap; overflow: visible; overflow-wrap: anywhere; }
+      .err { color: #b91c1c; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">ClaudFlow</a>
+    <ul class="nav-links">
+      <li><a href="/research/">Research</a></li>
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/tools/">Tools</a></li>
+      <li><a href="/answers/">Answers</a></li>
+      <li><a href="/blog/">Blog</a></li>
+      <li><a href="/about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro</a>
+      <a href="https://zovo.one/tools?utm_source=claudflow&amp;utm_medium=nav&amp;utm_campaign=tool" class="nav-zovo">Zovo Tools</a>
+    </div>
+  </nav>
+
+  <main class="tool-wrap">
+    <h1 class="page-title">Claude Managed Agents pricing calculator</h1>
+    <p class="page-sub">What a Claude Managed Agents session costs, from tokens, session runtime, and web searches</p>
+    <p class="byline">By Michael Lip, <a href="https://claudflow.com/about.html">claudflow.com</a>. Updated October 31, 2026.</p>
+
+  <section class="aeo-answer" aria-label="Short answer">
+    <p>A Claude Managed Agents session is billed on two dimensions, tokens and session runtime. Tokens use the standard model rates. Runtime is $0.08 USD per session-hour, metered only while the session status is running. A web search inside a session adds $10 USD per 1,000 searches. Anthropic's own worked example, a 1-hour Opus 5.5 session with 50,000 input and 15,000 output tokens, totals $0.58 USD, or $0.428 USD when 40,000 of those input tokens are cache reads.</p>
+    <p class="aeo-updated">Updated October 31, 2026</p>
+  </section>
+
+    <p class="lead">Claude Managed Agents is Anthropic's managed harness for running Claude as an autonomous agent. Unlike plain Messages API calls, a session accrues a runtime charge while its status is running, on top of the token bill. Enter your expected session profile below. The calculator applies the token rate card for your model, the $0.08 USD per session-hour runtime rate, your web search volume at $10 USD per 1,000 searches, prompt caching at the official cache rates, and the 1.1x multiplier when the agent pins US inference geography, then shows the per-session and per-month cost.</p>
+
+    <form id="calc" novalidate onsubmit="return false">
+      <div class="field-grid">
+        <div class="field">
+          <label for="model">Model</label>
+          <select id="model">
+            <option value="opus55">Claude Opus 5.5</option>
+            <option value="opus55fast">Claude Opus 5.5, fast mode (model.speed "fast")</option>
+            <option value="fable51">Claude Fable 5.1</option>
+            <option value="sonnet55">Claude Sonnet 5.5</option>
+            <option value="sonnet5">Claude Sonnet 5 (legacy model)</option>
+            <option value="haiku55">Claude Haiku 5.5, prompts up to 100,000 tokens</option>
+            <option value="haiku55long">Claude Haiku 5.5, prompts over 100,000 tokens</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="sessions">Sessions per month</label>
+          <input type="number" id="sessions" min="0" step="1" value="100" inputmode="numeric" aria-describedby="sessions-err">
+          <p class="err" id="sessions-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="hours">Average session runtime, running hours per session</label>
+          <input type="number" id="hours" min="0" step="0.1" value="1" inputmode="decimal" aria-describedby="hours-err">
+          <p class="err" id="hours-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="inTok">Input tokens per session, including cache reads</label>
+          <input type="number" id="inTok" min="0" step="1000" value="50000" inputmode="numeric" aria-describedby="inTok-err">
+          <p class="err" id="inTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="outTok">Output tokens per session</label>
+          <input type="number" id="outTok" min="0" step="1000" value="15000" inputmode="numeric" aria-describedby="outTok-err">
+          <p class="err" id="outTok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="w5Tok">5-minute cache write tokens per session</label>
+          <input type="number" id="w5Tok" min="0" step="1000" value="0" inputmode="numeric" aria-describedby="w5Tok-err">
+          <p class="err" id="w5Tok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="w1Tok">1-hour cache write tokens per session</label>
+          <input type="number" id="w1Tok" min="0" step="1000" value="0" inputmode="numeric" aria-describedby="w1Tok-err">
+          <p class="err" id="w1Tok-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="cacheReadPct">Share of input tokens that are cache reads, percent</label>
+          <input type="number" id="cacheReadPct" min="0" max="100" step="1" value="0" inputmode="numeric" aria-describedby="cacheReadPct-err">
+          <p class="err" id="cacheReadPct-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="searches">Web searches per session</label>
+          <input type="number" id="searches" min="0" step="1" value="0" inputmode="numeric" aria-describedby="searches-err">
+          <p class="err" id="searches-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="budget">Session budget cap, USD (optional)</label>
+          <input type="text" id="budget" value="" inputmode="decimal" placeholder="1.25" aria-describedby="budget-err">
+          <p class="err" id="budget-err" role="alert"></p>
+        </div>
+        <div class="field">
+          <label for="geo">Inference geography</label>
+          <select id="geo">
+            <option value="1">global (standard rates)</option>
+            <option value="1.1">us (1.1x multiplier)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="results" aria-live="polite">
+        <div class="res-row"><span class="k">Token cost per session</span><span class="v" id="tokOut">-</span></div>
+        <div class="res-row"><span class="k">Session runtime cost per session</span><span class="v" id="runOut">-</span></div>
+        <div class="res-row"><span class="k">Web search cost per session</span><span class="v" id="searchOut">-</span></div>
+        <div class="res-row total"><span class="k">Total per session</span><span class="v" id="sesOut">-</span></div>
+        <div class="res-row total"><span class="k">Total per month</span><span class="v" id="monOut">-</span></div>
+        <div class="res-row"><span class="k">Budget, max_list_cost</span><span class="v" id="capOut">-</span></div>
+      </div>
+
+      <details class="formula-box" open>
+        <summary>Formula and assumptions</summary>
+        <p>The calculator uses the official rates, all verified October 31, 2026 against the Anthropic pricing page at platform.claude.com/docs/en/about-claude/pricing.</p>
+        <ul>
+          <li>Token cost = uncached input x input rate + cache reads x cache hit rate + 5-minute cache writes x 5m write rate + 1-hour cache writes x 1h write rate + output x output rate, all in USD per million tokens (MTok). Enter cache writes as their own token counts, not as part of the input tokens.</li>
+          <li>Runtime cost = running hours x $0.08 USD per session-hour. Idle, rescheduling, and terminated time does not count, so enter only the running share of your sessions.</li>
+          <li>Search cost = searches per session / 1000 x $10 USD per 1,000 searches. Web search results are counted as input tokens, so include them in the input tokens.</li>
+          <li>The 1.1x US data residency multiplier applies to all token charges when the agent's model.inference_geo is pinned to us. Session runtime and web search are not listed as multiplied.</li>
+        </ul>
+        <p class="formula" id="formulaEcho">-</p>
+      </details>
+      <p class="verdict" id="verdict" aria-live="polite">Enter your session profile to see a result.</p>
+    </form>
+
+    <div class="section">
+      <h2>Rate cards used, verified October 31, 2026</h2>
+      <table class="cmp">
+        <caption>Claude Managed Agents token rates, USD per million tokens (MTok)</caption>
+        <thead><tr><th>Model</th><th>Base input</th><th>5m cache writes</th><th>1h cache writes</th><th>Cache hits</th><th>Output</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Fable 5.1</td><td>$10 / MTok</td><td>$12.50 / MTok</td><td>$20 / MTok</td><td>$0.25 / MTok</td><td>$50 / MTok</td></tr>
+          <tr><td>Claude Opus 5.5</td><td>$4 / MTok</td><td>$5 / MTok</td><td>$8 / MTok</td><td>$0.20 / MTok</td><td>$20 / MTok</td></tr>
+          <tr><td>Claude Opus 5.5, fast mode</td><td>$8 / MTok</td><td>$10 / MTok (calculated)</td><td>$16 / MTok (calculated)</td><td>$0.40 / MTok (calculated)</td><td>$40 / MTok</td></tr>
+          <tr><td>Claude Sonnet 5.5</td><td>$2 / MTok</td><td>$2.50 / MTok</td><td>$4 / MTok</td><td>$0.10 / MTok</td><td>$10 / MTok</td></tr>
+          <tr><td>Claude Sonnet 5 (legacy model)</td><td>$2 / MTok</td><td>$2.50 / MTok</td><td>$4 / MTok</td><td>$0.20 / MTok</td><td>$10 / MTok</td></tr>
+          <tr><td>Claude Haiku 5.5, prompts up to 100,000 tokens</td><td>$0.10 / MTok</td><td>$0.125 / MTok</td><td>$0.20 / MTok</td><td>$0.01 / MTok</td><td>$0.50 / MTok</td></tr>
+          <tr><td>Claude Haiku 5.5, prompts over 100,000 tokens</td><td>$0.50 / MTok</td><td>$0.625 / MTok</td><td>$1 / MTok</td><td>$0.05 / MTok</td><td>$2.50 / MTok</td></tr>
+        </tbody>
+      </table>
+      <p>These prices are from the <a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener">Anthropic pricing page</a>, fetched October 31, 2026.</p>
+      <p>The pricing page quotes fast mode input at $8 and output at $40 USD per MTok. The fast mode cache prices are a calculation with the prompt caching multipliers, because the pricing page says that they apply on top of fast mode pricing. The 5m cache write is $8 x 1.25 = $10, the 1h cache write is $8 x 2 = $16 and the cache hit is $8 x 0.05 = $0.40 USD per MTok. Claude Haiku 5.5 prices each request by its own prompt length, and that length counts all of its input tokens, including cache reads and cache writes. Session totals do not show the prompt length of each request, so select the Haiku 5.5 level that matches your requests.</p>
+      <table class="cmp">
+        <caption>Claude Managed Agents session charges</caption>
+        <thead><tr><th>Item</th><th>Rate</th><th>Metering</th></tr></thead>
+        <tbody>
+          <tr><td>Session runtime</td><td>$0.08 USD per session-hour</td><td>running status duration, to the millisecond</td></tr>
+          <tr><td>Web search</td><td>$10 USD per 1,000 searches</td><td>per search triggered inside the session</td></tr>
+          <tr><td>US inference geography</td><td>1.1x token rates</td><td>when model.inference_geo is us</td></tr>
+        </tbody>
+      </table>
+      <p>Session runtime replaces the code execution container-hour billing model when using Claude Managed Agents. You are not separately billed for container hours on top of session runtime. Batch API discounts do not apply because sessions are stateful and interactive, and there is no batch mode. Cloud platform pricing does not apply either, because Claude Managed Agents is not available on partner-operated cloud platforms such as Bedrock and Claude Models on Google Cloud (Google managed).</p>
+    </div>
+
+    <div class="section">
+      <h2>Worked examples from the official docs</h2>
+      <p>Anthropic's pricing page gives two worked examples for a 1-hour coding session using Claude Opus 5.5 that consumes 50,000 input tokens and 15,000 output tokens.</p>
+      <ul>
+        <li>Without caching. Input 50,000 x $4 per MTok = $0.20 USD. Output 15,000 x $20 per MTok = $0.30 USD. Runtime 1.0 hour x $0.08 = $0.08 USD. Total $0.58 USD.</li>
+        <li>With prompt caching, where 40,000 of the 50,000 input tokens are cache reads. Uncached input 10,000 x $4 per MTok = $0.04 USD. Cache reads 40,000 x $4 x 0.05 per MTok = $0.008 USD. Output $0.30 USD. Runtime $0.08 USD. Total $0.428 USD.</li>
+      </ul>
+      <p>The default inputs above match the first example, so the calculator reproduces the official $0.58 USD figure when you load the page.</p>
+    </div>
+
+    <div class="section">
+      <h2>Session budget and max_list_cost</h2>
+      <p>A session budget is an optional hard spend ceiling. A budget can only be attached when the session is created. The max_list_cost amount is a whole number of US cents written as a string with no leading zeros, so "125" is $1.25 USD and "50" is 50 cents. Decimal forms such as "25.00" are rejected. Enter a dollar cap in the calculator to get the amount string.</p>
+      <p>The budget compares against list cost, which is model tokens at list prices, web searches at $10 USD per 1,000 searches and session running time at $0.08 USD per hour. List cost is not your contracted price. With negotiated discounts, your billed spend can be lower than the cap. The cap is checked between model requests, so model spend past the cap is at most the cost of one model request for each thread. The tool calls in that request's response still run, and their web searches and running time also count toward list cost, so size the cap with that margin.</p>
+    </div>
+
+    <div class="section">
+      <h2>Fast mode, if speed matters more than cost</h2>
+      <p>Fast mode provides faster output for Claude Opus 5.5 at premium token pricing, $8 USD per MTok input and $40 USD per MTok output instead of $4 and $20. Prompt caching and data residency multipliers stack on top of fast mode pricing. Fast mode applies when the agent's model.speed is set to "fast", and it is available on Claude Opus 5.5 for Managed Agents. The pricing page lists fast mode on the Claude API and, for Claude Opus 5.5, on Claude Models on Google Cloud (Anthropic managed) and Claude in Microsoft Foundry. It does not list Claude Platform on AWS. Select "Claude Opus 5.5, fast mode" in the calculator to compare it with a standard run at the same token volumes.</p>
+    </div>
+
+    <div class="section">
+      <h2>Ways to reduce session cost</h2>
+      <ul>
+        <li>Cache aggressively. On Opus 5.5, cache reads cost 5 percent of the base input rate, $0.20 versus $4 per MTok. The official caching example cuts a 1-hour session from $0.58 to $0.428 USD.</li>
+        <li>Watch the running clock. Runtime accrues only while the session status is running. Idle waits, rescheduling, and termination do not count, but a session left running while it thinks through a long task does. Shorter running time is a direct saving at $0.08 USD per session-hour.</li>
+        <li>Cap sessions with a budget. You can set a hard list-cost budget at session creation. The platform stops issuing new model requests once the session reaches it.</li>
+        <li>Pick the smallest model that passes your quality bar. Sonnet 5.5 output is $10 per MTok against Opus 5.5 at $20 per MTok.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Limitations</h2>
+      <p>This calculator models the listed rates only. It does not model tool pricing beyond web search. On Claude Platform on AWS, session token and runtime charges convert to Claude Consumption Units at $0.01 USD per CCU. Claude Managed Agents is in beta on every model. LLM pricing shown is based on hardcoded reference values and may not reflect current provider rates. Always verify against official pricing pages before making budget decisions. The token counts you enter are estimates. Actual usage depends on encoding, model version, and prompt structure. This tool does not execute LLM calls. All computation happens locally in your browser.</p>
+    </div>
+
+    <details>
+      <summary>Sources</summary>
+      <ul>
+        <li><a href="https://platform.claude.com/docs/en/about-claude/pricing" rel="noopener">Anthropic, Claude pricing (Managed Agents pricing, Model pricing, Fast mode pricing, Data residency pricing)</a>, fetched October 31, 2026.</li>
+        <li><a href="https://platform.claude.com/docs/en/managed-agents/budgets" rel="noopener">Anthropic, Session budgets</a>, fetched October 31, 2026.</li>
+        <li><a href="https://platform.claude.com/docs/en/managed-agents/overview" rel="noopener">Anthropic, Claude Managed Agents overview</a>, fetched October 31, 2026.</li>
+        <li><a href="https://platform.claude.com/docs/en/managed-agents/session-operations" rel="noopener">Anthropic, Session operations (session statuses)</a>, fetched October 31, 2026.</li>
+        <li><a href="https://platform.claude.com/docs/en/build-with-claude/fast-mode" rel="noopener">Anthropic, Fast mode</a>, fetched October 31, 2026.</li>
+        <li><a href="https://platform.claude.com/docs/en/models/overview" rel="noopener">Anthropic, Models overview (current and legacy models)</a>, fetched October 31, 2026.</li>
+      </ul>
+    </details>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">Zovo Tools</div>
+      <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+      <a href="/about.html#analytics">Analytics and privacy</a>
+      <a href="https://zovo.one/pricing?utm_source=claudflow&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+      <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=claudflow&amp;utm_medium=footer&amp;utm_campaign=tool">Zovo</a></div>
+    </div>
+  </footer>
+<!-- support-cta:footer -->
+<section class="support-cta support-cta--footer" data-support-cta="footer" aria-label="Support ClaudFlow"><div class="sct-maker"><img class="sct-portrait" src="/assets/michael-128.webp" width="40" height="40" loading="lazy" alt="Michael Lip"><h2 class="support-cta__title">Made by Michael, one person and a lot of coffee.</h2></div><p>If ClaudFlow has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</p><div class="support-cta__actions"><span class="sct-card-option"><a class="support-cta__btn sct-primary support-cta__btn--primary" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="support-cta__btn support-cta__btn--secondary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="sct-github" href="https://github.com/sponsors/theluckystrike" target="_blank" rel="noopener" data-rail="github"><span>Sponsor on GitHub<small>monthly or one-time</small></span></a><a class="support-cta__link" href="/support/">Why I ask</a></div></section>
+
+
+
+
+  <script>
+  (function () {
+    'use strict';
+    // Rates in USD per MTok. Verified 2026-10-31 against the Anthropic pricing page.
+    // i = base input, w5 = 5m cache write, w1 = 1h cache write, c = cache hit, o = output.
+    // Fast mode: input 8 and output 40 are quoted; its cache prices use the 1.25x, 2x and 0.05x multipliers.
+    var R = {
+      opus55:      { i: 4,    w5: 5,     w1: 8,    c: 0.20, o: 20,   name: 'Claude Opus 5.5' },
+      opus55fast:  { i: 8,    w5: 10,    w1: 16,   c: 0.40, o: 40,   name: 'Claude Opus 5.5 fast mode' },
+      fable51:     { i: 10,   w5: 12.50, w1: 20,   c: 0.25, o: 50,   name: 'Claude Fable 5.1' },
+      sonnet55:    { i: 2,    w5: 2.50,  w1: 4,    c: 0.10, o: 10,   name: 'Claude Sonnet 5.5' },
+      sonnet5:     { i: 2,    w5: 2.50,  w1: 4,    c: 0.20, o: 10,   name: 'Claude Sonnet 5' },
+      haiku55:     { i: 0.10, w5: 0.125, w1: 0.20, c: 0.01, o: 0.50, name: 'Claude Haiku 5.5, prompts up to 100,000 tokens' },
+      haiku55long: { i: 0.50, w5: 0.625, w1: 1,    c: 0.05, o: 2.50, name: 'Claude Haiku 5.5, prompts over 100,000 tokens' }
+    };
+    var RUNTIME_PER_HOUR = 0.08;   // USD per session-hour, running status only
+    var SEARCH_PER_1000 = 10;      // USD per 1,000 searches
+
+    var MAX_N = 1000000000;
+
+    function $(id) { return document.getElementById(id); }
+    function money(n) {
+      n = Number(n.toPrecision(15)); // drop binary float noise so x.xx5 rounds up like the exact decimal
+      if (n >= 1) return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+      return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 4, minimumFractionDigits: 2 });
+    }
+
+    function read(id, opts) {
+      var el = $(id), err = $(id + '-err');
+      var s = el.value.replace(/[\s,_]/g, '');
+      var n = null;
+      if ((el.validity && el.validity.badInput) || s === '') n = null;
+      else if (/^[+-]?0*\.?0*$/.test(s)) n = 0;
+      else if (/^\+?(\d{1,9}(\.\d{1,4})?|\.\d{1,4})$/.test(s)) { n = parseFloat(s); if (n > (opts && opts.max || MAX_N)) n = null; }
+      if (n === null) {
+        el.setAttribute('aria-invalid', 'true');
+        err.textContent = 'Enter a number' + (opts && opts.max ? ' from 0 to ' + opts.max.toLocaleString('en-US') + '.' : '.');
+        return null;
+      }
+      el.removeAttribute('aria-invalid');
+      err.textContent = '';
+      return n;
+    }
+
+    // Dollar cap to max_list_cost.amount: whole US cents as a string, no leading zeros, above 0. Integer arithmetic only.
+    function capCents(s) {
+      var m = /^0*(\d{1,13})(?:\.(\d{1,2}))?$/.exec(s);
+      if (!m) return null;
+      var c = parseInt(m[1], 10) * 100 + (m[2] ? parseInt((m[2] + '0').slice(0, 2), 10) : 0);
+      return c > 0 ? String(c) : null;
+    }
+
+    function run() {
+      var model = R[$('model').value];
+      var bs = $('budget').value.trim().replace(/^\$\s*/, '');
+      if (/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/.test(bs)) bs = bs.replace(/,/g, '');
+      var cap = bs === '' ? '' : capCents(bs);
+      if (cap === null) {
+        $('budget').setAttribute('aria-invalid', 'true');
+        $('budget-err').textContent = 'Enter a dollar amount above 0 with at most 2 decimals, for example 1.25.';
+        $('capOut').textContent = '-';
+      } else {
+        $('budget').removeAttribute('aria-invalid');
+        $('budget-err').textContent = '';
+        $('capOut').textContent = cap === '' ? '-' : '{"amount": "' + cap + '", "currency": "USD"}';
+      }
+      var sessions = read('sessions', { max: 1000000 });
+      var hours = read('hours', { max: 10000 });
+      var inTok = read('inTok', { max: 100000000 });
+      var outTok = read('outTok', { max: 100000000 });
+      var w5Tok = read('w5Tok', { max: 100000000 });
+      var w1Tok = read('w1Tok', { max: 100000000 });
+      var crPct = read('cacheReadPct', { max: 100 });
+      var searches = read('searches', { max: 10000 });
+      var geo = parseFloat($('geo').value);
+      if (sessions === null || hours === null || inTok === null || outTok === null || w5Tok === null || w1Tok === null || crPct === null || searches === null) {
+        ['tokOut','runOut','searchOut','sesOut','monOut'].forEach(function (id) { $(id).textContent = '-'; });
+        $('formulaEcho').textContent = '-';
+        $('verdict').textContent = 'Correct the marked fields to see a result.';
+        return;
+      }
+
+      // token cost per session, USD. Cache reads replace base input on the covered share.
+      var mTok = function (t) { return t / 1000000; };
+      var crTok = inTok * (crPct / 100);
+      var uncTok = inTok - crTok;
+      var tok = (uncTok * model.i + crTok * model.c + w5Tok * model.w5 + w1Tok * model.w1 + outTok * model.o) / 1000000;
+      tok *= geo;
+      var runCost = hours * RUNTIME_PER_HOUR;
+      var searchCost = searches / 1000 * SEARCH_PER_1000;
+      var per = tok + runCost + searchCost;
+
+      $('tokOut').textContent = money(tok);
+      $('runOut').textContent = money(runCost);
+      $('searchOut').textContent = money(searchCost);
+      $('sesOut').textContent = money(per);
+      $('monOut').textContent = money(per * sessions);
+
+      var rt = function (r) { return '$' + r.toLocaleString('en-US', { minimumFractionDigits: r % 1 ? 2 : 0, maximumFractionDigits: 3 }); };
+      var nm = function (n) { return n.toLocaleString('en-US', { maximumFractionDigits: 4 }); };
+      $('formulaEcho').textContent =
+        model.name + '. Tokens = (' + nm(uncTok) + ' uncached input x ' + rt(model.i)
+        + ' + ' + nm(crTok) + ' cache reads x ' + rt(model.c)
+        + ' + ' + nm(w5Tok) + ' 5m cache writes x ' + rt(model.w5)
+        + ' + ' + nm(w1Tok) + ' 1h cache writes x ' + rt(model.w1)
+        + ' + ' + nm(outTok) + ' output x ' + rt(model.o) + ') / 1,000,000'
+        + (geo !== 1 ? ' x 1.1 for us inference geography' : '')
+        + '. Runtime = ' + nm(hours) + ' running hours x $0.08. Search = ' + nm(searches) + ' searches x $10 / 1,000.';
+
+      var bits = [];
+      if (hours > 0) bits.push('Runtime adds ' + money(runCost) + ' per session at $0.08 per session-hour');
+      if (crPct > 0 && inTok > 0) bits.push('Caching ' + crPct + ' percent of input at the cache hit rate saves ' + money(crTok * mTok(1) * (model.i - model.c) * geo) + ' per session versus uncached input');
+      if (cap) bits.push('The budget amount string is "' + cap + '", which is ' + money(parseInt(cap, 10) / 100) + (parseInt(cap, 10) / 100 < per ? ', below the estimated cost of one session, so a session with this profile would reach the cap and pause before it finishes' : ''));
+      if (searches > 0) bits.push(searches.toLocaleString('en-US') + ' search' + (searches === 1 ? ' per session adds ' : 'es per session add ') + money(searchCost));
+      $('verdict').textContent = bits.length
+        ? 'At this profile a session costs ' + money(per) + (sessions > 0 ? ', so ' + sessions.toLocaleString('en-US') + ' sessions per month cost ' + money(per * sessions) : '') + '. ' + bits.join('. ') + '.'
+        : 'At this profile a session costs ' + money(per) + (sessions > 0 ? ', so ' + sessions.toLocaleString('en-US') + ' sessions per month cost ' + money(per * sessions) : '') + '.';
+    }
+
+    ['model','sessions','hours','inTok','outTok','w5Tok','w1Tok','cacheReadPct','searches','geo','budget'].forEach(function (id) {
+      var el = $(id);
+      el.addEventListener('input', run);
+      el.addEventListener('change', run);
+    });
+    run();
+    // The browser can restore form values after this script runs (Back button), so recompute from the restored values.
+    globalThis.onload = run;
+    globalThis.onpageshow = run;
+  })();
+  </script>
+  <script src="/assets/js/cdf-ui.js" defer></script>
+</body>
+</html>
